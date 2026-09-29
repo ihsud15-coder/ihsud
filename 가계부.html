@@ -13,6 +13,7 @@
       --sub: #8b95a1;
       --danger: #f04452;
       --danger-bg: #fff5f5;
+      --warning: #ff9500;
       --success: #00c471;
       --badge-green: #eefcf3;
       --badge-green-border: #bbf7d0;
@@ -33,11 +34,17 @@
     /* 4종 요약 카드 */
     .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px; }
     @media (max-width: 600px) { .summary-grid { grid-template-columns: repeat(2, 1fr); } }
-    .sum-box { background: #f2f4f6; border-radius: 14px; padding: 12px; }
+    .sum-box { background: #f2f4f6; border-radius: 14px; padding: 12px; position: relative; }
     .sum-box label { font-size: 0.75rem; color: var(--sub); display: block; margin-bottom: 4px; font-weight: bold; }
     .sum-box .val { font-size: 1.25rem; font-weight: 800; color: var(--text); }
     .sum-box .val.green { color: var(--success); }
     .sum-box .val.blue { color: var(--primary); }
+    .sum-box .val.danger { color: var(--danger); }
+
+    /* 전체 예산 진행 바 */
+    .budget-gauge-box { margin-top: 14px; background: #f2f4f6; padding: 12px; border-radius: 12px; }
+    .gauge-bg { width: 100%; height: 12px; background: #e5e8eb; border-radius: 6px; overflow: hidden; margin-top: 6px; }
+    .gauge-fill { height: 100%; width: 0%; border-radius: 6px; transition: width 0.3s ease, background-color 0.3s ease; }
 
     /* 소형 고정지출 비율 배지 */
     .fixed-exp-badge {
@@ -45,13 +52,14 @@
       padding: 4px 8px; border-radius: 8px; margin-top: 4px;
     }
 
-    /* 카드 실적 초록색 진행 바 */
+    /* 카드 실적 진행 바 */
     .progress-bar-bg {
       width: 100%; background: #e5e8eb; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 6px;
     }
     .progress-bar-fill {
       height: 100%; background: var(--success); border-radius: 5px; transition: width 0.3s ease;
     }
+    .progress-bar-fill.achieved { background: #9ca3af; } /* 실적 달성 후 회색 */
 
     /* Inputs & Form */
     label { font-size: 0.8rem; color: var(--sub); font-weight: 600; display: block; margin-top: 8px; margin-bottom: 2px; }
@@ -77,11 +85,11 @@
     .day-cell.sat { color: var(--sat-blue); }
     .day-cell.today { border: 2px solid var(--primary); background: #ffffff; }
     
-    /* 4만원 이상 지출일 스타일 */
+    /* 4만원 이상 지출일 */
     .day-cell.high-expense { background: var(--danger-bg); border: 1px solid #fca5a5; }
     .day-cell.high-expense .day-spent { color: var(--danger); font-weight: 800; }
 
-    /* 무지출(0원) 배경 스타일 */
+    /* 무지출(0원) 연초록 배경 */
     .day-cell.no-expense { background: var(--badge-green); border: 1px solid var(--badge-green-border); }
 
     .day-spent { color: #191f28; font-weight: 700; font-size: 0.75rem; word-break: break-all; }
@@ -90,6 +98,14 @@
     .badge-no-spent { 
       font-size: 1.1rem; text-align: center; width: 100%; margin: auto 0;
     }
+
+    /* 카테고리 비율 미니 차트 */
+    .cat-chart-box { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; background: #f8f9fa; padding: 12px; border-radius: 12px; }
+    .cat-bar-item { display: flex; align-items: center; font-size: 0.78rem; gap: 8px; }
+    .cat-bar-name { width: 70px; font-weight: bold; color: var(--text); }
+    .cat-bar-track { flex: 1; height: 8px; background: #e5e8eb; border-radius: 4px; overflow: hidden; }
+    .cat-bar-fill { height: 100%; background: var(--primary); border-radius: 4px; }
+    .cat-bar-val { width: 50px; text-align: right; color: var(--sub); font-size: 0.72rem; }
 
     /* Top List */
     .top-expense-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f4f6; font-size: 0.88rem; }
@@ -124,13 +140,24 @@
             <label>이번 달 총 지출</label>
             <div class="val" id="totalSpentAmt">0원</div>
           </div>
-          <div class="sum-box">
+          <div class="sum-box" id="remainBox">
             <label>남은 변동비 예산</label>
             <div class="val green" id="remainBudgetAmt">0원</div>
           </div>
           <div class="sum-box">
             <label>일평균 지출</label>
             <div class="val" id="avgDailySpent">0원</div>
+          </div>
+        </div>
+
+        <!-- 1. 예산 소진 프로그레스 바 -->
+        <div class="budget-gauge-box">
+          <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:bold;">
+            <span>예산 사용률</span>
+            <span id="gaugeStatus">0% 사용 중</span>
+          </div>
+          <div class="gauge-bg">
+            <div class="gauge-fill" id="gaugeBar"></div>
           </div>
         </div>
       </div>
@@ -145,20 +172,28 @@
         <div class="calendar" id="calendar"></div>
       </div>
 
-      <!-- 이 달의 지출 내역 (수정/삭제 지원) -->
+      <!-- 이 달의 지출 내역 및 카테고리 분석 -->
       <div class="card" id="cardTopExpenses">
         <div class="card-header" onclick="toggleCard('cardTopExpenses')">
           <h2>이 달의 지출 내역 (높은 금액순)</h2>
           <span>▼</span>
         </div>
-        <div class="collapsible-content" id="topExpensesList">
-          <div style="color:var(--sub); font-size:0.85rem; text-align:center; padding:10px 0;">등록된 지출 내역이 없습니다.</div>
+        <div class="collapsible-content">
+          <!-- 4. 카테고리별 비중 미니 차트 -->
+          <div class="cat-chart-box" id="categoryChart">
+            <div style="font-size:0.8rem; font-weight:bold; color:var(--sub);">지출 카테고리 비중</div>
+            <div id="categoryChartItems"></div>
+          </div>
+
+          <div id="topExpensesList">
+            <div style="color:var(--sub); font-size:0.85rem; text-align:center; padding:10px 0;">등록된 지출 내역이 없습니다.</div>
+          </div>
         </div>
       </div>
     </div>
 
     <div>
-      <!-- 지출 입력 및 수정 (기본 접힘) -->
+      <!-- 지출 입력 및 수정 -->
       <div class="card collapsed" id="cardExpense">
         <div class="card-header" onclick="toggleCard('cardExpense')">
           <h2 id="formTitle">지출 입력</h2>
@@ -207,7 +242,7 @@
         </div>
       </div>
 
-      <!-- 예산 설정 (기본 접힘 & 기본 90만원) -->
+      <!-- 예산 설정 -->
       <div class="card collapsed" id="cardBudget">
         <div class="card-header" onclick="toggleCard('cardBudget')">
           <h2><span id="budgetSettingMonth"></span> 예산 설정</h2>
@@ -220,7 +255,7 @@
         </div>
       </div>
 
-      <!-- 카드 실적 및 현황 (초록색 프로그레스 바 적용) -->
+      <!-- 카드 실적 및 현황 (5. 실적 달성 구분 배지 적용) -->
       <div class="card">
         <h2 style="margin:0 0 14px 0; font-size:1.1rem;">결제 수단별 실적 현황</h2>
         
@@ -265,14 +300,14 @@
         </div>
       </div>
 
-      <!-- 데이터 백업 & 안전 이관 -->
+      <!-- 백업 카드 -->
       <div class="card collapsed" id="cardBackup">
         <div class="card-header" onclick="toggleCard('cardBackup')">
           <h2>데이터 백업 / 안전 이관</h2>
           <span>▼</span>
         </div>
         <div class="collapsible-content">
-          <small style="color:var(--sub); display:block; margin-bottom:8px;">깃허브 코드 업데이트 시에도 데이터는 자동 유지됩니다. 필요 시 아래 버튼으로 파일 백업도 가능합니다.</small>
+          <small style="color:var(--sub); display:block; margin-bottom:8px;">데이터는 브라우저에 안전하게 저장됩니다.</small>
           <button onclick="exportData()">클립보드로 데이터 복사</button>
           <button onclick="downloadBackupFile()" style="background:#4b5563; margin-top:6px;">JSON 백업 파일 다운로드</button>
           <button onclick="importData()" style="background:#8b95a1; margin-top:6px;">복사한 코드 붙여넣기 복원</button>
@@ -298,10 +333,7 @@
       if (saved) {
         try { return JSON.parse(saved); } catch(e) {}
       }
-      return {
-        monthlyBudgets: {},
-        expenses: []
-      };
+      return { monthlyBudgets: {}, expenses: [] };
     }
 
     let state = loadState();
@@ -453,10 +485,42 @@
 
       document.getElementById('targetBudgetAmt').innerText = `${targetBudget.toLocaleString()}원`;
       document.getElementById('totalSpentAmt').innerText = `${totalSpent.toLocaleString()}원`;
-      document.getElementById('remainBudgetAmt').innerText = `${remainVariableBudget.toLocaleString()}원`;
+      
+      // 3. 일일 권장 지출 경고등
+      const remainAmtElem = document.getElementById('remainBudgetAmt');
+      remainAmtElem.innerText = `${remainVariableBudget.toLocaleString()}원`;
+      if (dailyTarget < 1000 && remainVariableBudget > 0) {
+        remainAmtElem.className = 'val danger';
+        remainAmtElem.innerText = `🚨 ${remainVariableBudget.toLocaleString()}원`;
+      } else if (remainVariableBudget <= 0) {
+        remainAmtElem.className = 'val danger';
+      } else {
+        remainAmtElem.className = 'val green';
+      }
+
       document.getElementById('avgDailySpent').innerText = `${avgSpent.toLocaleString()}원`;
 
-      // 캘린더 rendering
+      // 1. 전체 예산 게이지 바 업데이트
+      const usedPercent = targetBudget > 0 ? Math.min(100, Math.round((totalSpent / targetBudget) * 100)) : 0;
+      const gaugeBar = document.getElementById('gaugeBar');
+      const gaugeStatus = document.getElementById('gaugeStatus');
+      
+      gaugeBar.style.width = `${usedPercent}%`;
+      if (usedPercent >= 90) {
+        gaugeBar.style.backgroundColor = 'var(--danger)';
+        gaugeStatus.innerText = `🚨 ${usedPercent}% (예산 초과 임계!)`;
+        gaugeStatus.style.color = 'var(--danger)';
+      } else if (usedPercent >= 70) {
+        gaugeBar.style.backgroundColor = 'var(--warning)';
+        gaugeStatus.innerText = `⚠️ ${usedPercent}% 사용 중`;
+        gaugeStatus.style.color = 'var(--warning)';
+      } else {
+        gaugeBar.style.backgroundColor = 'var(--success)';
+        gaugeStatus.innerText = `${usedPercent}% 사용 중`;
+        gaugeStatus.style.color = 'var(--text)';
+      }
+
+      // 캘린더 rendering & 2. 무지출 연속 콤보 계산
       const cal = document.getElementById('calendar');
       cal.innerHTML = '';
       const dayHeaders = ['일', '월', '화', '수', '목', '금', '토'];
@@ -464,6 +528,8 @@
 
       const firstDayIdx = new Date(viewYear, viewMonth, 1).getDay();
       for (let p = 0; p < firstDayIdx; p++) cal.innerHTML += `<div></div>`;
+
+      let currentCombo = 0; // 연속 무지출 카운트
 
       for (let i = 1; i <= lastDay; i++) {
         const dateStr = `${monthKey}-${String(i).padStart(2, '0')}`;
@@ -477,7 +543,6 @@
         const isPastOrToday = dateStr <= systemTodayStr;
         const isToday = dateStr === systemTodayStr;
 
-        // 4만원 이상 지출 스타일
         if (daySpent >= 40000) {
           dayClass += ' high-expense';
         }
@@ -485,10 +550,17 @@
         let contentHtml = '';
         if (isPastOrToday) {
           if (daySpent === 0) {
-            // 무지출 초록색 배경 클래스 추가
+            currentCombo++;
             dayClass += ' no-expense';
-            contentHtml = `<div class="badge-no-spent" title="무지출 성공!">🎉</div>`;
+            
+            // 2. 연속 무지출 콤보 배지 지정
+            let comboBadge = '🎉';
+            if (currentCombo === 2) comboBadge = '🔥';
+            else if (currentCombo >= 3) comboBadge = '👑';
+
+            contentHtml = `<div class="badge-no-spent" title="${currentCombo}일 연속 무지출!">${comboBadge}</div>`;
           } else {
+            currentCombo = 0; // 무지출 리셋
             contentHtml = `<div class="day-spent">${daySpent.toLocaleString()}원</div>`;
           }
         } else {
@@ -503,7 +575,31 @@
         `;
       }
 
-      // 결제 수단별 실적 현황
+      // 4. 카테고리별 비중 미니 차트 생성
+      const catTotals = {};
+      monthExpenses.forEach(e => {
+        catTotals[e.category] = (catTotals[e.category] || 0) + e.actualAmount;
+      });
+      const sortedCats = Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]).slice(0, 5);
+      
+      const catChartBox = document.getElementById('categoryChartItems');
+      if (sortedCats.length === 0) {
+        catChartBox.innerHTML = `<small style="color:var(--sub);">기록된 지출이 없습니다.</small>`;
+      } else {
+        catChartBox.innerHTML = sortedCats.map(cat => {
+          const amt = catTotals[cat];
+          const pct = totalSpent > 0 ? Math.round((amt / totalSpent) * 100) : 0;
+          return `
+            <div class="cat-bar-item">
+              <span class="cat-bar-name">${cat}</span>
+              <div class="cat-bar-track"><div class="cat-bar-fill" style="width: ${pct}%;"></div></div>
+              <span class="cat-bar-val">${pct}%</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 5. 결제 수단별 실적 및 달성 상태 업데이트
       const getCardAmt = (m) => monthExpenses.filter(e => e.method === m).reduce((s, e) => s + e.cardAmount, 0);
       
       const hdAmt = getCardAmt('현대카드');
@@ -511,15 +607,35 @@
       const kbAmt = getCardAmt('국민카드');
       const cashAmt = getCardAmt('현금');
 
-      document.getElementById('hyundaiStatus').innerText = `${hdAmt.toLocaleString()} / 300,000원`;
-      document.getElementById('hyundaiBar').style.width = `${Math.min(100, (hdAmt / 300000) * 100)}%`;
+      // 현대카드 (30만 실적)
+      const hdBar = document.getElementById('hyundaiBar');
+      if (hdAmt >= 300000) {
+        document.getElementById('hyundaiStatus').innerHTML = `${hdAmt.toLocaleString()}원 <small style="color:var(--success);">✅ 실적달성 (사용 자제)</small>`;
+        hdBar.className = 'progress-bar-fill achieved';
+        hdBar.style.width = '100%';
+      } else {
+        document.getElementById('hyundaiStatus').innerText = `${hdAmt.toLocaleString()} / 300,000원`;
+        hdBar.className = 'progress-bar-fill';
+        hdBar.style.width = `${Math.min(100, (hdAmt / 300000) * 100)}%`;
+      }
 
+      // 롯데카드
       document.getElementById('lotteStatus').innerText = `${ltAmt.toLocaleString()}원`;
       document.getElementById('lotteBar').style.width = ltAmt > 0 ? '100%' : '0%';
 
-      document.getElementById('kbStatus').innerText = `${kbAmt.toLocaleString()} / 550,000원`;
-      document.getElementById('kbBar').style.width = `${Math.min(100, (kbAmt / 550000) * 100)}%`;
+      // 국민카드 (55만 실적)
+      const kbBar = document.getElementById('kbBar');
+      if (kbAmt >= 550000) {
+        document.getElementById('kbStatus').innerHTML = `${kbAmt.toLocaleString()}원 <small style="color:var(--success);">✅ 실적달성 (사용 자제)</small>`;
+        kbBar.className = 'progress-bar-fill achieved';
+        kbBar.style.width = '100%';
+      } else {
+        document.getElementById('kbStatus').innerText = `${kbAmt.toLocaleString()} / 550,000원`;
+        kbBar.className = 'progress-bar-fill';
+        kbBar.style.width = `${Math.min(100, (kbAmt / 550000) * 100)}%`;
+      }
 
+      // 현금
       document.getElementById('cashStatus').innerText = `${cashAmt.toLocaleString()}원`;
       document.getElementById('cashBar').style.width = cashAmt > 0 ? '100%' : '0%';
 
