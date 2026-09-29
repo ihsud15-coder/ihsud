@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intro 포트폴리오 면접 준비</title>
+  <style>
+    :root {
+      --primary-color: #0f172a;
+      --accent-color: #2563eb;
+      --sub-accent: #4f46e5;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --border-color: #cbd5e1;
+      --success-color: #16a34a;
+    }
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-color);
+      color: #334155;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 880px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+    /* 컨트롤 바 */
+    .control-bar {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-color);
+      background-color: #fff;
+      color: #334155;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background-color: #f1f5f9;
+    }
+    .btn-primary {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #1d4ed8;
+    }
+    .btn-success {
+      background-color: var(--success-color);
+      color: white;
+      border: none;
+    }
+    .btn-success:hover {
+      background-color: #15803d;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);
+    }
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      border-bottom: 2px solid var(--accent-color);
+      padding-bottom: 8px;
+      margin-top: 0;
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #475569;
+    }
+    input[type="text"], select, textarea {
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent-color);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 85px;
+      line-height: 1.5;
+    }
+    .tip-box {
+      background-color: #eff6ff;
+      border-left: 4px solid var(--accent-color);
+      padding: 10px 14px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+      color: #1e40af;
+      line-height: 1.4;
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-top: 6px;
+    }
+    .checkbox-label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .checkbox-label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    .badge {
+      background-color: #e0e7ff;
+      color: var(--sub-accent);
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .short-q-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .short-q-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .short-q-item span {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #334155;
+    }
+    .short-q-item input {
+      padding: 8px 10px;
+      font-size: 0.88rem;
+    }
+    .btn-print {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .btn-print:hover {
+      background-color: #1d4ed8;
+    }
+    #fileInput { display: none; }
+    @media print {
+      .control-bar, .btn-print { display: none; }
+      body { background: white; padding: 0; }
+      .card { box-shadow: none; border: 1px solid #aaa; page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Intro 포트폴리오 면접 준비</h1>
+
+  <!-- 파일 저장/임시 저장 컨트롤 바 -->
+  <div class="control-bar">
+    <div style="font-size:0.88rem; font-weight:600; color:#475569;">
+      💾 작성 데이터 관리
+    </div>
+    <div class="btn-group">
+      <button class="btn" onclick="saveToLocal()">💾 브라우저 임시 저장</button>
+      <button class="btn btn-primary" onclick="exportToFile()">📥 다른 이름으로 저장 (파일 다운로드)</button>
+      <button class="btn btn-success" onclick="document.getElementById('fileInput').click()">📂 저장된 파일 불러오기</button>
+      <input type="file" id="fileInput" accept=".json" onchange="importFromFile(event)">
+    </div>
+  </div>
+
+  <form id="interviewForm">
+    <!-- 1. 기본 정보 및 고사 일정 -->
+    <div class="card">
+      <h2 class="card-title">기본 정보 및 고사 일정</h2>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>학생 이름</label>
+          <input type="text" id="studentName" placeholder="예: 홍길동">
+        </div>
+        <div class="form-group">
+          <label>지원 대학교</label>
+          <input type="text" id="targetUniversity" placeholder="예: OO대학교">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>지원 학과</label>
+          <select id="department">
+            <option value="애니">애니</option>
+            <option value="만화">만화</option>
+            <option value="만화애니">만화애니</option>
+            <option value="만화웹툰">만화웹툰</option>
+            <option value="게임">게임</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>면접 날짜 및 위치</label>
+          <input type="text" id="interviewSchedule" placeholder="예: 10/24(토) 14:00 / OO대 조형관 301호">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>포트폴리오 제출 상황</label>
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" id="pfPresent"> 당일 지참 (실물/USB)
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="pfSubmitted"> 사전 제출 완료 (온라인/서류)
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 1분 자기소개 -->
+    <div class="card">
+      <h2 class="card-title">
+        1분 자기소개 구상
+        <span class="badge">핵심 첫인상</span>
+      </h2>
+      <div class="tip-box">
+        💡 <strong>1분 자기소개 팁:</strong> 말하기 속도 기준 <strong>350자 ~ 400자 내외(약 45초~50초 분량)</strong>가 가장 적당합니다. 자신을 대표하는 키워드로 시작해 강점과 지원 동기를 자연스럽게 이어가세요.
+      </div>
+      <div class="form-group">
+        <label>1분 자기소개 대본 작성 (350자~400자 권장)</label>
+        <textarea id="introText" style="min-height: 110px;" placeholder="안녕하세요, 끊임없이 연구하고 발전하는 작가 OOO입니다..."></textarea>
+      </div>
+    </div>
+
+    <!-- 3. 인성적 역량 & 공동체 역량 -->
+    <div class="card">
+      <h2 class="card-title">
+        인성적 역량 & 공동체 역량
+        <span class="badge">성실성 · 리더십 · 협동심 · 태도</span>
+      </h2>
+
+      <div class="form-group">
+        <label>Q1. 본인의 장점과 단점은 무엇이며, 단점을 극복하기 위해 어떤 노력을 기울이고 있나요?</label>
+        <textarea id="q1" placeholder="자신의 강점과 더불어 단점을 인지하고 이를 보완하기 위해 실행 중인 구체적 루틴이나 노력 작성"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Q2. 팀 프로젝트나 동아리 등 단체 활동 중 의견 충돌이 생겼을 때, 본인은 어떤 역할을 맡아 어떻게 해결했나요?</label>
+        <textarea id="q2" placeholder="경청과 조율을 통해 공동 목표를 달성했던 경험 작성"></textarea>
+      </div>
+    </div>
+
+    <!-- 4. 전문적 역량 & 진로 역량 -->
+    <div class="card">
+      <h2 class="card-title">
+        전문적 역량 & 진로 역량
+        <span class="badge">지원동기 · 학업의지 · 전공지식</span>
+      </h2>
+
+      <div class="form-group">
+        <label>Q3. 이 학과에 관심을 갖게 된 계기와, 지원한 대학의 커리큘럼(수업) 중 가장 듣고 싶은 과목은 무엇인가요?</label>
+        <textarea id="q3" placeholder="입덕 계기 및 대학 홈페이지에서 확인한 실제 전공 수업 명칭 언급"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Q4. 다른 지원자(타인)와 비교되는 나만의 확실한 강점과, 이를 증명할 수 있는 경험은 무엇인가요?</label>
+        <textarea id="q4" placeholder="시각적·연출적 차별점(예: 독특한 색채감, 몰입도 높은 스토리를 완성했던 경험 등) 작성"></textarea>
+      </div>
+    </div>
+
+    <!-- 5. 창의융합 역량 & 포트폴리오/트렌드 -->
+    <div class="card">
+      <h2 class="card-title">
+        창의융합 역량 & 포트폴리오
+        <span class="badge">트렌드 · 연출의도 · 미래비전</span>
+      </h2>
+
+      <div class="form-group">
+        <label>Q5. 제출(지참)한 포트폴리오 중 가장 애착이 가는 작품의 '기획 의도'와 '연출적 특징'을 설명해 보세요.</label>
+        <textarea id="q5" placeholder="작품의 핵심 메시지, 구도, 색감, 카메라 워크 등 시각적 연출 포인트 작성"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Q6. 최근 이미지/영상 생성형 AI 기술의 발전과 이로 인한 웹툰·애니·게임 업계 변화에 대해 어떻게 생각하며, 본인은 이를 어떻게 활용하거나 차별화를 둘 것인가요?</label>
+        <textarea id="q6" placeholder="AI 기술에 대한 본인의 견해와 인간 창작자로서의 독창성/연출력 차별화 방안 작성"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Q7. 대학 재학 중 또는 졸업 후 진심을 담아 꼭 제작해보고 싶은 본인만의 대표작(세계관/스토리/타겟층)은 무엇인가요?</label>
+        <textarea id="q7" placeholder="만들어보고 싶은 작품의 기획안 및 목표 작성"></textarea>
+      </div>
+    </div>
+
+    <!-- 6. 마지막 한 마디 -->
+    <div class="card">
+      <h2 class="card-title">
+        마지막 한 마디 (마지막 질문 대비)
+        <span class="badge">열정 · 진실성</span>
+      </h2>
+      <div class="tip-box">
+        💡 <strong>Tip:</strong> "없습니다" 대신 간절한 합격 의지를 재강조하거나, 면접 중 미처 전달하지 못한 나만의 강점을 강렬하게 정리해 보세요.
+      </div>
+      <div class="form-group">
+        <label>"마지막으로 하고 싶은 말이 있나요?" 질문 답변</label>
+        <textarea id="lastWord" style="min-height: 80px;" placeholder="오늘 면접을 통해 이 학과에 오고 싶은 이유가 더 명확해졌습니다. 꼭 OO대학교에서 깊이 있게 공부하고 싶습니다!"></textarea>
+      </div>
+    </div>
+
+    <!-- 7. 추가 질문 대비용 (한 줄 연습) -->
+    <div class="card">
+      <h2 class="card-title">
+        추가 질문 대비용 (한 줄 연습)
+        <span class="badge">순발력 · 돌발질문</span>
+      </h2>
+      <div class="short-q-list">
+        <div class="short-q-item">
+          <span>1. 가장 존경하는 롤모델(작가/감독/크리에이터)과 그 이유는?</span>
+          <input type="text" id="short1" placeholder="인물명 및 존경하는 연출/작품적 이유">
+        </div>
+        <div class="short-q-item">
+          <span>2. 작업 중 지치거나 슬럼프가 왔을 때 극복하는 자신만의 방법은?</span>
+          <input type="text" id="short2" placeholder="스트레스 해소 및 재충전 루틴">
+        </div>
+        <div class="short-q-item">
+          <span>3. 최근 감명 깊게 읽은 책/영화/웹툰/전시회와 느낀 점은?</span>
+          <input type="text" id="short3" placeholder="작품명 및 창작자로서 느낀 점">
+        </div>
+        <div class="short-q-item">
+          <span>4. 최근 관심을 가졌던 사회적 이슈나 예술/기술적 트렌드는?</span>
+          <input type="text" id="short4" placeholder="이슈 및 본인의 시각">
+        </div>
+        <div class="short-q-item">
+          <span>5. 자신만의 좋은 습관과 나쁜 습관은 무엇인가요?</span>
+          <input type="text" id="short5" placeholder="습관 및 개선 태도">
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <button class="btn-print" onclick="window.print()">📄 작성한 면접 워크시트 인쇄 / PDF 저장하기</button>
+</div>
+
+<script>
+  function getFormData() {
+    const form = document.getElementById('interviewForm');
+    const formData = {};
+    const inputs = form.querySelectorAll('input, select, textarea');
+    
+    inputs.forEach(input => {
+      if (input.type === 'checkbox') {
+        formData[input.id] = input.checked;
+      } else if (input.id) {
+        formData[input.id] = input.value;
+      }
+    });
+    return formData;
+  }
+
+  function applyFormData(data) {
+    if (!data) return;
+    Object.keys(data).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        if (el.type === 'checkbox') {
+          el.checked = data[id];
+        } else {
+          el.value = data[id];
+        }
+      }
+    });
+  }
+
+  function saveToLocal(silent = false) {
+    const data = getFormData();
+    localStorage.setItem('interview_sheet_data', JSON.stringify(data));
+    if (!silent) alert('브라우저에 임시 저장되었습니다.');
+  }
+
+  function exportToFile() {
+    const data = getFormData();
+    const name = data.studentName || '학생';
+    const uni = data.targetUniversity || '면접준비';
+    const filename = `${name}_${uni}_면접준비노트.json`;
+    
+    const jsonStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function importFromFile(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        applyFormData(data);
+        saveToLocal(true);
+        alert('파일을 불러와 적용했습니다.');
+      } catch (err) {
+        alert('올바른 파일 형식이 아닙니다.');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('interview_sheet_data');
+    if (saved) {
+      try {
+        applyFormData(JSON.parse(saved));
+      } catch(e) {}
+    }
+
+    document.getElementById('interviewForm').addEventListener('input', () => {
+      saveToLocal(true);
+    });
+  });
+</script>
+
+</body>
+</html>
