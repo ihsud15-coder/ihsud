@@ -3,250 +3,871 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>가계부 캘린더 UI</title>
+  <title>스마트 가계부 Pro</title>
   <style>
-    /* 기본 스타일 및 리셋 */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    :root { 
+      --primary: #3182f6; 
+      --bg: #f8f9fa; 
+      --card: #ffffff; 
+      --text: #191f28; 
+      --sub: #8b95a1;
+      --danger: #f04452;
+      --danger-bg: #fff5f5;
+      --warning: #ff9500;
+      --success: #00c471;
+      --badge-green: #eefcf3;
+      --badge-green-border: #bbf7d0;
+      --sun-red: #ef4444;
+      --sat-blue: #3b82f6;
     }
 
-    body {
-      padding: 20px;
-      background-color: #f8f9fa;
-      display: flex;
-      justify-content: center;
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 16px; }
+    .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
+    @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
+
+    .card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.03); margin-bottom: 16px; border: 1px solid #f2f4f6; position: relative; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+    .card-header h2 { margin: 0; font-size: 1.1rem; }
+    .collapsed .collapsible-content { display: none; }
+    .collapsible-content { margin-top: 15px; }
+
+    /* 요약 카드리스트 (5종) */
+    .summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 12px; }
+    @media (max-width: 768px) { .summary-grid { grid-template-columns: repeat(2, 1fr); } }
+    .sum-box { background: #f2f4f6; border-radius: 14px; padding: 12px; position: relative; }
+    .sum-box label { font-size: 0.73rem; color: var(--sub); display: block; margin-bottom: 4px; font-weight: bold; }
+    .sum-box .val { font-size: 1.15rem; font-weight: 800; color: var(--text); }
+    .sum-box .val.green { color: var(--success); }
+    .sum-box .val.blue { color: var(--primary); }
+    .sum-box .val.danger { color: var(--danger); }
+    .sum-box .game-reward { font-size: 0.7rem; font-weight: bold; margin-top: 4px; display: block; }
+
+    /* 전체 예산 진행 바 */
+    .budget-gauge-box { margin-top: 14px; background: #f2f4f6; padding: 12px; border-radius: 12px; }
+    .gauge-bg { width: 100%; height: 12px; background: #e5e8eb; border-radius: 6px; overflow: hidden; margin-top: 6px; }
+    .gauge-fill { height: 100%; width: 0%; border-radius: 6px; transition: width 0.3s ease, background-color 0.3s ease; }
+
+    /* 고정지출 비율 배지 */
+    .fixed-exp-badge {
+      display: inline-block; background: #eef2ff; color: #4f46e5; font-size: 0.72rem; font-weight: 700;
+      padding: 4px 8px; border-radius: 8px; margin-top: 4px;
     }
 
-    /* 캘린더 컨테이너 */
-    .calendar-container {
-      width: 100%;
-      max-width: 800px;
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-    }
+    /* 카드 실적 진행 바 */
+    .progress-bar-bg { width: 100%; background: #e5e8eb; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 6px; }
+    .progress-bar-fill { height: 100%; background: var(--success); border-radius: 5px; transition: width 0.3s ease; }
+    .progress-bar-fill.achieved { background: #9ca3af; }
 
-    /* 캘린더 헤더 (요일) */
-    .calendar-header {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      background-color: #f1f3f5;
-      text-align: center;
-      font-weight: bold;
-      font-size: 14px;
-      color: #495057;
-      border-bottom: 1px solid #dee2e6;
-    }
+    /* Inputs & Form */
+    label { font-size: 0.8rem; color: var(--sub); font-weight: 600; display: block; margin-top: 8px; margin-bottom: 2px; }
+    input, select, button { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #e5e8eb; box-sizing: border-box; font-size: 0.9rem; outline: none; }
+    button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    button:hover { opacity: 0.9; }
 
-    .calendar-header div {
-      padding: 10px 0;
-    }
+    /* Month Selector */
+    .month-picker { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .month-picker button { width: auto; padding: 6px 14px; margin: 0; background: #e8f3ff; color: var(--primary); }
 
-    /* 캘린더 본문 (날짜 셀) */
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      grid-auto-rows: minmax(90px, auto);
-    }
+    /* 캘린더 */
+    .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
+    .day-header { font-size: 0.82rem; color: var(--sub); padding: 4px 0; font-style: italic; }
+    .day-header:nth-child(1) { color: var(--sun-red); }
+    .day-header:nth-child(7) { color: var(--sat-blue); }
 
-    /* 날짜 칸 */
-    .calendar-day {
-      border-right: 1px solid #edf2f7;
-      border-bottom: 1px solid #edf2f7;
-      padding: 6px;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      background-color: #fff;
+    .day-cell { 
+      background: #f2f4f6; border-radius: 12px; padding: 8px 6px; min-height: 72px; font-size: 0.8rem; 
+      position: relative; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid transparent;
     }
+    .day-cell.sun { color: var(--sun-red); }
+    .day-cell.sat { color: var(--sat-blue); }
+    .day-cell.today { border: 2px solid var(--primary); background: #ffffff; }
+    .day-cell.high-expense { background: var(--danger-bg); border: 1px solid #fca5a5; }
+    .day-cell.high-expense .day-spent { color: var(--danger); font-weight: 800; }
+    .day-cell.no-expense { background: var(--badge-green); border: 1px solid var(--badge-green-border); }
 
-    .calendar-day:nth-child(7n) {
-      border-right: none; /* 마지막 열 우측 테두리 제거 */
-    }
+    .day-spent { color: #191f28; font-weight: 700; font-size: 0.75rem; word-break: break-all; }
+    .day-target { color: #8b95a1; font-size: 0.72rem; word-break: break-all; }
+    .badge-no-spent { font-size: 1.1rem; text-align: center; width: 100%; margin: auto 0; }
 
-    /* 날짜 숫자 */
-    .day-number {
-      font-size: 12px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 4px;
-    }
+    /* 카테고리 미니 차트 및 비교 */
+    .cat-chart-box { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; background: #f8f9fa; padding: 12px; border-radius: 12px; }
+    .cat-bar-item { display: flex; align-items: center; font-size: 0.78rem; gap: 8px; }
+    .cat-bar-name { width: 100px; font-weight: bold; color: var(--text); }
+    .cat-bar-track { flex: 1; height: 8px; background: #e5e8eb; border-radius: 4px; overflow: hidden; }
+    .cat-bar-fill { height: 100%; background: var(--primary); border-radius: 4px; }
+    .cat-bar-val { width: 45px; text-align: right; color: var(--sub); font-size: 0.72rem; }
+    .cat-bar-diff { width: 85px; text-align: right; font-weight: bold; font-size: 0.72rem; }
 
-    .calendar-day.sunday .day-number { color: #e53e3e; }
-    .calendar-day.saturday .day-number { color: #3182ce; }
-    .calendar-day.other-month { background-color: #f7fafc; opacity: 0.5; }
+    /* 태그 분석 바 */
+    .tag-container { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .tag-chip { background: #e8f3ff; color: var(--primary); font-size: 0.75rem; padding: 4px 8px; border-radius: 12px; cursor: pointer; font-weight: 600; }
+    .tag-chip:hover, .tag-chip.active { background: var(--primary); color: white; }
 
-    /* 💡 이모지 컨테이너 (핵심 CSS) */
-    .category-emojis {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 3px;
-      align-content: flex-start;
-    }
+    /* Top List */
+    .top-expense-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f4f6; font-size: 0.88rem; }
+    .rank-num { font-weight: bold; color: var(--primary); width: 24px; }
+    .waste-badge { background: #fee2e2; color: var(--danger); font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 6px; margin-left: 4px; }
+    
+    .action-btn { width: auto; padding: 4px 8px; font-size: 0.75rem; border-radius: 6px; margin-top: 0; display: inline-block; }
+    .btn-edit { background: #e8f3ff; color: var(--primary); }
+    .btn-del { background: #fee2e2; color: var(--danger); }
 
-    /* 이모지 아이템 배지 */
-    .emoji-item {
-      position: relative;
-      font-size: 12px; /* 이모지 크기 지정 */
-      line-height: 1;
-      padding: 3px;
-      background-color: #f1f5f9;
-      border-radius: 6px;
-      cursor: pointer;
-      user-select: none;
-      transition: transform 0.15s ease, background-color 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .emoji-item:hover {
-      transform: scale(1.25);
-      background-color: #e2e8f0;
-      z-index: 10;
-    }
-
-    /* 동일 카테고리 복수 발생 시 갯수 표기 배지 */
-    .emoji-count {
-      position: absolute;
-      top: -3px;
-      right: -4px;
-      background-color: #ef4444;
-      color: white;
-      font-size: 8px;
-      font-weight: bold;
-      border-radius: 10px;
-      padding: 1px 3px;
-      line-height: 1;
-    }
+    .fixed-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #e5e8eb; font-size: 0.85rem; }
   </style>
 </head>
 <body>
+  <div class="container">
+    <div>
+      <!-- 상단 요약 카드 -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+          <div>
+            <h1 id="pageTitle" style="margin:0; font-size:1.4rem; font-weight:800;">가계부</h1>
+            <small style="color:var(--sub); font-size:0.78rem;">고정지출 목록 차감 후 순수 변동비 기준 일일 권장 지출액 계산</small>
+          </div>
+          <span style="font-size:0.75rem; color:var(--sub); font-style:italic;" id="todayReference"></span>
+        </div>
 
-  <div class="calendar-container">
-    <div class="calendar-header">
-      <div style="color: #e53e3e;">일</div>
-      <div>월</div>
-      <div>화</div>
-      <div>수</div>
-      <div>목</div>
-      <div>금</div>
-      <div style="color: #3182ce;">토</div>
+        <div class="summary-grid">
+          <div class="sum-box">
+            <label>목표 예산</label>
+            <div class="val blue" id="targetBudgetAmt">0원</div>
+            <div class="fixed-exp-badge" id="fixedExpRatio">고정지출 0% (0원)</div>
+          </div>
+          <div class="sum-box">
+            <label>이번 달 총 지출</label>
+            <div class="val" id="totalSpentAmt">0원</div>
+          </div>
+          <div class="sum-box" id="remainBox">
+            <label>남은 변동비 예산</label>
+            <div class="val green" id="remainBudgetAmt">0원</div>
+          </div>
+          <div class="sum-box">
+            <label>오늘 권장 예산 🎮</label>
+            <div class="val" id="todayRecommendAmt">0원</div>
+            <span class="game-reward" id="gameRewardText"></span>
+          </div>
+          <div class="sum-box">
+            <label>일평균 지출</label>
+            <div class="val" id="avgDailySpent">0원</div>
+          </div>
+        </div>
+
+        <!-- 예산 소진 프로그레스 바 -->
+        <div class="budget-gauge-box">
+          <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:bold;">
+            <span>예산 사용률</span>
+            <span id="gaugeStatus">0% 사용 중</span>
+          </div>
+          <div class="gauge-bg">
+            <div class="gauge-fill" id="gaugeBar"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 캘린더 영역 -->
+      <div class="card">
+        <div class="month-picker">
+          <button onclick="changeMonth(-1)">◀ 이전달</button>
+          <h2 id="currentMonthTitle" style="margin:0; font-size:1.2rem;">캘린더</h2>
+          <button onclick="changeMonth(1)">다음달 ▶</button>
+        </div>
+        <div class="calendar" id="calendar"></div>
+      </div>
+
+      <!-- 이 달의 지출 내역 및 전월 대비 분석 -->
+      <div class="card" id="cardTopExpenses">
+        <div class="card-header" onclick="toggleCard('cardTopExpenses')">
+          <h2>이 달의 지출 분석 & 내역 (금액순)</h2>
+          <span>▼</span>
+        </div>
+        <div class="collapsible-content">
+          <!-- 카테고리 비중 및 전월 대비 비교 -->
+          <div class="cat-chart-box">
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:bold; color:var(--sub); margin-bottom:4px;">
+              <span>카테고리별 비중</span>
+              <span>전월 동기간 대비</span>
+            </div>
+            <div id="categoryChartItems"></div>
+          </div>
+
+          <!-- 태그 파싱 칩 목록 -->
+          <div style="font-size:0.8rem; font-weight:bold; color:var(--sub); margin-bottom:6px;">이달의 주요 해시태그 (#클릭시 필터)</div>
+          <div class="tag-container" id="tagChips"></div>
+
+          <!-- 지출 리스트 -->
+          <div id="topExpensesList">
+            <div style="color:var(--sub); font-size:0.85rem; text-align:center; padding:10px 0;">등록된 지출 내역이 없습니다.</div>
+          </div>
+        </div>
+      </div>
     </div>
-    
-    <!-- 달력 날짜 셀 영역 -->
-    <div class="calendar-grid" id="calendarGrid"></div>
+
+    <div>
+      <!-- 지출 입력 및 수정 -->
+      <div class="card" id="cardExpense">
+        <div class="card-header" onclick="toggleCard('cardExpense')">
+          <h2 id="formTitle">지출 입력</h2>
+          <span>▼</span>
+        </div>
+        <div class="collapsible-content">
+          <input type="hidden" id="editId">
+          
+          <label>날짜</label>
+          <input type="date" id="expDate">
+          
+          <label>내역 (태그 가능: 예: 편의점 #야식)</label>
+          <input type="text" id="expTitle" placeholder="예: 카카오T #지각, 점심 #외식">
+
+          <label>결제 금액</label>
+          <input type="number" id="expAmount" placeholder="원">
+
+          <div style="display:flex; gap:10px; margin-top:8px;">
+            <label style="display:flex; align-items:center; gap:4px; margin:0; cursor:pointer;">
+              <input type="checkbox" id="isSplit" onchange="toggleSplitInput()" style="width:auto;"> N빵 계산
+            </label>
+            <label style="display:flex; align-items:center; gap:4px; margin:0; cursor:pointer; color:var(--danger);">
+              <input type="checkbox" id="isWaste" style="width:auto;"> 🚨 낭비(충동구매)
+            </label>
+          </div>
+
+          <div id="splitBox" style="display:none; margin-top:8px;">
+            <label>나누기 (N명)</label>
+            <input type="number" id="expSplit" value="2" min="1">
+          </div>
+
+          <label>카테고리</label>
+          <select id="expCategory">
+            <option>식비(식재료)</option>
+            <option>식비(외식/배달)</option>
+            <option>교통(대중교통)</option>
+            <option>교통(택시)</option>
+            <option>주거(월세/관리비)</option>
+            <option>통신(휴대폰/인터넷)</option>
+            <option>의료/건강</option>
+            <option>교육/자기계발</option>
+            <option>의류/패션</option>
+            <option>문화여가</option>
+            <option>술유흥</option>
+            <option>생활</option>
+            <option>카페간식</option>
+            <option>보험비</option>
+            <option>뷰티미용</option>
+            <option>경조선물</option>
+            <option>여행숙박</option>
+          </select>
+
+          <label>결제 수단</label>
+          <select id="expMethod">
+            <option>현대카드</option>
+            <option>롯데카드</option>
+            <option>국민카드</option>
+            <option>현금</option>
+          </select>
+
+          <button onclick="saveExpense()" id="btnSaveExpense">등록하기</button>
+          <button onclick="resetExpenseForm()" id="btnCancelEdit" style="display:none; background:#8b95a1; margin-top:6px;">수정 취소</button>
+        </div>
+      </div>
+
+      <!-- 고정지출 상세 관리 (신규 추가) -->
+      <div class="card collapsed" id="cardFixedExpenses">
+        <div class="card-header" onclick="toggleCard('cardFixedExpenses')">
+          <h2>📌 고정지출 상세 관리</h2>
+          <span>▼</span>
+        </div>
+        <div class="collapsible-content">
+          <small style="color:var(--sub); display:block; margin-bottom:10px;">매달 정기적으로 나가는 구독료, 월세 등을 등록하세요. 예산에서 자동으로 공제됩니다.</small>
+          
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+            <input type="text" id="fixedName" placeholder="항목명 (예: 넷플릭스)">
+            <input type="number" id="fixedAmount" placeholder="금액 (원)">
+          </div>
+          <button onclick="addFixedItem()" style="background:#4f46e5;">고정지출 항목 추가</button>
+
+          <div id="fixedList" style="margin-top:12px;"></div>
+        </div>
+      </div>
+
+      <!-- 예산 설정 -->
+      <div class="card collapsed" id="cardBudget">
+        <div class="card-header" onclick="toggleCard('cardBudget')">
+          <h2><span id="budgetSettingMonth"></span> 목표 예산 설정</h2>
+          <span>▼</span>
+        </div>
+        <div class="collapsible-content">
+          <label>이 달의 목표 총 예산 설정 (원)</label>
+          <input type="number" id="budgetInput" value="900000" placeholder="예: 900000">
+          <button onclick="updateMonthBudget()">목표 예산 저장</button>
+        </div>
+      </div>
+
+      <!-- 카드사 총 이용대금 및 결제 수단별 실적 현황 -->
+      <div class="card">
+        <h2 style="margin:0 0 14px 0; font-size:1.1rem;">결제 수단별 이용대금 & 실적</h2>
+        
+        <!-- 현대카드 -->
+        <div style="margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:bold;">
+            <span>현대카드</span><span id="hyundaiStatus">0원 / 30만</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="hyundaiBar" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- 롯데카드 -->
+        <div style="margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:bold;">
+            <span>롯데카드 (총 이용)</span><span id="lotteStatus">0원</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="lotteBar" style="width: 100%;"></div>
+          </div>
+        </div>
+
+        <!-- 국민카드 -->
+        <div style="margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:bold;">
+            <span>국민카드</span><span id="kbStatus">0원 / 55만</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="kbBar" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- 현금 -->
+        <div>
+          <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:bold;">
+            <span>💵 현금 지출</span><span id="cashStatus">0원</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="cashBar" style="width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 데이터 백업 -->
+      <div class="card collapsed" id="cardBackup">
+        <div class="card-header" onclick="toggleCard('cardBackup')">
+          <h2>데이터 백업 / 안전 이관</h2>
+          <span>▼</span>
+        </div>
+        <div class="collapsible-content">
+          <button onclick="exportData()">클립보드로 데이터 복사</button>
+          <button onclick="downloadBackupFile()" style="background:#4b5563; margin-top:6px;">JSON 백업 파일 다운로드</button>
+          <button onclick="importData()" style="background:#8b95a1; margin-top:6px;">복사한 코드 붙여넣기 복원</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    // 1. 카테고리 매핑 정의
-    const CATEGORIES = {
-      HOME_FOOD:    { emoji: '🍚', name: '식비 (집밥)' },
-      EAT_OUT:      { emoji: '🍔', name: '식비 (외식)' },
-      CAFE:         { emoji: '☕', name: '카페·간식' },
-      ALCOHOL:      { emoji: '🍻', name: '술·유흥' },
-      GROCERY:      { emoji: '🛒', name: '생활용품' },
-      TRANSPORT:    { emoji: '🚌', name: '교통·차량' },
-      BEAUTY:       { emoji: '✂️', name: '뷰티·미용' },
-      CULTURE:      { emoji: '🍿', name: '문화·여가' },
-      SHOPPING:     { emoji: '📦', name: '쇼핑·잡화' },
-      HOUSING:      { emoji: '🏠', name: '주거·통신' },
-      HEALTH:       { emoji: '💊', name: '의료·건강' },
-      GIFT:         { emoji: '🎁', name: '경조사·선물' },
-      TRAVEL:       { emoji: '✈️', name: '여행·숙박' },
-      FIXED:        { emoji: '📌', name: '고정지출' }
-    };
+    const systemToday = new Date();
+    const systemTodayStr = `${systemToday.getFullYear()}-${String(systemToday.getMonth()+1).padStart(2,'0')}-${String(systemToday.getDate()).padStart(2,'0')}`;
 
-    // 2. 가상의 일자별 지출 데이터 샘플
-    const sampleData = {
-      15: [
-        { category: 'EAT_OUT', amount: 15000, memo: '점심 버거킹' },
-        { category: 'CAFE', amount: 4500, memo: '아이스 아메리카노' },
-        { category: 'CAFE', amount: 3800, memo: '퇴근길 디저트' },
-        { category: 'TRANSPORT', amount: 1400, memo: '지하철' }
-      ],
-      16: [
-        { category: 'HOME_FOOD', amount: 25000, memo: '마트 장보기' },
-        { category: 'GROCERY', amount: 12000, memo: '휴지 및 세제' }
-      ],
-      20: [
-        { category: 'FIXED', amount: 65000, memo: '알뜰폰 통신비' },
-        { category: 'HOUSING', amount: 50000, memo: '아파트 관리비' }
-      ],
-      25: [
-        { category: 'ALCOHOL', amount: 45000, memo: '팀 회식' },
-        { category: 'TRANSPORT', amount: 18000, memo: '야간 택시' }
-      ]
-    };
+    let viewYear = systemToday.getFullYear();
+    let viewMonth = systemToday.getMonth();
+    let activeTagFilter = null;
 
-    // 3. 캘린더 생성 및 이모지 렌더링 로직
-    const calendarGrid = document.getElementById('calendarGrid');
+    const STORAGE_KEY = 'my_ledger_app_data_v2';
 
-    function renderCalendar() {
-      // 1일부터 30일까지 샘플 달력 렌더링
-      for (let day = 1; day <= 30; day++) {
-        const dayCell = document.createElement('div');
-        dayCell.className = 'calendar-day';
+    function loadState() {
+      let saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) {
+        saved = localStorage.getItem('my_ledger_app_data') || localStorage.getItem('my_ledger_v11');
+      }
+      if (saved) {
+        try { 
+          const parsed = JSON.parse(saved);
+          if (!parsed.fixedItems) parsed.fixedItems = [];
+          return parsed;
+        } catch(e) {}
+      }
+      return { monthlyBudgets: {}, expenses: [], fixedItems: [] };
+    }
 
-        // 날짜 표시
-        const dayNum = document.createElement('span');
-        dayNum.className = 'day-number';
-        dayNum.textContent = day;
-        dayCell.appendChild(dayNum);
+    let state = loadState();
 
-        // 해당 날짜의 지출 데이터가 있는 경우 이모지 집계 처리
-        if (sampleData[day]) {
-          const emojiContainer = document.createElement('div');
-          emojiContainer.className = 'category-emojis';
+    function toggleCard(id) { document.getElementById(id).classList.toggle('collapsed'); }
 
-          // 카테고리별 중복 개수 및 합계 금액 계산
-          const summary = {};
-          sampleData[day].forEach(item => {
-            if (!summary[item.category]) {
-              summary[item.category] = { count: 0, totalAmount: 0, memos: [] };
-            }
-            summary[item.category].count += 1;
-            summary[item.category].totalAmount += item.amount;
-            summary[item.category].memos.push(item.memo);
-          });
+    function toggleSplitInput() {
+      const isSplit = document.getElementById('isSplit').checked;
+      document.getElementById('splitBox').style.display = isSplit ? 'block' : 'none';
+    }
 
-          // 집계된 카테고리별로 이모지 엘리먼트 생성
-          Object.keys(summary).forEach(catKey => {
-            const catInfo = CATEGORIES[catKey];
-            const data = summary[catKey];
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      render();
+    }
 
-            const emojiEl = document.createElement('div');
-            emojiEl.className = 'emoji-item';
-            emojiEl.innerHTML = catInfo.emoji;
+    function changeMonth(delta) {
+      viewMonth += delta;
+      if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+      else if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+      activeTagFilter = null;
+      render();
+    }
 
-            // 마우스 호버 시 보여줄 Tooltip 텍스트 설정
-            const tooltipText = `[${catInfo.name}]\n- 건수: ${data.count}건\n- 합계: ${data.totalAmount.toLocaleString()}원\n- 내역: ${data.memos.join(', ')}`;
-            emojiEl.setAttribute('title', tooltipText);
+    function getMonthKey(y = viewYear, m = viewMonth) { 
+      return `${y}-${String(m + 1).padStart(2, '0')}`; 
+    }
 
-            // 동일 카테고리 지출이 2건 이상인 경우 빨간색 숫자 배지 표시
-            if (data.count > 1) {
-              const countBadge = document.createElement('span');
-              countBadge.className = 'emoji-count';
-              countBadge.textContent = data.count;
-              emojiEl.appendChild(countBadge);
-            }
+    function updateMonthBudget() {
+      const val = Number(document.getElementById('budgetInput').value);
+      if (!val && val !== 0) return alert('올바른 예산 금액을 입력하세요.');
+      state.monthlyBudgets[getMonthKey()] = val;
+      save();
+      alert(`${viewMonth + 1}월 목표 예산이 저장되었습니다.`);
+    }
 
-            emojiContainer.appendChild(emojiEl);
-          });
+    /* 고정지출 항목 추가/삭제 */
+    function addFixedItem() {
+      const name = document.getElementById('fixedName').value.trim();
+      const amount = Number(document.getElementById('fixedAmount').value);
+      if (!name || !amount) return alert('고정지출 항목명과 금액을 입력하세요.');
+      
+      state.fixedItems.push({ id: Date.now(), name, amount });
+      document.getElementById('fixedName').value = '';
+      document.getElementById('fixedAmount').value = '';
+      save();
+    }
 
-          dayCell.appendChild(emojiContainer);
-        }
-
-        calendarGrid.appendChild(dayCell);
+    function deleteFixedItem(id) {
+      if (confirm('이 고정지출 항목을 삭제하시겠습니까?')) {
+        state.fixedItems = state.fixedItems.filter(item => item.id !== id);
+        save();
       }
     }
 
-    // 캘린더 실행
-    renderCalendar();
+    function saveExpense() {
+      const editId = document.getElementById('editId').value;
+      const date = document.getElementById('expDate').value;
+      const title = document.getElementById('expTitle').value;
+      const amount = Number(document.getElementById('expAmount').value);
+      const isSplit = document.getElementById('isSplit').checked;
+      const isWaste = document.getElementById('isWaste').checked;
+      const split = isSplit ? (Number(document.getElementById('expSplit').value) || 1) : 1;
+      const category = document.getElementById('expCategory').value;
+      const method = document.getElementById('expMethod').value;
+
+      if (!date || !amount) return alert('날짜와 결제 금액을 입력해주세요.');
+
+      if (editId) {
+        const idx = state.expenses.findIndex(e => e.id == editId);
+        if (idx !== -1) {
+          state.expenses[idx] = {
+            ...state.expenses[idx],
+            date, title,
+            cardAmount: amount,
+            actualAmount: Math.floor(amount / split),
+            split, isWaste, category, method
+          };
+        }
+      } else {
+        state.expenses.push({ 
+          id: Date.now(), date, title, 
+          cardAmount: amount, 
+          actualAmount: Math.floor(amount / split), 
+          split, isWaste, category, method 
+        });
+      }
+      
+      save();
+      resetExpenseForm();
+    }
+
+    function editExpense(id) {
+      const exp = state.expenses.find(e => e.id === id);
+      if (!exp) return;
+
+      document.getElementById('editId').value = exp.id;
+      document.getElementById('expDate').value = exp.date;
+      document.getElementById('expTitle').value = exp.title || '';
+      document.getElementById('expAmount').value = exp.cardAmount;
+      document.getElementById('isWaste').checked = !!exp.isWaste;
+      
+      const isSplit = exp.split > 1;
+      document.getElementById('isSplit').checked = isSplit;
+      document.getElementById('expSplit').value = exp.split || 2;
+      toggleSplitInput();
+
+      document.getElementById('expCategory').value = exp.category;
+      document.getElementById('expMethod').value = exp.method;
+
+      document.getElementById('formTitle').innerText = '지출 내역 수정';
+      document.getElementById('btnSaveExpense').innerText = '수정 완료';
+      document.getElementById('btnCancelEdit').style.display = 'block';
+
+      document.getElementById('cardExpense').classList.remove('collapsed');
+      document.getElementById('expTitle').focus();
+    }
+
+    function deleteExpense(id) {
+      if (confirm('이 지출 내역을 삭제하시겠습니까?')) {
+        state.expenses = state.expenses.filter(e => e.id !== id);
+        save();
+      }
+    }
+
+    function resetExpenseForm() {
+      document.getElementById('editId').value = '';
+      document.getElementById('expDate').value = systemTodayStr;
+      document.getElementById('expTitle').value = '';
+      document.getElementById('expAmount').value = '';
+      document.getElementById('isSplit').checked = false;
+      document.getElementById('isWaste').checked = false;
+      toggleSplitInput();
+      
+      document.getElementById('formTitle').innerText = '지출 입력';
+      document.getElementById('btnSaveExpense').innerText = '등록하기';
+      document.getElementById('btnCancelEdit').style.display = 'none';
+    }
+
+    function filterByTag(tag) {
+      activeTagFilter = activeTagFilter === tag ? null : tag;
+      render();
+    }
+
+    function render() {
+      const monthKey = getMonthKey();
+      document.getElementById('pageTitle').innerText = `${viewYear}년 ${viewMonth + 1}월 가계부`;
+      document.getElementById('currentMonthTitle').innerText = `${viewMonth + 1}월 캘린더`;
+      document.getElementById('budgetSettingMonth').innerText = `${viewMonth + 1}월`;
+      document.getElementById('todayReference').innerText = `기준월: ${viewYear}년 ${viewMonth + 1}월`;
+
+      const targetBudget = state.monthlyBudgets[monthKey] ?? 900000;
+      document.getElementById('budgetInput').value = targetBudget;
+
+      // 고정지출 총 합계
+      const fixedTotal = state.fixedItems.reduce((sum, item) => sum + item.amount, 0);
+
+      // 고정지출 리스트 렌더링
+      const fixedContainer = document.getElementById('fixedList');
+      if (state.fixedItems.length === 0) {
+        fixedContainer.innerHTML = `<small style="color:var(--sub);">등록된 고정지출 항목이 없습니다.</small>`;
+      } else {
+        fixedContainer.innerHTML = state.fixedItems.map(item => `
+          <div class="fixed-item">
+            <span>📌 ${item.name}</span>
+            <div>
+              <strong>${item.amount.toLocaleString()}원</strong>
+              <button class="action-btn btn-del" onclick="deleteFixedItem(${item.id})" style="margin-left:6px;">삭제</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const monthExpenses = state.expenses.filter(e => e.date && e.date.startsWith(monthKey));
+      const totalSpent = monthExpenses.reduce((sum, e) => sum + e.actualAmount, 0);
+
+      const fixedRatio = targetBudget > 0 ? ((fixedTotal / targetBudget) * 100).toFixed(1) : 0;
+      document.getElementById('fixedExpRatio').innerText = `고정지출 ${fixedRatio}% (${fixedTotal.toLocaleString()}원)`;
+
+      const netVariableBudget = targetBudget - fixedTotal;
+      const remainVariableBudget = netVariableBudget - totalSpent;
+
+      const lastDay = new Date(viewYear, viewMonth + 1, 0).getDate();
+      
+      let pastDaysCount = lastDay;
+      if (viewYear === systemToday.getFullYear() && viewMonth === systemToday.getMonth()) {
+        pastDaysCount = Math.min(lastDay, systemToday.getDate());
+      } else if (viewYear > systemToday.getFullYear() || (viewYear === systemToday.getFullYear() && viewMonth > systemToday.getMonth())) {
+        pastDaysCount = 0;
+      }
+
+      const remainingDays = Math.max(1, lastDay - pastDaysCount + 1); // 오늘 포함 남은 일수
+      const dailyTarget = remainVariableBudget > 0 ? Math.floor(remainVariableBudget / remainingDays) : 0;
+      const avgSpent = pastDaysCount > 0 ? Math.floor(totalSpent / pastDaysCount) : 0;
+
+      // 게이머화: 오늘 안 썼을 때 내일 늘어나는 예산 게이지
+      const todaySpentAmt = monthExpenses.filter(e => e.date === systemTodayStr).reduce((s, e) => s + e.actualAmount, 0);
+      const nextDayDays = Math.max(1, remainingDays - 1);
+      const nextDayRecommendIfZero = Math.floor(remainVariableBudget / nextDayDays);
+      const diffIfZero = nextDayRecommendIfZero - dailyTarget;
+
+      document.getElementById('targetBudgetAmt').innerText = `${targetBudget.toLocaleString()}원`;
+      document.getElementById('totalSpentAmt').innerText = `${totalSpent.toLocaleString()}원`;
+      
+      const remainAmtElem = document.getElementById('remainBudgetAmt');
+      remainAmtElem.innerText = `${remainVariableBudget.toLocaleString()}원`;
+      if (dailyTarget < 1000 && remainVariableBudget > 0) {
+        remainAmtElem.className = 'val danger';
+        remainAmtElem.innerText = `🚨 ${remainVariableBudget.toLocaleString()}원`;
+      } else if (remainVariableBudget <= 0) {
+        remainAmtElem.className = 'val danger';
+      } else {
+        remainAmtElem.className = 'val green';
+      }
+
+      document.getElementById('todayRecommendAmt').innerText = `${dailyTarget.toLocaleString()}원`;
+      
+      const rewardElem = document.getElementById('gameRewardText');
+      if (todaySpentAmt === 0 && diffIfZero > 0) {
+        rewardElem.innerText = `🔥 오늘 0원 방어 시 내일 +${diffIfZero.toLocaleString()}원 증가!`;
+        rewardElem.style.color = 'var(--success)';
+      } else if (todaySpentAmt > dailyTarget) {
+        rewardElem.innerText = `⚠️ 오늘 권장 초과! 내일 예산 차감됨`;
+        rewardElem.style.color = 'var(--danger)';
+      } else {
+        rewardElem.innerText = `오늘 지출: ${todaySpentAmt.toLocaleString()}원`;
+        rewardElem.style.color = 'var(--sub)';
+      }
+
+      document.getElementById('avgDailySpent').innerText = `${avgSpent.toLocaleString()}원`;
+
+      // 예산 게이지 바
+      const usedPercent = targetBudget > 0 ? Math.min(100, Math.round(((totalSpent + fixedTotal) / targetBudget) * 100)) : 0;
+      const gaugeBar = document.getElementById('gaugeBar');
+      const gaugeStatus = document.getElementById('gaugeStatus');
+      
+      gaugeBar.style.width = `${usedPercent}%`;
+      if (usedPercent >= 90) {
+        gaugeBar.style.backgroundColor = 'var(--danger)';
+        gaugeStatus.innerText = `🚨 ${usedPercent}% (예산 위험!)`;
+        gaugeStatus.style.color = 'var(--danger)';
+      } else if (usedPercent >= 70) {
+        gaugeBar.style.backgroundColor = 'var(--warning)';
+        gaugeStatus.innerText = `⚠️ ${usedPercent}% 사용 중`;
+        gaugeStatus.style.color = 'var(--warning)';
+      } else {
+        gaugeBar.style.backgroundColor = 'var(--success)';
+        gaugeStatus.innerText = `${usedPercent}% 사용 중`;
+        gaugeStatus.style.color = 'var(--text)';
+      }
+
+      // 캘린더 rendering
+      const cal = document.getElementById('calendar');
+      cal.innerHTML = '';
+      const dayHeaders = ['일', '월', '화', '수', '목', '금', '토'];
+      dayHeaders.forEach(dh => cal.innerHTML += `<div class="day-header">${dh}</div>`);
+
+      const firstDayIdx = new Date(viewYear, viewMonth, 1).getDay();
+      for (let p = 0; p < firstDayIdx; p++) cal.innerHTML += `<div></div>`;
+
+      let currentCombo = 0;
+
+      for (let i = 1; i <= lastDay; i++) {
+        const dateStr = `${monthKey}-${String(i).padStart(2, '0')}`;
+        const daySpent = monthExpenses.filter(e => e.date === dateStr).reduce((s, e) => s + e.actualAmount, 0);
+        
+        const dayOfWeek = (firstDayIdx + i - 1) % 7;
+        let dayClass = '';
+        if (dayOfWeek === 0) dayClass = 'sun';
+        if (dayOfWeek === 6) dayClass = 'sat';
+
+        const isPastOrToday = dateStr <= systemTodayStr;
+        const isToday = dateStr === systemTodayStr;
+
+        if (daySpent >= 40000) dayClass += ' high-expense';
+
+        let contentHtml = '';
+        if (isPastOrToday) {
+          if (daySpent === 0) {
+            currentCombo++;
+            dayClass += ' no-expense';
+            let comboBadge = '🎉';
+            if (currentCombo === 2) comboBadge = '🔥';
+            else if (currentCombo >= 3) comboBadge = '👑';
+            contentHtml = `<div class="badge-no-spent" title="${currentCombo}일 연속 무지출!">${comboBadge}</div>`;
+          } else {
+            currentCombo = 0;
+            contentHtml = `<div class="day-spent">${daySpent.toLocaleString()}원</div>`;
+          }
+        } else {
+          contentHtml = `<div class="day-target">${dailyTarget.toLocaleString()}원</div>`;
+        }
+
+        cal.innerHTML += `
+          <div class="day-cell ${dayClass} ${isToday ? 'today' : ''}">
+            <div style="font-weight:bold;">${i}</div>
+            ${contentHtml}
+          </div>
+        `;
+      }
+
+      // 전월 대비 카테고리 분석
+      let prevYear = viewYear;
+      let prevMonth = viewMonth - 1;
+      if (prevMonth < 0) { prevMonth = 11; prevYear--; }
+      const prevMonthKey = getMonthKey(prevYear, prevMonth);
+      const prevExpenses = state.expenses.filter(e => e.date && e.date.startsWith(prevMonthKey));
+
+      const catTotals = {};
+      monthExpenses.forEach(e => { catTotals[e.category] = (catTotals[e.category] || 0) + e.actualAmount; });
+      
+      const prevCatTotals = {};
+      prevExpenses.forEach(e => { prevCatTotals[e.category] = (prevCatTotals[e.category] || 0) + e.actualAmount; });
+
+      const sortedCats = Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]);
+      
+      const catChartBox = document.getElementById('categoryChartItems');
+      if (sortedCats.length === 0) {
+        catChartBox.innerHTML = `<small style="color:var(--sub);">기록된 지출이 없습니다.</small>`;
+      } else {
+        catChartBox.innerHTML = sortedCats.map(cat => {
+          const amt = catTotals[cat];
+          const prevAmt = prevCatTotals[cat] || 0;
+          const diff = amt - prevAmt;
+          const pct = totalSpent > 0 ? Math.round((amt / totalSpent) * 100) : 0;
+          
+          let diffText = '-';
+          let diffColor = 'var(--sub)';
+          if (diff > 0) {
+            diffText = `▲ +${diff.toLocaleString()}원`;
+            diffColor = 'var(--danger)';
+          } else if (diff < 0) {
+            diffText = `▼ ${diff.toLocaleString()}원`;
+            diffColor = 'var(--success)';
+          }
+
+          return `
+            <div class="cat-bar-item">
+              <span class="cat-bar-name">${cat}</span>
+              <div class="cat-bar-track"><div class="cat-bar-fill" style="width: ${pct}%;"></div></div>
+              <span class="cat-bar-val">${pct}%</span>
+              <span class="cat-bar-diff" style="color:${diffColor};">${diffText}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 해시태그 파싱 & 칩 생성
+      const tagMap = {};
+      monthExpenses.forEach(e => {
+        const tags = (e.title || '').match(/#[^\s#]+/g) || [];
+        tags.forEach(t => { tagMap[t] = (tagMap[t] || 0) + e.actualAmount; });
+      });
+
+      const tagChipsBox = document.getElementById('tagChips');
+      const tagsList = Object.keys(tagMap).sort((a,b) => tagMap[b] - tagMap[a]);
+
+      if (tagsList.length === 0) {
+        tagChipsBox.innerHTML = `<small style="color:var(--sub);">등록된 태그가 없습니다.</small>`;
+      } else {
+        tagChipsBox.innerHTML = tagsList.map(tag => `
+          <div class="tag-chip ${activeTagFilter === tag ? 'active' : ''}" onclick="filterByTag('${tag}')">
+            ${tag} (${tagMap[tag].toLocaleString()}원)
+          </div>
+        `).join('');
+      }
+
+      // 이 달의 지출 내역 (금액순 및 태그 필터 정렬)
+      let displayExpenses = [...monthExpenses];
+      if (activeTagFilter) {
+        displayExpenses = displayExpenses.filter(e => (e.title || '').includes(activeTagFilter));
+      }
+      displayExpenses.sort((a,b) => b.actualAmount - a.actualAmount);
+
+      const topList = document.getElementById('topExpensesList');
+      if (displayExpenses.length === 0) {
+        topList.innerHTML = `<div style="color:var(--sub); font-size:0.85rem; text-align:center; padding:10px 0;">조건에 맞는 지출 내역이 없습니다.</div>`;
+      } else {
+        topList.innerHTML = displayExpenses.map((exp, idx) => `
+          <div class="top-expense-item">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="rank-num">${idx + 1}</span>
+              <div>
+                <div style="font-weight:bold;">
+                  ${exp.title || exp.category}
+                  ${exp.isWaste ? '<span class="waste-badge">낭비</span>' : ''}
+                </div>
+                <div style="font-size:0.75rem; color:var(--sub);">
+                  ${exp.date} · ${exp.category} · ${exp.method} ${exp.split > 1 ? `(N빵 1/${exp.split})` : ''}
+                </div>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-weight:bold; color:var(--text);">${exp.actualAmount.toLocaleString()}원</div>
+              <div style="margin-top:2px;">
+                <button class="action-btn btn-edit" onclick="editExpense(${exp.id})">수정</button>
+                <button class="action-btn btn-del" onclick="deleteExpense(${exp.id})">삭제</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // 결제 수단별 실적 계산
+      const methodTotals = { '현대카드': 0, '롯데카드': 0, '국민카드': 0, '현금': 0 };
+      monthExpenses.forEach(e => {
+        const m = e.method || '현금';
+        const amt = e.cardAmount || e.actualAmount; // 승인금액 기준
+        if (methodTotals[m] !== undefined) {
+          methodTotals[m] += amt;
+        } else {
+          methodTotals['현금'] += amt;
+        }
+      });
+
+      // 현대카드 (목표 30만 원)
+      const hdAmt = methodTotals['현대카드'];
+      const hdTarget = 300000;
+      const hdPct = Math.min(100, Math.round((hdAmt / hdTarget) * 100));
+      document.getElementById('hyundaiStatus').innerText = `${hdAmt.toLocaleString()}원 / 30만 (${hdPct}%)`;
+      const hdBar = document.getElementById('hyundaiBar');
+      hdBar.style.width = `${hdPct}%`;
+      hdBar.className = `progress-bar-fill ${hdPct >= 100 ? 'achieved' : ''}`;
+
+      // 롯데카드 (전체 이용대금)
+      const lotteAmt = methodTotals['롯데카드'];
+      document.getElementById('lotteStatus').innerText = `${lotteAmt.toLocaleString()}원`;
+
+      // 국민카드 (목표 55만 원)
+      const kbAmt = methodTotals['국민카드'];
+      const kbTarget = 550000;
+      const kbPct = Math.min(100, Math.round((kbAmt / kbTarget) * 100));
+      document.getElementById('kbStatus').innerText = `${kbAmt.toLocaleString()}원 / 55만 (${kbPct}%)`;
+      const kbBar = document.getElementById('kbBar');
+      kbBar.style.width = `${kbPct}%`;
+      kbBar.className = `progress-bar-fill ${kbPct >= 100 ? 'achieved' : ''}`;
+
+      // 현금
+      const cashAmt = methodTotals['현금'];
+      document.getElementById('cashStatus').innerText = `${cashAmt.toLocaleString()}원`;
+    }
+
+    /* 데이터 백업 / 이관 기능 */
+    function exportData() {
+      const dataStr = JSON.stringify(state);
+      navigator.clipboard.writeText(dataStr).then(() => {
+        alert('가계부 데이터가 클립보드에 복사되었습니다.');
+      }).catch(() => {
+        alert('복사에 실패했습니다. JSON 백업 다운로드를 이용하세요.');
+      });
+    }
+
+    function downloadBackupFile() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `smart_ledger_backup_${systemTodayStr}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData() {
+      const input = prompt('복사했던 데이터 코드(JSON)를 붙여넣으세요:');
+      if (!input) return;
+      try {
+        const parsed = JSON.parse(input);
+        if (parsed && typeof parsed === 'object') {
+          state = parsed;
+          if (!state.fixedItems) state.fixedItems = [];
+          save();
+          alert('데이터 복원이 완료되었습니다.');
+        } else {
+          alert('올바르지 않은 데이터 형식입니다.');
+        }
+      } catch (e) {
+        alert('데이터 형식이 올바르지 않습니다.');
+      }
+    }
+
+    // 초기화 및 실행
+    document.getElementById('expDate').value = systemTodayStr;
+    render();
   </script>
 </body>
 </html>
