@@ -91,6 +91,9 @@
     .sch-bar.cont-mid { border-radius: 0; margin-left: -9px; margin-right: -9px; position: relative; z-index: 1; }
     .sch-bar.cont-end { border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -9px; position: relative; z-index: 2; }
 
+    /* 카테고리 차트 공통 뼈대 (수정됨) */
+    .cat-chart-box { padding: 16px; border-radius: 12px; margin-bottom: 16px; background:#ffffff; border:1px solid #e5e8eb; box-shadow:0 2px 8px rgba(0,0,0,0.02); }
+
     /* 폼 요소 */
     label { font-size: 0.8rem; color: var(--sub); font-weight: 600; display: block; margin-top: 10px; margin-bottom: 4px; }
     input, select, textarea, button { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #e5e8eb; box-sizing: border-box; font-size: 0.88rem; outline: none; }
@@ -105,7 +108,7 @@
     .action-btn { width: auto; padding: 4px 8px; font-size: 0.75rem; border-radius: 6px; margin-top: 0; }
     .btn-del { background: #fee2e2; color: var(--danger); }
     
-    /* 결제 수단 & 대출 전용 스타일 */
+    /* 결제 수단 전용 스타일 */
     .main-card-box { background: linear-gradient(135deg, #374151 0%, #111827 100%); border: 2px solid #1f2937; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); color: #ffffff; }
     .main-card-badge { background: #ffffff; color: #111827; font-size: 0.68rem; padding: 2px 6px; border-radius: 6px; font-weight: bold; }
     .progress-bar-bg { width: 100%; background: #e5e8eb; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 6px; }
@@ -309,7 +312,7 @@
     let currentMode = 'ledger'; 
     
     let selectedDate = systemTodayStr;
-    const STORAGE_KEY = 'my_ledger_app_data_v6';
+    const STORAGE_KEY = 'my_ledger_app_data_v7';
 
     function loadState() {
       let saved = localStorage.getItem(STORAGE_KEY);
@@ -524,7 +527,7 @@
       alert('목표 예산이 저장되었습니다.');
     }
 
-    // 💡 카테고리별 이모지 반환 함수
+    // 카테고리 이모지 반환
     function getCategoryEmoji(cat) {
       if(cat.includes('식비')) return '🍔';
       if(cat.includes('교통')) return '🚌';
@@ -839,7 +842,7 @@
       if (isLedger) {
         bottomTitle.innerText = "이 달의 지출 분석 & 내역 (금액순)";
         
-        // 💡 전월 데이터 계산 (전월 대비 표시용)
+        // 💡 전월 데이터 로직 (비교용)
         let prevYear = viewYear;
         let prevMonth = viewMonth - 1;
         if (prevMonth < 0) { prevMonth = 11; prevYear--; }
@@ -852,9 +855,11 @@
         prevMonthExpenses.forEach(e => { prevCatTotals[e.category] = (prevCatTotals[e.category] || 0) + e.actualAmount; });
         
         const sortedCats = Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]);
-        const catColors = ['#3182f6', '#00c471', '#ff9500', '#8b5cf6', '#ef4444', '#14b8a6', '#f43f5e'];
+        
+        // 💡 식비가 초록색 매칭되도록 0번 인덱스에 초록색 배치
+        const catColors = ['#00c471', '#3182f6', '#ff9500', '#8b5cf6', '#ef4444', '#14b8a6', '#f43f5e'];
 
-        // 💡 새로운 스타일의 바 차트 렌더링
+        // 💡 하나의 작은 블럭(cat-chart-box)에 압축하여 렌더링
         let catChartHtml = sortedCats.length > 0 ? sortedCats.map((cat, idx) => {
           const amt = catTotals[cat];
           const prevAmt = prevCatTotals[cat] || 0;
@@ -864,24 +869,23 @@
           const emoji = getCategoryEmoji(cat);
 
           let diffHtml = '';
-          if (diff > 0) diffHtml = `전월 대비 <span style="color:var(--danger); font-weight:bold;">▲ ${diff.toLocaleString()}원</span> 증가`;
-          else if (diff < 0) diffHtml = `전월 대비 <span style="color:var(--primary); font-weight:bold;">▼ ${Math.abs(diff).toLocaleString()}원</span> 감소`;
-          else diffHtml = `<span style="color:var(--sub);">전월과 지출액 동일</span>`;
+          if (diff > 0) diffHtml = `<span style="color:var(--danger); font-weight:700;" title="전월대비 증가">▲ ${diff.toLocaleString()}</span>`;
+          else if (diff < 0) diffHtml = `<span style="color:var(--primary); font-weight:700;" title="전월대비 감소">▼ ${Math.abs(diff).toLocaleString()}</span>`;
+          else diffHtml = `<span style="color:var(--sub); font-weight:600;">-</span>`;
+          
+          const isLast = idx === sortedCats.length - 1;
 
           return `
-          <div style="margin-bottom: 20px; background:#ffffff; border:1px solid #f2f4f6; padding:14px; border-radius:12px;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:8px;">
-              <span style="font-weight:800; font-size:1rem; color:var(--text);">${emoji} ${cat}</span>
-              <div style="text-align:right;">
-                <span style="font-weight:900; font-size:1.05rem;">${amt.toLocaleString()}원</span>
-                <span style="font-size:0.85rem; color:var(--sub); margin-left:4px; font-weight:600;">(${pct}%)</span>
+          <div style="margin-bottom: ${isLast ? '0' : '12px'};">
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:4px; font-size:0.85rem;">
+              <span style="font-weight:700; color:var(--text);">${emoji} ${cat}</span>
+              <div style="text-align:right; display:flex; align-items:center; gap:6px;">
+                <span style="font-weight:800;">${amt.toLocaleString()}원 <span style="font-size:0.75rem; color:var(--sub);">(${pct}%)</span></span>
+                <span style="font-size:0.75rem; min-width:60px; text-align:right;">${diffHtml}</span>
               </div>
             </div>
-            <div style="height:12px; background:#e5e8eb; border-radius:6px; overflow:hidden;">
-              <div style="height:100%; width:${pct}%; background:${color}; border-radius:6px; transition:width 0.4s ease;"></div>
-            </div>
-            <div style="margin-top:8px; font-size:0.8rem; color:var(--sub);">
-              ${diffHtml}
+            <div style="height:6px; background:#e5e8eb; border-radius:3px; overflow:hidden;">
+              <div style="height:100%; width:${pct}%; background:${color}; border-radius:3px; transition:width 0.4s ease;"></div>
             </div>
           </div>`;
         }).join('') : '<div style="text-align:center; color:var(--sub); padding:10px 0;">기록된 지출이 없습니다.</div>';
@@ -893,7 +897,8 @@
             <div><strong style="margin-right:8px;">${e.actualAmount.toLocaleString()}원</strong><button class="action-btn btn-del" onclick="deleteExpense(${e.id})">삭제</button></div>
           </div>`).join('') : '<div style="text-align:center; color:var(--sub); padding:16px 0;">지출 내역이 없습니다.</div>';
         
-        bottomContent.innerHTML = `<div style="margin-bottom:24px;">${catChartHtml}</div>${expListHtml}`;
+        // 하나의 통합된 박스에 밀도 있게 삽입
+        bottomContent.innerHTML = `<div class="cat-chart-box">${catChartHtml}</div>${expListHtml}`;
       
       } else {
         bottomTitle.innerText = "🏆 이번 달 완료한 할 일";
