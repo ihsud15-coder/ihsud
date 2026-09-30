@@ -185,8 +185,8 @@
     </div>
 
     <div>
-      <!-- 대출 상환 & 금리 이자 관리 (신규) -->
-      <div class="card" id="cardLoans">
+      <!-- 대출 상환 & 금리 이자 관리 (기본 접힘 상태 적용) -->
+      <div class="card collapsed" id="cardLoans">
         <div class="card-header" onclick="toggleCard('cardLoans')">
           <h2>🏦 대출 관리 & 이자 자동계산</h2>
           <span>▼</span>
@@ -733,21 +733,33 @@
 
       for (let i = 1; i <= lastDay; i++) {
         const dateStr = `${monthKey}-${String(i).padStart(2, '0')}`;
-        const daySpent = monthExpenses.filter(e => e.date === dateStr).reduce((s, e) => s + e.actualAmount, 0);
+        const dayExpenses = monthExpenses.filter(e => e.date === dateStr);
+        const daySpent = dayExpenses.reduce((s, e) => s + e.actualAmount, 0);
         
         const dayOfWeek = (firstDayIdx + i - 1) % 7;
         let dayClass = '';
         if (dayOfWeek === 0) dayClass = 'sun';
         if (dayOfWeek === 6) dayClass = 'sat';
 
-        const isPastOrToday = dateStr <= systemTodayStr;
         const isToday = dateStr === systemTodayStr;
 
-        if (daySpent >= 50000) dayClass += ' high-expense';
+        // 지출 상태별 스타일 결정 (0원: 무지출 / 40,000원 초과: 과소비 빨간불)
+        if (dayExpenses.length > 0 || dateStr <= systemTodayStr) {
+          if (daySpent === 0) {
+            dayClass += ' no-expense';
+          } else if (daySpent > 40000) {
+            dayClass += ' high-expense';
+          }
+        }
 
-        let contentHtml = isPastOrToday 
-          ? (daySpent === 0 ? `<div class="badge-no-spent">🎉</div>` : `<div class="day-spent">${daySpent.toLocaleString()}원</div>`)
-          : '';
+        let contentHtml = '';
+        if (dayExpenses.length > 0 || dateStr <= systemTodayStr) {
+          if (daySpent === 0) {
+            contentHtml = `<div class="badge-no-spent">🎉</div>`;
+          } else {
+            contentHtml = `<div class="day-spent">${daySpent.toLocaleString()}원</div>`;
+          }
+        }
 
         cal.innerHTML += `
           <div class="day-cell ${dayClass} ${isToday ? 'today' : ''}">
