@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>승환캘린더</title>
+  <title>스마트 가계부 & 일정 관리 시스템</title>
   <style>
     :root { 
       --primary: #3182f6; 
@@ -17,7 +17,7 @@
       --warning: #ff9500;
       --success: #00c471;
       --badge-green: #eefcf3;
-      --badge-green-border: #bbf7d0;
+      --badge-green-border: #86efac;
       --sun-red: #ef4444;
       --sat-blue: #3b82f6;
     }
@@ -28,7 +28,7 @@
     @media (max-width: 960px) { .container { grid-template-columns: 1fr; } }
 
     /* 카드 스타일 */
-    .card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.02); margin-bottom: 20px; border: 1px solid #f2f4f6; position: relative; }
+    .card { background: var(--card); border-radius: 20px; padding: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.02); margin-bottom: 20px; border: 1px solid #f2f4f6; position: relative; transition: all 0.3s ease; }
     .card-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
     .card-header h2 { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text); }
     .collapsed .collapsible-content { display: none; }
@@ -52,10 +52,11 @@
 
     /* 캘린더 Header */
     .month-picker { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .month-btn { width: auto; padding: 6px 14px; background: #e8f3ff; color: var(--primary); border: none; font-weight: bold; border-radius: 20px; cursor: pointer; }
-    .calendar-toggle-title { margin: 0; font-size: 1.25rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: opacity 0.2s; }
+    .month-btn { width: auto; padding: 6px 14px; background: #e8f3ff; color: var(--primary); border: none; font-weight: bold; border-radius: 20px; cursor: pointer; transition: background 0.2s; }
+    .month-btn:hover { background: #d0e5ff; }
+    .calendar-toggle-title { margin: 0; font-size: 1.25rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: opacity 0.2s; user-select: none; }
     .calendar-toggle-title:hover { opacity: 0.8; }
-    .mode-badge { font-size: 0.72rem; padding: 3px 8px; border-radius: 12px; font-weight: bold; }
+    .mode-badge { font-size: 0.72rem; padding: 3px 8px; border-radius: 12px; font-weight: bold; transition: all 0.3s; }
     .mode-badge.ledger { background: #e8f3ff; color: var(--primary); }
     .mode-badge.schedule { background: #fef3c7; color: #d97706; }
 
@@ -67,16 +68,16 @@
 
     .day-cell { 
       background: #f2f4f6; border-radius: 12px; padding: 6px; min-height: 76px; font-size: 0.8rem; 
-      position: relative; display: flex; flex-direction: column; justify-content: flex-start; border: 1px solid transparent;
+      position: relative; display: flex; flex-direction: column; justify-content: flex-start; border: 2px solid transparent;
       box-sizing: border-box; cursor: pointer; transition: all 0.1s ease; overflow: visible;
     }
     .day-cell.sun { color: var(--sun-red); }
     .day-cell.sat { color: var(--sat-blue); }
     .day-cell.today { border: 2px dashed #b0b8c1; }
-    .day-cell.selected-date { border: 2px solid var(--primary) !important; background: #ffffff; box-shadow: 0 0 0 2px rgba(49,130,246,0.15); }
-    .day-cell.high-expense { background: var(--danger-bg); border: 1px solid #fca5a5; }
+    .day-cell.selected-date { border: 2px solid var(--primary) !important; background: #ffffff; box-shadow: 0 0 0 2px rgba(49,130,246,0.15); transform: scale(1.02); z-index: 10; }
+    .day-cell.high-expense { background: var(--danger-bg); border: 2px solid #fca5a5; }
     .day-cell.high-expense .day-spent { color: var(--danger); font-weight: 800; }
-    .day-cell.no-expense { background: var(--badge-green); border: 1px solid var(--badge-green-border); }
+    .day-cell.no-expense { background: var(--badge-green); border: 2px solid var(--badge-green-border); }
     .day-spent { color: #191f28; font-weight: 700; font-size: 0.75rem; margin-top: 6px; }
     .badge-no-spent { font-size: 1.1rem; text-align: center; margin: auto 0; }
 
@@ -91,12 +92,17 @@
     .sch-bar.cont-mid { border-radius: 0; margin-left: -9px; margin-right: -9px; position: relative; z-index: 1; }
     .sch-bar.cont-end { border-top-left-radius: 0; border-bottom-left-radius: 0; margin-left: -9px; position: relative; z-index: 2; }
 
+    /* 카테고리 차트 공통 뼈대 */
+    .cat-chart-box { padding: 16px; border-radius: 12px; margin-bottom: 16px; background:#ffffff; border:1px solid #e5e8eb; box-shadow:0 2px 8px rgba(0,0,0,0.02); }
+
     /* 폼 요소 */
     label { font-size: 0.8rem; color: var(--sub); font-weight: 600; display: block; margin-top: 10px; margin-bottom: 4px; }
-    input, select, textarea, button { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #e5e8eb; box-sizing: border-box; font-size: 0.88rem; outline: none; }
+    input, select, textarea, button { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid #e5e8eb; box-sizing: border-box; font-size: 0.88rem; outline: none; transition: border 0.2s; }
+    input:focus, select:focus { border-color: var(--primary); }
     textarea { resize: vertical; font-family: inherit; }
-    button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 12px; transition: background 0.2s; }
+    button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 12px; transition: background 0.2s, transform 0.1s; }
     button:hover { background: var(--primary-hover); }
+    button:active { transform: scale(0.98); }
     .btn-secondary { background: #6b7280; color: white; }
     .btn-success { background: var(--success); }
     .btn-warning { background: var(--warning); }
@@ -105,15 +111,14 @@
     .action-btn { width: auto; padding: 4px 8px; font-size: 0.75rem; border-radius: 6px; margin-top: 0; }
     .btn-del { background: #fee2e2; color: var(--danger); }
     
-    /* 결제 수단 & 대출 전용 스타일 */
-    .kb-card-box { background: linear-gradient(135deg, #fffbeb 0%, #fef08a 100%); border: 2px solid #facc15; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(250, 204, 21, 0.25); }
-    .kb-badge { background: #ca8a04; color: #ffffff; font-size: 0.68rem; padding: 2px 6px; border-radius: 6px; font-weight: bold; }
-    .loan-box { border: 1px solid #e5e8eb; padding: 14px; border-radius: 12px; margin-bottom: 12px; background: #ffffff; }
-    .loan-interest-badge { color: var(--danger); font-weight: 800; background: var(--danger-bg); padding: 4px 8px; border-radius: 8px; font-size: 0.85rem; }
-    .loan-input-section { display: none; margin-top: 12px; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid #e5e8eb; }
+    /* 결제 수단 전용 스타일 */
+    .main-card-box { background: linear-gradient(135deg, #374151 0%, #111827 100%); border: 2px solid #1f2937; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); color: #ffffff; }
+    .main-card-badge { background: #ffffff; color: #111827; font-size: 0.68rem; padding: 2px 6px; border-radius: 6px; font-weight: bold; }
     .progress-bar-bg { width: 100%; background: #e5e8eb; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 6px; }
-    .progress-bar-fill { height: 100%; background: var(--primary); border-radius: 4px; }
+    .progress-bar-fill { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.4s ease; }
     .progress-bar-fill.achieved { background: #9ca3af; }
+    .dark-bar-bg { background: rgba(255,255,255,0.2); }
+    .dark-bar-fill { background: #ffffff; }
 
     /* 투두 메이트 스타일 & 중요도 CSS */
     .todo-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 0.95rem; font-weight: 600; }
@@ -122,7 +127,6 @@
     .todo-item.done .todo-check::after { content: '✔'; color: white; font-size: 11px; font-weight: bold; }
     .todo-item.done .todo-text { text-decoration: line-through; color: #b0b8c1; font-weight: 500; }
     
-    /* 중요도 막대 아이콘 */
     .pri-icon { display: flex; align-items: flex-end; gap: 2px; height: 14px; }
     .pri-bar { width: 4px; background: #e5e8eb; border-radius: 2px; }
     .pri-bar-1 { height: 6px; }
@@ -133,14 +137,1337 @@
     .pri-2 .pri-bar-1, .pri-2 .pri-bar-2 { background: var(--warning); }
     .pri-3 .pri-bar { background: var(--danger); }
     
-    /* 투두 추가 버튼 & 중요도 라디오 버튼 */
     .pri-radio-group { display: flex; gap: 8px; margin-bottom: 10px; }
     .pri-label { font-size: 0.75rem; padding: 6px 12px; border-radius: 12px; border: 1px solid #e5e8eb; cursor: pointer; color: var(--sub); font-weight: 600; transition: all 0.2s; display:flex; align-items:center; gap:6px; background:#ffffff; }
     .pri-radio:checked + .pri-label.pl-1 { background: var(--badge-green); border-color: var(--success); color: var(--success); }
     .pri-radio:checked + .pri-label.pl-2 { background: #fffbeb; border-color: var(--warning); color: var(--warning); }
     .pri-radio:checked + .pri-label.pl-3 { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
     .pri-radio { display: none; }
-  </style>
+  
+    /* ==================== Premium UI Refresh ====================
+       기존 HTML/JS/문구/데이터 구조는 유지하고 시각 스타일만 재정의합니다.
+    =============================================================== */
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f4f7fb;
+      --card: rgba(255,255,255,0.96);
+      --text: #172033;
+      --sub: #7b8799;
+      --danger: #e5484d;
+      --danger-bg: #fff4f4;
+      --warning: #e59a24;
+      --success: #12a875;
+      --badge-green: #effaf5;
+      --badge-green-border: #9be2c4;
+      --sun-red: #e25555;
+      --sat-blue: #4778d8;
+      --line: #e7ebf1;
+      --soft: #f5f7fa;
+      --soft-blue: #eef5ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { background: var(--bg); }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, sans-serif;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(37,99,235,.055), transparent 28%),
+        radial-gradient(circle at 92% 8%, rgba(18,168,117,.04), transparent 24%),
+        var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 34px 24px 48px;
+      letter-spacing: -0.015em;
+    }
+
+    .container {
+      max-width: 1320px;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow:
+        0 1px 2px rgba(20,35,60,.025),
+        0 10px 30px rgba(32,52,84,.055);
+      margin-bottom: 22px;
+      border: 1px solid rgba(226,231,239,.9);
+      position: relative;
+      transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .card:hover {
+      border-color: #dfe5ee;
+      box-shadow:
+        0 2px 4px rgba(20,35,60,.03),
+        0 14px 34px rgba(32,52,84,.07);
+    }
+
+    .card-header {
+      min-height: 26px;
+      gap: 12px;
+    }
+
+    .card-header h2 {
+      font-size: 1rem;
+      letter-spacing: -0.025em;
+    }
+
+    .card-header > span:last-child {
+      color: #9aa5b5;
+      font-size: .78rem;
+      transition: transform .2s ease;
+    }
+
+    .summary-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .sum-box {
+      background: linear-gradient(145deg, #f8fafc, #f2f5f9);
+      border: 1px solid #e9edf3;
+      border-radius: 16px;
+      padding: 15px 16px;
+      min-height: 92px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+      transition: transform .2s ease, border-color .2s ease;
+    }
+
+    .sum-box:hover {
+      transform: translateY(-1px);
+      border-color: #dfe5ed;
+    }
+
+    .sum-box label {
+      color: #8995a6;
+      font-size: .72rem;
+      letter-spacing: -.01em;
+    }
+
+    .sum-box .val {
+      font-size: 1.22rem;
+      letter-spacing: -.035em;
+    }
+
+    .sub-badge {
+      font-size: .69rem;
+      color: #64748b;
+    }
+
+    .budget-gauge-box {
+      margin-top: 18px;
+      background: #f7f9fc;
+      padding: 14px 16px 15px;
+      border-radius: 15px;
+      border: 1px solid #e9edf3;
+    }
+
+    .gauge-bg {
+      height: 9px;
+      background: #e5eaf1;
+      border-radius: 999px;
+      margin-top: 9px;
+    }
+
+    .gauge-fill {
+      border-radius: 999px;
+      box-shadow: 0 1px 5px rgba(0,0,0,.08);
+    }
+
+    .month-picker {
+      margin-bottom: 18px;
+      gap: 10px;
+    }
+
+    .month-btn {
+      width: auto;
+      min-width: 84px;
+      padding: 8px 13px;
+      background: #f1f5fb;
+      color: #48617f;
+      border: 1px solid #e4eaf2;
+      font-size: .76rem;
+      border-radius: 10px;
+      box-shadow: none;
+    }
+
+    .month-btn:hover {
+      background: #e8eef7;
+      color: var(--primary);
+    }
+
+    .calendar-toggle-title {
+      font-size: 1.18rem;
+      letter-spacing: -.04em;
+    }
+
+    .mode-badge {
+      font-size: .67rem;
+      padding: 4px 8px;
+      border-radius: 8px;
+      letter-spacing: -.015em;
+    }
+
+    .mode-badge.ledger {
+      background: #edf4ff;
+      color: #2563eb;
+    }
+
+    .mode-badge.schedule {
+      background: #fff6df;
+      color: #b97912;
+    }
+
+    .calendar {
+      gap: 6px;
+    }
+
+    .day-header {
+      font-size: .72rem;
+      color: #96a0af;
+      padding: 3px 0 7px;
+      font-weight: 700;
+    }
+
+    .day-cell {
+      background: #f7f9fb;
+      border-radius: 13px;
+      padding: 8px;
+      min-height: 82px;
+      font-size: .78rem;
+      border: 1px solid #edf0f4;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease;
+    }
+
+    .day-cell:hover {
+      transform: translateY(-1px);
+      border-color: #dbe3ed;
+      box-shadow: 0 5px 14px rgba(35,55,80,.06);
+      z-index: 4;
+    }
+
+    .day-cell.today {
+      border: 1px dashed #9eabbc;
+      background: #fbfcfe;
+    }
+
+    .day-cell.selected-date {
+      border: 1.5px solid var(--primary) !important;
+      background: #fff !important;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.10), 0 7px 18px rgba(37,99,235,.10);
+      transform: translateY(-1px) scale(1.005);
+    }
+
+    .day-cell.high-expense {
+      background: #fff7f7;
+      border: 1px solid #f2b5b5;
+    }
+
+    .day-cell.no-expense {
+      background: #f3fbf7;
+      border: 1px solid #b9e7d2;
+    }
+
+    .day-spent {
+      color: #273449;
+      font-size: .73rem;
+      margin-top: 7px;
+    }
+
+    .badge-no-spent {
+      font-size: .95rem;
+      opacity: .8;
+    }
+
+    .sch-bar {
+      font-size: .66rem;
+      padding: 3px 6px;
+      margin-top: 4px;
+      height: 22px;
+      line-height: 16px;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,.10);
+    }
+
+    .cat-chart-box {
+      padding: 18px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      background: #fbfcfe;
+      border: 1px solid #e8edf3;
+      box-shadow: none;
+    }
+
+    label {
+      font-size: .73rem;
+      color: #7d899a;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      letter-spacing: -.01em;
+    }
+
+    input, select, textarea, button {
+      padding: 11px 13px;
+      border-radius: 11px;
+      border: 1px solid #e1e7ef;
+      background: #fff;
+      color: var(--text);
+      font-size: .84rem;
+      box-shadow: 0 1px 1px rgba(20,35,60,.02);
+    }
+
+    input::placeholder, textarea::placeholder { color: #b0b8c5; }
+
+    input:hover, select:hover, textarea:hover {
+      border-color: #d2dbe7;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #8bb2f5;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.09);
+    }
+
+    button {
+      background: var(--primary);
+      font-weight: 750;
+      margin-top: 12px;
+      box-shadow: 0 4px 10px rgba(37,99,235,.14);
+    }
+
+    button:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 6px 14px rgba(37,99,235,.18);
+    }
+
+    button:active { transform: translateY(1px) scale(.99); }
+
+    .btn-secondary {
+      background: #eef1f5 !important;
+      color: #5f6b7a !important;
+      box-shadow: none !important;
+    }
+
+    .btn-secondary:hover { background: #e6eaf0 !important; }
+
+    .btn-success {
+      background: #12a875 !important;
+      box-shadow: 0 4px 10px rgba(18,168,117,.14) !important;
+    }
+
+    .btn-warning {
+      background: #d99122 !important;
+      box-shadow: 0 4px 10px rgba(217,145,34,.14) !important;
+    }
+
+    .list-item {
+      padding: 12px 4px;
+      border-bottom: 1px solid #edf0f4;
+      font-size: .84rem;
+    }
+
+    .action-btn {
+      padding: 5px 8px;
+      font-size: .7rem;
+      border-radius: 7px;
+      box-shadow: none;
+    }
+
+    .btn-del {
+      background: #fff0f0 !important;
+      color: var(--danger) !important;
+      border: 1px solid #ffd6d6 !important;
+    }
+
+    .main-card-box {
+      background: linear-gradient(135deg, #273449 0%, #111827 100%);
+      border: 1px solid #263246;
+      border-radius: 16px;
+      padding: 14px 15px;
+      margin-bottom: 13px;
+      box-shadow: 0 8px 18px rgba(17,24,39,.15);
+    }
+
+    .main-card-badge {
+      background: rgba(255,255,255,.95);
+      color: #263246;
+      padding: 3px 7px;
+      border-radius: 6px;
+      font-size: .64rem;
+    }
+
+    .progress-bar-bg {
+      background: #e8edf3;
+      height: 7px;
+      border-radius: 999px;
+      margin-top: 7px;
+    }
+
+    .progress-bar-fill {
+      border-radius: 999px;
+    }
+
+    .todo-item {
+      gap: 11px;
+      margin-bottom: 13px;
+      font-size: .88rem;
+    }
+
+    .todo-check {
+      width: 19px;
+      height: 19px;
+      border: 2px solid #cbd4df;
+      box-shadow: 0 1px 2px rgba(0,0,0,.03);
+    }
+
+    .todo-item.done .todo-check {
+      box-shadow: 0 3px 8px rgba(37,99,235,.20);
+    }
+
+    .pri-icon { opacity: .9; }
+    .pri-bar { width: 3.5px; border-radius: 3px; }
+
+    .pri-label {
+      padding: 7px 11px;
+      border-radius: 10px;
+      border: 1px solid #e4e9ef;
+      background: #fff;
+      box-shadow: none;
+    }
+
+    .pri-radio:checked + .pri-label.pl-1 { background: #effaf5; }
+    .pri-radio:checked + .pri-label.pl-2 { background: #fff8e9; }
+    .pri-radio:checked + .pri-label.pl-3 { background: #fff1f1; }
+
+    /* 우측 주요 입력 카드에만 살짝 강조 */
+    #cardDynamicInput {
+      border-color: #dce6f5;
+      box-shadow: 0 10px 30px rgba(37,99,235,.065);
+    }
+
+    #cardDynamicInput .card-header {
+      padding-bottom: 2px;
+    }
+
+    /* 투두/입력 영역의 인라인 배경도 전체 톤에 맞춤 */
+    #todoInputContainer {
+      background: #f7f9fc !important;
+      border-color: #e5eaf1 !important;
+    }
+
+    /* 모바일 */
+    @media (max-width: 960px) {
+      body { padding: 20px 14px 36px; }
+      .container { gap: 16px; }
+      .card { padding: 18px; border-radius: 18px; }
+    }
+
+    @media (max-width: 600px) {
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .day-cell { min-height: 68px; padding: 6px; }
+      .month-picker { flex-wrap: wrap; }
+      .calendar-toggle-title { order: -1; width: 100%; justify-content: center; margin-bottom: 2px; }
+    }
+
+  
+
+/* =========================================================
+   PREMIUM FINANCE DASHBOARD UI — VISUAL POLISH v2
+   Content / HTML structure / JS behavior intentionally untouched.
+   ========================================================= */
+
+:root{
+  --primary:#5b67f1;
+  --primary-2:#7c5cff;
+  --primary-soft:#eef0ff;
+  --accent:#23b8a9;
+  --accent-soft:#e8faf7;
+  --danger:#ef6674;
+  --danger-soft:#fff0f2;
+  --warning:#f2ad45;
+  --warning-soft:#fff6e7;
+  --ink:#172033;
+  --ink-2:#475166;
+  --muted:#8790a3;
+  --line:#e8ebf2;
+  --line-strong:#dfe3ec;
+  --bg:#f5f7fb;
+  --card:rgba(255,255,255,.94);
+  --shadow-sm:0 4px 16px rgba(29,38,68,.055);
+  --shadow-md:0 14px 38px rgba(29,38,68,.075);
+  --shadow-lg:0 24px 60px rgba(29,38,68,.10);
+}
+
+/* Background / overall atmosphere */
+html{
+  background:#f5f7fb;
+}
+body{
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 7% 0%, rgba(124,92,255,.10), transparent 27%),
+    radial-gradient(circle at 93% 4%, rgba(35,184,169,.075), transparent 24%),
+    radial-gradient(circle at 50% 100%, rgba(91,103,241,.055), transparent 35%),
+    linear-gradient(180deg,#f8f9fd 0%,#f4f6fa 58%,#f7f8fb 100%);
+  letter-spacing:-.012em;
+}
+
+/* Header becomes a premium glass surface */
+header,
+.header{
+  position:relative;
+  isolation:isolate;
+  border:1px solid rgba(255,255,255,.9) !important;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.97),rgba(248,249,255,.92)) !important;
+  box-shadow:
+    0 10px 35px rgba(31,41,75,.065),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+  overflow:hidden;
+}
+header::before,
+.header::before{
+  content:"";
+  position:absolute;
+  width:230px;
+  height:230px;
+  right:-95px;
+  top:-130px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(124,92,255,.12),transparent 68%);
+  pointer-events:none;
+}
+header::after,
+.header::after{
+  content:"";
+  position:absolute;
+  width:170px;
+  height:170px;
+  left:-90px;
+  bottom:-115px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(35,184,169,.09),transparent 68%);
+  pointer-events:none;
+}
+
+/* Brand / title hierarchy */
+h1,h2,h3{
+  color:var(--ink);
+  letter-spacing:-.035em;
+}
+h1{
+  font-weight:800;
+}
+h2{
+  font-weight:760;
+}
+h3{
+  font-weight:720;
+}
+
+/* Cards */
+.card{
+  position:relative;
+  background:var(--card) !important;
+  border:1px solid rgba(224,228,237,.82) !important;
+  box-shadow:var(--shadow-sm) !important;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+}
+.card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(91,103,241,.16) !important;
+  box-shadow:var(--shadow-md) !important;
+}
+.card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.92);
+}
+
+/* Section headings — elegant micro accent */
+.card h2,
+.card h3{
+  position:relative;
+}
+.card h2::after,
+.card h3::after{
+  content:"";
+  display:inline-block;
+  width:24px;
+  height:3px;
+  margin-left:9px;
+  vertical-align:middle;
+  border-radius:99px;
+  background:linear-gradient(90deg,var(--primary),var(--primary-2));
+  opacity:.72;
+}
+
+/* Summary / KPI blocks */
+.summary-box,
+.summary-item,
+.stat-card{
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(224,228,237,.75) !important;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.98),rgba(247,248,253,.92)) !important;
+  box-shadow:0 7px 24px rgba(30,39,69,.055) !important;
+}
+.summary-box::before,
+.summary-item::before,
+.stat-card::before{
+  content:"";
+  position:absolute;
+  width:92px;
+  height:92px;
+  right:-36px;
+  top:-42px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(91,103,241,.11),transparent 68%);
+  pointer-events:none;
+}
+
+/* Strong numbers */
+.summary-box strong,
+.summary-item strong,
+.stat-card strong,
+.amount,
+.total{
+  letter-spacing:-.045em;
+}
+
+/* Budget gauge / progress */
+.progress,
+.budget-progress,
+.progress-bar,
+.gauge{
+  overflow:hidden;
+  border:1px solid rgba(221,225,235,.7) !important;
+  background:#edf0f5 !important;
+  box-shadow:inset 0 1px 3px rgba(24,31,52,.05);
+}
+.progress-bar,
+.gauge-fill{
+  background:
+    linear-gradient(90deg,var(--primary),#7867f5 55%,var(--primary-2)) !important;
+  box-shadow:0 3px 12px rgba(91,103,241,.22);
+}
+
+/* Buttons — gradient only where emphasis is needed */
+button,
+.btn{
+  border:1px solid rgba(220,224,234,.9);
+  box-shadow:0 3px 10px rgba(31,40,69,.035);
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease;
+}
+button:hover,
+.btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 7px 18px rgba(31,40,69,.08);
+}
+button:active,
+.btn:active{
+  transform:translateY(0);
+}
+button.primary,
+.btn-primary,
+button[type="submit"]{
+  background:linear-gradient(135deg,var(--primary),var(--primary-2)) !important;
+  border-color:transparent !important;
+  box-shadow:0 7px 18px rgba(91,103,241,.20);
+}
+
+/* Month / tab controls */
+.month-btn,
+.month-button,
+.tab-btn,
+.mode-btn{
+  background:rgba(255,255,255,.82) !important;
+  border-color:var(--line) !important;
+}
+.month-btn.active,
+.month-button.active,
+.tab-btn.active,
+.mode-btn.active,
+.month-btn.selected,
+.month-button.selected{
+  color:var(--primary) !important;
+  background:linear-gradient(135deg,#f1f2ff,#e9e7ff) !important;
+  border-color:rgba(91,103,241,.18) !important;
+  box-shadow:0 5px 15px rgba(91,103,241,.09);
+}
+
+/* Inputs */
+input,select,textarea{
+  color:var(--ink) !important;
+  background:rgba(255,255,255,.9) !important;
+  border:1px solid #e1e5ee !important;
+  box-shadow:inset 0 1px 2px rgba(24,31,52,.025);
+  transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
+input:hover,select:hover,textarea:hover{
+  border-color:#cfd5e3 !important;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none !important;
+  background:#fff !important;
+  border-color:rgba(91,103,241,.55) !important;
+  box-shadow:0 0 0 4px rgba(91,103,241,.10) !important;
+}
+
+/* Calendar */
+.calendar{
+  background:transparent;
+}
+.calendar-header,
+.week-header{
+  color:#788195;
+  font-weight:700;
+}
+.day-cell{
+  position:relative;
+  min-height:82px;
+  border:1px solid #eceef4 !important;
+  background:linear-gradient(145deg,#fff,#fafbfc) !important;
+  border-radius:15px !important;
+  transition:background .18s ease,border-color .18s ease,transform .18s ease,box-shadow .18s ease;
+}
+.day-cell:hover{
+  transform:translateY(-1px);
+  border-color:rgba(91,103,241,.22) !important;
+  box-shadow:0 6px 17px rgba(31,40,69,.06);
+}
+.day-cell.today{
+  background:linear-gradient(145deg,#f4f3ff,#eef0ff) !important;
+  border-color:rgba(91,103,241,.38) !important;
+}
+.day-cell.selected{
+  background:linear-gradient(145deg,#ecebff,#f5f3ff) !important;
+  border-color:rgba(124,92,255,.46) !important;
+  box-shadow:0 8px 22px rgba(91,103,241,.11);
+}
+.day-cell.has-expense{
+  box-shadow:inset 0 -3px 0 rgba(239,102,116,.62);
+}
+
+/* Schedule / expense chips */
+.schedule-item,
+.schedule-bar,
+.expense-item,
+.expense-chip{
+  border:1px solid rgba(222,226,235,.82) !important;
+  box-shadow:0 3px 9px rgba(31,40,69,.04);
+  background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(248,249,252,.96)) !important;
+}
+.schedule-item{
+  border-left:3px solid var(--primary) !important;
+}
+.expense-item{
+  border-left:3px solid var(--danger) !important;
+}
+
+/* Pills / badges — outline style */
+.badge,
+.tag,
+.mode-badge,
+.status-badge,
+.category-badge{
+  background:rgba(255,255,255,.72) !important;
+  border:1px solid currentColor !important;
+  box-shadow:none !important;
+  font-weight:700;
+}
+
+/* Icons / pictograms: line-art treatment */
+.icon,
+.icon-wrap,
+.menu-icon,
+.action-icon,
+.category-icon,
+.payment-icon,
+.pictogram{
+  background:transparent !important;
+  background-image:none !important;
+  box-shadow:none !important;
+  border:0 !important;
+  color:var(--primary);
+  filter:none !important;
+}
+.icon svg,
+.icon-wrap svg,
+.menu-icon svg,
+.action-icon svg,
+.category-icon svg,
+.payment-icon svg,
+.pictogram svg{
+  fill:none !important;
+  stroke:currentColor !important;
+  stroke-width:1.7 !important;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.icon.primary,
+.icon-wrap.primary,
+.menu-icon.primary,
+.category-icon.primary{
+  color:var(--primary);
+}
+.icon.success,
+.icon-wrap.success,
+.category-icon.success{
+  color:var(--accent);
+}
+.icon.danger,
+.icon-wrap.danger,
+.category-icon.danger{
+  color:var(--danger);
+}
+.icon.warning,
+.icon-wrap.warning,
+.category-icon.warning{
+  color:var(--warning);
+}
+
+/* Payment method cards */
+.payment-card,
+.payment-method,
+.pay-card{
+  position:relative;
+  overflow:hidden;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.98),rgba(246,247,251,.95)) !important;
+  border:1px solid #e5e8ef !important;
+  box-shadow:0 7px 20px rgba(30,39,69,.05) !important;
+}
+.payment-card::before,
+.payment-method::before,
+.pay-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:3px;
+  background:linear-gradient(180deg,var(--primary),var(--primary-2));
+  opacity:.85;
+}
+
+/* Todo */
+.todo-item,
+.task-item{
+  background:rgba(255,255,255,.72) !important;
+  border-bottom:1px solid #edf0f4 !important;
+}
+.todo-item:hover,
+.task-item:hover{
+  background:#fff !important;
+}
+.todo-item input[type="checkbox"],
+.task-item input[type="checkbox"]{
+  accent-color:var(--primary);
+}
+
+/* Dynamic input card */
+.dynamic-input,
+.input-card,
+.expense-input-card,
+.schedule-input-card{
+  background:
+    linear-gradient(145deg,rgba(246,247,255,.92),rgba(255,255,255,.96)) !important;
+  border:1px solid rgba(91,103,241,.13) !important;
+  box-shadow:0 10px 28px rgba(91,103,241,.065) !important;
+}
+
+/* Chart area */
+.chart-container,
+.chart-box,
+.chart-wrap{
+  background:
+    radial-gradient(circle at 85% 15%,rgba(124,92,255,.07),transparent 30%),
+    linear-gradient(145deg,#fff,#f9fafc) !important;
+  border:1px solid #e8ebf1 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 8px 25px rgba(31,40,69,.045);
+}
+
+/* Fixed expense / secondary cards */
+.fixed-expense,
+.fixed-item,
+.budget-card{
+  background:linear-gradient(145deg,#fff,#fafbfc) !important;
+  border:1px solid #e7eaf0 !important;
+  box-shadow:0 6px 18px rgba(31,40,69,.045) !important;
+}
+
+/* Dividers */
+hr{
+  border:0 !important;
+  border-top:1px solid rgba(225,228,236,.8) !important;
+}
+
+/* Scrollbars */
+*{
+  scrollbar-width:thin;
+  scrollbar-color:#cfd4df transparent;
+}
+*::-webkit-scrollbar{
+  width:7px;
+  height:7px;
+}
+*::-webkit-scrollbar-track{
+  background:transparent;
+}
+*::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#cfd4df,#bfc5d2);
+  border-radius:99px;
+}
+
+/* Responsive */
+@media (max-width:900px){
+  .card{
+    box-shadow:0 7px 24px rgba(29,38,68,.06) !important;
+  }
+  .day-cell{
+    min-height:68px;
+    border-radius:12px !important;
+  }
+}
+@media (max-width:600px){
+  body{
+    background:
+      radial-gradient(circle at 10% 0%,rgba(124,92,255,.09),transparent 32%),
+      linear-gradient(180deg,#f8f9fd,#f5f7fb);
+  }
+  .card{
+    border-radius:17px !important;
+  }
+  .day-cell{
+    min-height:58px;
+    border-radius:10px !important;
+  }
+}
+
+</style>
+
+<style>
+
+/* =========================================================
+   PREMIUM UI v2 — Urban / Clean / Rewarding
+   ========================================================= */
+
+/* 1. Remove decorative purple bars beside every heading */
+.card h2::after,
+.card h3::after{
+  display:none !important;
+  content:none !important;
+}
+
+/* 2. Sharper, more urban typography */
+body{
+  color:#172033;
+  font-family:Inter,"Pretendard","Noto Sans KR",-apple-system,BlinkMacSystemFont,
+               "Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+h1,h2,h3,h4,h5,h6,
+strong,b,
+.amount,.total,
+.summary-box strong,
+.summary-item strong,
+.stat-card strong{
+  color:#26304a;
+  font-weight:750;
+  letter-spacing:-.045em;
+}
+
+/* Gradient typography only for strong/high-emphasis text */
+h1,
+.summary-box strong,
+.summary-item strong,
+.stat-card strong,
+.amount,
+.total,
+.card .value,
+.card .total-value{
+  background:linear-gradient(100deg,#26304a 0%,#5b67d9 48%,#7458cf 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  color:transparent;
+}
+
+/* Keep small/body bold text highly readable rather than over-stylized */
+h2,h3,h4,h5,h6,
+label,
+button,
+.badge,
+.tag,
+.status-badge,
+.category-badge{
+  color:#273148;
+}
+
+/* 3. More sophisticated surface system */
+.card{
+  border-color:rgba(220,224,234,.86) !important;
+  box-shadow:
+    0 1px 2px rgba(20,28,49,.025),
+    0 10px 32px rgba(29,38,68,.055) !important;
+}
+
+.card:hover{
+  box-shadow:
+    0 2px 4px rgba(20,28,49,.025),
+    0 17px 42px rgba(29,38,68,.085) !important;
+}
+
+/* 4. Premium accent colors */
+:root{
+  --success:#1fb88f;
+  --success-deep:#138d72;
+  --success-soft:#e9faf4;
+  --blue:#4f75e8;
+  --blue-soft:#edf3ff;
+  --violet:#6958d9;
+}
+
+/* 5. Zero-spend / no-expense success states
+      Support common class names used by the existing UI. */
+.zero-expense,
+.no-expense,
+.no-spending,
+.spend-zero,
+.expense-zero,
+.no-spend,
+.success-day,
+.zero-day,
+.day-cell.zero-expense,
+.day-cell.no-expense,
+.day-cell.no-spending{
+  background:
+    radial-gradient(circle at 86% 12%,rgba(31,184,143,.16),transparent 32%),
+    linear-gradient(145deg,#f7fffc,#eefaf7) !important;
+  border-color:rgba(31,184,143,.34) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(31,184,143,.035),
+    0 8px 24px rgba(31,184,143,.075) !important;
+}
+
+/* A small positive visual signal without changing content */
+.zero-expense::before,
+.no-expense::before,
+.no-spending::before,
+.success-day::before,
+.zero-day::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:inherit;
+  background:
+    linear-gradient(120deg,transparent 0%,rgba(31,184,143,.035) 50%,transparent 100%);
+}
+
+.zero-expense *,
+.no-expense *,
+.no-spending *,
+.success-day *,
+.zero-day *{
+  color:#15856d;
+}
+
+/* Calendar zero-spend day: blue-green, rewarding but not childish */
+.day-cell.zero-expense,
+.day-cell.no-expense,
+.day-cell.no-spending{
+  position:relative;
+}
+
+.day-cell.zero-expense::after,
+.day-cell.no-expense::after,
+.day-cell.no-spending::after{
+  content:"";
+  position:absolute;
+  top:9px;
+  right:9px;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#32c6a1,#4f9ce8);
+  box-shadow:0 0 0 4px rgba(31,184,143,.08);
+}
+
+/* 6. Success / positive money values */
+.success,
+.positive,
+.income,
+.income-value,
+.balance-positive{
+  color:#158a72 !important;
+}
+.success strong,
+.positive strong,
+.income strong,
+.income-value strong,
+.balance-positive strong{
+  background:linear-gradient(100deg,#12866e,#319dc1);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+/* 7. Negative spending remains restrained and readable */
+.negative,
+.expense,
+.expense-value,
+.spending{
+  color:#d85c6b;
+}
+
+/* 8. Calendar becomes more editorial / premium */
+.day-cell{
+  background:
+    linear-gradient(145deg,#ffffff 0%,#fafbfd 100%) !important;
+}
+.day-cell.today{
+  background:
+    radial-gradient(circle at 85% 12%,rgba(91,103,241,.11),transparent 35%),
+    linear-gradient(145deg,#f7f7ff,#eef0ff) !important;
+}
+.day-cell.selected{
+  background:
+    radial-gradient(circle at 86% 14%,rgba(124,92,255,.12),transparent 35%),
+    linear-gradient(145deg,#f2f1ff,#faf9ff) !important;
+}
+
+/* 9. Month controls: restrained premium highlight */
+.month-btn.active,
+.month-button.active,
+.tab-btn.active,
+.mode-btn.active,
+.month-btn.selected,
+.month-button.selected{
+  color:#564bc2 !important;
+  background:
+    linear-gradient(135deg,#f4f3ff,#eceaff) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 5px 16px rgba(91,103,241,.075);
+}
+
+/* 10. Input cards — more like a modern product UI */
+.dynamic-input,
+.input-card,
+.expense-input-card,
+.schedule-input-card{
+  background:
+    radial-gradient(circle at 95% 0%,rgba(124,92,255,.08),transparent 30%),
+    linear-gradient(145deg,#f9f9ff,#ffffff) !important;
+  border-color:rgba(91,103,241,.13) !important;
+}
+
+/* 11. Buttons: cleaner, less toy-like */
+button,
+.btn{
+  font-weight:650;
+  letter-spacing:-.02em;
+}
+button.primary,
+.btn-primary,
+button[type="submit"]{
+  background:linear-gradient(120deg,#5868e9,#7058d8) !important;
+  box-shadow:
+    0 6px 16px rgba(91,103,241,.18),
+    inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+/* 12. Outline icons: consistent, thin, urban */
+.icon,
+.icon-wrap,
+.menu-icon,
+.action-icon,
+.category-icon,
+.payment-icon,
+.pictogram{
+  color:#5c68d7 !important;
+}
+.icon svg,
+.icon-wrap svg,
+.menu-icon svg,
+.action-icon svg,
+.category-icon svg,
+.payment-icon svg,
+.pictogram svg{
+  fill:none !important;
+  stroke:currentColor !important;
+  stroke-width:1.65 !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+}
+
+/* Don't put a colored tile behind line icons */
+.icon-wrap,
+.category-icon,
+.payment-icon,
+.pictogram{
+  background:transparent !important;
+}
+
+/* 13. Payment / fixed / todo surfaces */
+.payment-card,
+.payment-method,
+.pay-card,
+.fixed-expense,
+.fixed-item,
+.budget-card{
+  box-shadow:
+    0 5px 18px rgba(31,40,69,.042),
+    inset 0 1px 0 rgba(255,255,255,.9) !important;
+}
+
+/* 14. Fine divider language */
+hr{
+  border-top-color:#e9ecf2 !important;
+}
+
+/* 15. Reward-like success badge */
+.success-badge,
+.zero-badge,
+.no-spend-badge{
+  color:#16886f !important;
+  background:linear-gradient(135deg,#eafaf5,#edf8ff) !important;
+  border:1px solid rgba(31,184,143,.24) !important;
+  box-shadow:0 4px 12px rgba(31,184,143,.07) !important;
+}
+
+/* 16. Accessibility / contrast safeguard */
+.muted,
+.secondary,
+.helper-text,
+.description,
+small{
+  color:#7c8495;
+}
+
+/* Avoid gradients on tiny text where readability matters */
+input,select,textarea,
+.day-cell,
+.schedule-item,
+.expense-item{
+  -webkit-text-fill-color:initial;
+}
+
+</style>
+
+<style id="kb-kookmin-card-override">
+/* KB국민카드: 실적 대상이 아닌 포인트 적립 카드 */
+.kb-kookmin-card {
+  background: linear-gradient(135deg, #FFD400 0%, #FFC400 100%) !important;
+  border: 1px solid #E7AD00 !important;
+  color: #111827 !important;
+  box-shadow: 0 8px 22px rgba(224, 171, 0, .20), inset 0 1px 0 rgba(255,255,255,.45) !important;
+}
+.kb-kookmin-card .main-card-badge {
+  background: #111827 !important;
+  color: #FFD400 !important;
+  border: 0 !important;
+}
+
+/* 카드사 대표 아이콘: 공식 로고를 복제하지 않고 제품 UI용 심볼로 표현 */
+.card-company-icon {
+  width: 23px;
+  height: 23px;
+  flex: 0 0 23px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.card-company-icon svg {
+  width: 17px;
+  height: 17px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.card-company-icon.kb {
+  color: #4a3b00;
+  background: rgba(255,255,255,.32);
+  border: 1px solid rgba(74,59,0,.15);
+}
+.card-company-icon.shinhan {
+  color: #1769d1;
+  background: #edf5ff;
+  border: 1px solid #d8e8ff;
+}
+.card-company-icon.woori {
+  color: #1768b3;
+  background: #eef7ff;
+  border: 1px solid #d8ebff;
+}
+.card-company-icon.samsung {
+  color: #4268b9;
+  background: #eef3ff;
+  border: 1px solid #dbe4fa;
+}
+.card-company-icon.lotte {
+  color: #d64b58;
+  background: #fff1f2;
+  border: 1px solid #ffe0e3;
+}
+
+/* 카드명은 아이콘과 함께 한 덩어리로 정렬 */
+.payment-card-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.payment-card-name-text {
+  white-space: nowrap;
+}
+
+/* 국민카드는 문구를 비우고 카드명 자체를 깔끔하게 강조 */
+.kb-kookmin-card .kb-point-label,
+.kb-kookmin-card .kb-point-status {
+  display: none !important;
+}
+.kb-kookmin-card > div:first-child {
+  min-height: 31px;
+}
+.kb-kookmin-card .payment-card-name-text {
+  color: #342900;
+  font-weight: 800;
+  letter-spacing: -.035em;
+}
+.kb-kookmin-card .kb-usage-status {
+  color: #342900;
+  font-size: .88rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+</style>
 </head>
 <body>
 
@@ -148,8 +1475,8 @@
     <!-- ==================== [좌측 메인 영역] ==================== -->
     <div>
       
-      <!-- 💡 상단 가변(Dynamic) 대시보드 영역 -->
-      <div class="card">
+      <!-- 상단 가변(Dynamic) 대시보드 영역 -->
+      <div class="card" id="dashboardCard">
         <div style="display:flex; justify-content:space-between; align-items:flex-end;">
           <div>
             <h1 id="pageTitle" style="margin:0; font-size:1.35rem; font-weight:800;">2026년 9월 가계부</h1>
@@ -158,10 +1485,8 @@
           <span style="font-size:0.75rem; color:var(--sub); font-style:italic;" id="todayReference">기준월: 2026년 9월</span>
         </div>
 
-        <!-- 6구역 요약 그리드 컨테이너 (JS에서 동적 렌더링) -->
         <div class="summary-grid" id="topSummaryGrid"></div>
 
-        <!-- 하단 게이지 바 -->
         <div class="budget-gauge-box">
           <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:bold;">
             <span id="gaugeLabel">예산 사용률</span><span id="gaugeStatus">0% 사용 중</span>
@@ -180,7 +1505,6 @@
           </h2>
           <button class="month-btn" onclick="changeMonth(1)">다음달 ▶</button>
         </div>
-        <!-- 캘린더 그리드 -->
         <div class="calendar" id="calendar"></div>
       </div>
 
@@ -213,7 +1537,6 @@
         </div>
         <div class="collapsible-content">
           <div id="todoListContainer" style="margin-bottom: 8px; min-height: 40px;">
-            <!-- 투두 목록 렌더링 위치 -->
           </div>
           
           <div id="todoAddBtnContainer" style="text-align:center; margin-top:16px;">
@@ -245,59 +1568,73 @@
       <!-- 3. 결제 수단별 이용대금 -->
       <div class="card" id="cardPayment">
         <h2 style="margin:0 0 14px 0; font-size:1.05rem;">💳 결제 수단별 이용대금 & 실적</h2>
-        <div class="kb-card-box">
+
+        <div class="main-card-box kb-kookmin-card">
           <div style="display:flex; justify-content:space-between; align-items:center; font-weight:800;">
-            <span style="display:flex; align-items:center; gap:6px; color:#713f12;"><span class="kb-badge">BEST</span>⭐ KB국민카드 (메인)</span>
-            <span id="kbStatus" style="color:#854d0e; font-size:0.9rem;">0원 (포인트 적립)</span>
+            <span class="payment-card-name">
+              <span class="main-card-badge">BEST</span>
+              <span class="card-company-icon kb" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M4 8.5h16M6.5 5.5h11l1.5 3H5z"/><path d="M5 11.5v6.5h14v-6.5"/><path d="M8 15h3M15 15h1"/></svg>
+              </span>
+              <span class="payment-card-name-text">KB국민카드</span>
+            </span>
+            <span id="kookminStatus" class="kb-usage-status">0원 사용</span>
           </div>
         </div>
-        <div style="margin-bottom:10px;"><div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:bold;"><span>신한카드</span><span id="shinhanStatus">0원 / 30만</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="shinhanBar" style="width: 0%;"></div></div></div>
-        <div style="margin-bottom:10px;"><div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:bold;"><span>우리카드</span><span id="wooriStatus">0원 / 30만</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="wooriBar" style="width: 0%;"></div></div></div>
-        <div style="margin-bottom:10px;"><div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:bold;"><span>삼성카드</span><span id="samsungStatus">0원 / 30만</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="samsungBar" style="width: 0%;"></div></div></div>
-        <div style="margin-bottom:10px;"><div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:bold;"><span>롯데카드</span><span id="lotteStatus">0원 / 30만</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="lotteBar" style="width: 0%;"></div></div></div>
-        <div style="margin-bottom:10px;"><div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:bold;"><span>현대카드</span><span id="hyundaiStatus">0원 / 30만</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="hyundaiBar" style="width: 0%;"></div></div></div>
+
+        <div style="margin-bottom:10px;"><div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:bold;"><span class="payment-card-name"><span class="card-company-icon shinhan" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/><path d="M9 12h6M12 9v6"/></svg></span><span class="payment-card-name-text">신한카드</span></span><span id="shinhanStatus">0원 / 30만</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="shinhanBar" style="width: 0%;"></div></div></div>
+        <div style="margin-bottom:10px;"><div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:bold;"><span class="payment-card-name"><span class="card-company-icon woori" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 8.5h14M6.5 6h11l1.5 2.5H5z"/><path d="M7 11.5v6h10v-6"/><path d="M9.5 14h5"/></svg></span><span class="payment-card-name-text">우리카드</span></span><span id="wooriStatus">0원 / 30만</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="wooriBar" style="width: 0%;"></div></div></div>
+        <div style="margin-bottom:10px;"><div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:bold;"><span class="payment-card-name"><span class="card-company-icon samsung" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4.5" y="6.5" width="15" height="11" rx="2"/><path d="M7.5 10h9M7.5 13h5"/></svg></span><span class="payment-card-name-text">삼성카드</span></span><span id="samsungStatus">0원 / 30만</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="samsungBar" style="width: 0%;"></div></div></div>
+        <div style="margin-bottom:12px;"><div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:bold;"><span class="payment-card-name"><span class="card-company-icon lotte" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17V7h4.2a3.2 3.2 0 1 1 0 6.4H7"/><path d="M11.2 13.4L16.5 17"/></svg></span><span class="payment-card-name-text">롯데카드</span></span><span id="lotteStatus">0원 / 30만</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="lotteBar" style="width: 0%;"></div></div></div>
         <div><div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:bold;"><span>💵 현금 지출</span><span id="cashStatus">0원</span></div></div>
       </div>
 
       <!-- 4. 대출 관리 & 이자 계산 -->
-      <div class="card collapsed" id="cardLoan">
-        <div class="card-header" onclick="toggleCard('cardLoan')">
+      <div class="card collapsed" id="cardLoans">
+        <div class="card-header" onclick="toggleCard('cardLoans')">
           <h2>🏦 대출 관리 & 이자 계산</h2>
           <span>▼</span>
         </div>
         <div class="collapsible-content">
-          <div class="loan-box">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-              <strong style="font-size:1rem;">농협 대출</strong><span id="nhInterest" class="loan-interest-badge">이번 달 이자: 0원</span>
+          <div class="loan-item" id="loan1Card" style="border:1px solid #e1e5ec; border-radius:12px; padding:14px; margin-bottom:10px; background:#fff;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <strong style="font-size:1rem;">농협 대출</strong>
+              <strong id="loan1Interest" style="color:#ef6674; background:#fff1f3; padding:7px 10px; border-radius:9px;">이번 달 이자: 0원</strong>
             </div>
-            <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;">
-              <span>남은 원금: <strong id="nhRemainText">0</strong>원</span><span>상환완료: <strong id="nhRepaidText" style="color:var(--success);">0</strong>원 (<span id="nhPctText" style="color:var(--success);">0%</span>)</span>
+            <div style="display:flex; justify-content:space-between; font-size:0.86rem; margin-bottom:8px;">
+              <span>남은 원금: <strong id="loan1Remaining">0원</strong></span>
+              <span>상환완료: <strong id="loan1Paid" style="color:#12a982;">0원</strong> (<strong id="loan1Percent" style="color:#12a982;">0.0%</strong>)</span>
             </div>
-            <div class="progress-bar-bg" style="height: 10px; margin-bottom: 10px;"><div class="progress-bar-fill" id="nhBar" style="width:0%; background:var(--success);"></div></div>
-            <div style="text-align: right;"><span style="font-size:0.75rem; color:var(--primary); cursor:pointer; font-weight:bold;" onclick="toggleLoanInput('nhInputDiv')">⚙️ 원금/금리 상세 입력 ▾</span></div>
-            <div id="nhInputDiv" class="loan-input-section">
-              <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:6px;">
-                <div><label style="margin-top:0;">총 원금</label><input type="number" id="nhTotal" oninput="updateLoans()"></div>
-                <div><label style="margin-top:0;">상환액</label><input type="number" id="nhRepaid" oninput="updateLoans()"></div>
-                <div><label style="margin-top:0;">금리(%)</label><input type="number" id="nhRate" step="0.01" oninput="updateLoans()"></div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="loan1Progress" style="width:0%;"></div></div>
+            <button type="button" onclick="toggleLoanDetail('loan1Detail')" class="btn-secondary" style="width:auto; margin:10px 0 0 auto; display:block; border:0; background:transparent; box-shadow:none; color:#4f75e8;">⚙ 원금/금리 상세 입력 ▼</button>
+            <div id="loan1Detail" style="display:none; margin-top:8px; padding-top:10px; border-top:1px solid #edf0f4;">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                <input type="number" id="loan1Principal" placeholder="대출 원금" min="0">
+                <input type="number" id="loan1Rate" placeholder="연 이자율 (%)" min="0" step="0.01">
+                <input type="number" id="loan1PaidInput" placeholder="상환한 원금" min="0">
               </div>
+              <button type="button" onclick="saveLoan('loan1')" style="margin-top:6px;">대출 정보 저장</button>
             </div>
           </div>
-          <div class="loan-box">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-              <strong style="font-size:1rem;">롯데 캐피탈</strong><span id="ltInterest" class="loan-interest-badge">이번 달 이자: 0원</span>
+
+          <div class="loan-item" id="loan2Card" style="border:1px solid #e1e5ec; border-radius:12px; padding:14px; background:#fff;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <strong style="font-size:1rem;">롯데 캐피탈</strong>
+              <strong id="loan2Interest" style="color:#ef6674; background:#fff1f3; padding:7px 10px; border-radius:9px;">이번 달 이자: 0원</strong>
             </div>
-            <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;">
-              <span>남은 원금: <strong id="ltRemainText">0</strong>원</span><span>상환완료: <strong id="ltRepaidText" style="color:var(--success);">0</strong>원 (<span id="ltPctText" style="color:var(--success);">0%</span>)</span>
+            <div style="display:flex; justify-content:space-between; font-size:0.86rem; margin-bottom:8px;">
+              <span>남은 원금: <strong id="loan2Remaining">0원</strong></span>
+              <span>상환완료: <strong id="loan2Paid" style="color:#12a982;">0원</strong> (<strong id="loan2Percent" style="color:#12a982;">0.0%</strong>)</span>
             </div>
-            <div class="progress-bar-bg" style="height: 10px; margin-bottom: 10px;"><div class="progress-bar-fill" id="ltBar" style="width:0%; background:var(--success);"></div></div>
-            <div style="text-align: right;"><span style="font-size:0.75rem; color:var(--primary); cursor:pointer; font-weight:bold;" onclick="toggleLoanInput('ltInputDiv')">⚙ 원금/금리 상세 입력 ▾</span></div>
-            <div id="ltInputDiv" class="loan-input-section">
-              <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:6px;">
-                <div><label style="margin-top:0;">총 원금</label><input type="number" id="ltTotal" oninput="updateLoans()"></div>
-                <div><label style="margin-top:0;">상환액</label><input type="number" id="ltRepaid" oninput="updateLoans()"></div>
-                <div><label style="margin-top:0;">금리(%)</label><input type="number" id="ltRate" step="0.01" oninput="updateLoans()"></div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="loan2Progress" style="width:0%;"></div></div>
+            <button type="button" onclick="toggleLoanDetail('loan2Detail')" class="btn-secondary" style="width:auto; margin:10px 0 0 auto; display:block; border:0; background:transparent; box-shadow:none; color:#4f75e8;">⚙ 원금/금리 상세 입력 ▼</button>
+            <div id="loan2Detail" style="display:none; margin-top:8px; padding-top:10px; border-top:1px solid #edf0f4;">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+                <input type="number" id="loan2Principal" placeholder="대출 원금" min="0">
+                <input type="number" id="loan2Rate" placeholder="연 이자율 (%)" min="0" step="0.01">
+                <input type="number" id="loan2PaidInput" placeholder="상환한 원금" min="0">
               </div>
+              <button type="button" onclick="saveLoan('loan2')" style="margin-top:6px;">대출 정보 저장</button>
             </div>
           </div>
         </div>
@@ -357,10 +1694,9 @@
 
     let viewYear = systemToday.getFullYear();
     let viewMonth = systemToday.getMonth();
-    let currentMode = 'ledger'; // 'ledger' or 'schedule'
-    
+    let currentMode = 'ledger'; 
     let selectedDate = systemTodayStr;
-    const STORAGE_KEY = 'my_ledger_app_data_v4';
+    const STORAGE_KEY = 'my_ledger_app_data_v8';
 
     function loadState() {
       let saved = localStorage.getItem(STORAGE_KEY);
@@ -371,27 +1707,77 @@
           if (!parsed.schedules) parsed.schedules = [];
           if (!parsed.todos) parsed.todos = []; 
           if (!parsed.recentColors) parsed.recentColors = [];
-          if (!parsed.loans) parsed.loans = { nh: { total:0, repaid:0, rate:0 }, lotte: { total:0, repaid:0, rate:0 } };
+          if (!parsed.loans) parsed.loans = {
+            loan1: { principal: 0, rate: 0, paid: 0 },
+            loan2: { principal: 0, rate: 0, paid: 0 }
+          };
           return parsed;
         } catch(e) {}
       }
-      return { monthlyBudgets: {}, expenses: [], fixedItems: [], schedules: [], todos: [], recentColors: [], loans: { nh: { total:0, repaid:0, rate:0 }, lotte: { total:0, repaid:0, rate:0 } } };
+      return { monthlyBudgets: {}, expenses: [], fixedItems: [], schedules: [], todos: [], recentColors: [], loans: { loan1: { principal: 0, rate: 0, paid: 0 }, loan2: { principal: 0, rate: 0, paid: 0 } } };
     }
 
     let state = loadState();
 
     function toggleCard(id) { document.getElementById(id).classList.toggle('collapsed'); }
-    function toggleLoanInput(id) {
+
+    function toggleLoanDetail(id) {
       const el = document.getElementById(id);
-      el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
+      if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
     }
+
+    function saveLoan(id) {
+      if (!state.loans) state.loans = {};
+      const principal = Math.max(0, Number(document.getElementById(id + 'Principal').value) || 0);
+      const rate = Math.max(0, Number(document.getElementById(id + 'Rate').value) || 0);
+      const paid = Math.min(principal, Math.max(0, Number(document.getElementById(id + 'PaidInput').value) || 0));
+      state.loans[id] = { principal, rate, paid };
+      save();
+    }
+
+    function renderLoans() {
+      if (!state.loans) state.loans = {
+        loan1: { principal: 0, rate: 0, paid: 0 },
+        loan2: { principal: 0, rate: 0, paid: 0 }
+      };
+
+      ['loan1','loan2'].forEach(id => {
+        const loan = state.loans[id] || { principal: 0, rate: 0, paid: 0 };
+        const principal = Math.max(0, Number(loan.principal) || 0);
+        const paid = Math.min(principal, Math.max(0, Number(loan.paid) || 0));
+        const rate = Math.max(0, Number(loan.rate) || 0);
+        const remaining = Math.max(0, principal - paid);
+        const interest = Math.round(remaining * (rate / 100) / 12);
+        const pct = principal > 0 ? Math.min(100, (paid / principal) * 100) : 0;
+
+        const set = (suffix, value) => {
+          const el = document.getElementById(id + suffix);
+          if (el) el.innerText = value;
+        };
+        set('Interest', `이번 달 이자: ${interest.toLocaleString()}원`);
+        set('Remaining', `${remaining.toLocaleString()}원`);
+        set('Paid', `${paid.toLocaleString()}원`);
+        set('Percent', `${pct.toFixed(1)}%`);
+
+        const bar = document.getElementById(id + 'Progress');
+        if (bar) bar.style.width = pct + '%';
+
+        const principalInput = document.getElementById(id + 'Principal');
+        const rateInput = document.getElementById(id + 'Rate');
+        const paidInput = document.getElementById(id + 'PaidInput');
+        if (principalInput && document.activeElement !== principalInput) principalInput.value = principal || '';
+        if (rateInput && document.activeElement !== rateInput) rateInput.value = rate || '';
+        if (paidInput && document.activeElement !== paidInput) paidInput.value = paid || '';
+      });
+    }
+
 
     function save() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       render();
     }
 
-    /* 캘린더 모드 전환 */
+    // 💡 캘린더 모드 토글 (에러 없이 즉각 반응)
     function toggleCalendarMode() {
       currentMode = (currentMode === 'ledger') ? 'schedule' : 'ledger';
       render();
@@ -429,7 +1815,7 @@
       } catch(e) { alert("올바르지 않은 데이터 형식입니다."); }
     }
 
-    /* 투두리스트 액션 토글 기능 */
+    /* 투두리스트 액션 토글 */
     function showTodoActions(id) {
       document.getElementById('todo-action-default-' + id).style.display = 'none';
       document.getElementById('todo-action-expanded-' + id).style.display = 'flex';
@@ -468,7 +1854,10 @@
       const input = document.getElementById('newTodoInput');
       const text = input.value.trim();
       if (!text) return;
-      const pri = parseInt(document.querySelector('input[name="todoPri"]:checked').value);
+      
+      let priElem = document.querySelector('input[name="todoPri"]:checked');
+      const pri = priElem ? parseInt(priElem.value) : 2;
+      
       state.todos.push({ id: Date.now(), date: selectedDate, text: text, done: false, priority: pri });
       save();
       hideTodoInput(); 
@@ -488,8 +1877,10 @@
       const container = document.getElementById('todoListContainer');
       const dateTodos = state.todos.filter(t => t.date === selectedDate);
       
-      const [, m, d] = selectedDate.split('-');
-      document.getElementById('todoDateDisplay').innerText = `${Number(m)}월 ${Number(d)}일`;
+      const parts = selectedDate.split('-');
+      if(parts.length === 3) {
+          document.getElementById('todoDateDisplay').innerText = `${Number(parts[1])}월 ${Number(parts[2])}일`;
+      }
 
       if (dateTodos.length === 0) {
         container.innerHTML = `<div style="text-align:center; color:var(--sub); padding:24px 0; font-size:0.85rem;">등록된 할 일이 없습니다.<br>오늘의 목표를 추가해보세요!</div>`;
@@ -528,19 +1919,18 @@
       }).join('');
     }
 
-    /* 지출, 일정, 예산 설정 등 기능 */
     function saveExpense() {
       const date = document.getElementById('expDate').value;
       const title = document.getElementById('expTitle').value.trim();
       const amount = Number(document.getElementById('expAmount').value);
       const category = document.getElementById('expCategory').value;
       const method = document.getElementById('expMethod').value;
-      if (!date || !amount) return alert('입력해주세요.');
+      if (!date || !amount) return alert('결제 금액을 올바르게 입력해주세요.');
       state.expenses.push({ id: Date.now(), date, title, cardAmount: amount, actualAmount: amount, category, method });
       save();
       document.getElementById('expTitle').value = ''; document.getElementById('expAmount').value = '';
     }
-    function deleteExpense(id) { if (confirm('삭제?')) { state.expenses = state.expenses.filter(e => e.id !== id); save(); } }
+    function deleteExpense(id) { if (confirm('해당 내역을 삭제하시겠습니까?')) { state.expenses = state.expenses.filter(e => e.id !== id); save(); } }
     
     function setSchColor(color) {
       const el = document.getElementById('schColor');
@@ -553,9 +1943,9 @@
       const title = document.getElementById('schTitle').value.trim();
       const color = document.getElementById('schColor').value;
       const note = document.getElementById('schNote').value.trim();
-      if (!startDate || !title) return alert('입력해주세요.');
+      if (!startDate || !title) return alert('일정 제목을 입력해주세요.');
       if (!endDate) endDate = startDate;
-      if (endDate < startDate) return alert('종료일 오류');
+      if (endDate < startDate) return alert('종료일이 시작일보다 빠를 수 없습니다.');
       
       state.recentColors = state.recentColors.filter(c => c !== color);
       state.recentColors.unshift(color);
@@ -565,7 +1955,8 @@
       save();
       document.getElementById('schTitle').value = ''; document.getElementById('schNote').value = '';
     }
-    function deleteSchedule(id) { if (confirm('삭제?')) { state.schedules = state.schedules.filter(s => s.id !== id); save(); } }
+    function deleteSchedule(id) { if (confirm('일정을 삭제하시겠습니까?')) { state.schedules = state.schedules.filter(s => s.id !== id); save(); } }
+    
     function addFixedItem() {
       const name = document.getElementById('fixedName').value.trim();
       const amount = Number(document.getElementById('fixedAmount').value);
@@ -583,42 +1974,25 @@
       alert('목표 예산이 저장되었습니다.');
     }
 
-    function updateLoans() {
-      state.loans.nh.total = Number(document.getElementById('nhTotal').value) || 0;
-      state.loans.nh.repaid = Number(document.getElementById('nhRepaid').value) || 0;
-      state.loans.nh.rate = Number(document.getElementById('nhRate').value) || 0;
-      state.loans.lotte.total = Number(document.getElementById('ltTotal').value) || 0;
-      state.loans.lotte.repaid = Number(document.getElementById('ltRepaid').value) || 0;
-      state.loans.lotte.rate = Number(document.getElementById('ltRate').value) || 0;
-      save();
-    }
-    function renderLoans() {
-      document.getElementById('nhTotal').value = state.loans.nh.total || '';
-      document.getElementById('nhRepaid').value = state.loans.nh.repaid || '';
-      document.getElementById('nhRate').value = state.loans.nh.rate || '';
-      document.getElementById('ltTotal').value = state.loans.lotte.total || '';
-      document.getElementById('ltRepaid').value = state.loans.lotte.repaid || '';
-      document.getElementById('ltRate').value = state.loans.lotte.rate || '';
-
-      let nhRemain = Math.max(0, state.loans.nh.total - state.loans.nh.repaid);
-      let nhInterest = Math.floor(nhRemain * (state.loans.nh.rate / 100) / 12);
-      let nhPct = state.loans.nh.total > 0 ? (state.loans.nh.repaid / state.loans.nh.total * 100) : 0;
-      document.getElementById('nhInterest').innerText = `이번 달 이자: ${nhInterest.toLocaleString()}원`;
-      document.getElementById('nhRemainText').innerText = nhRemain.toLocaleString();
-      document.getElementById('nhRepaidText').innerText = state.loans.nh.repaid.toLocaleString();
-      document.getElementById('nhPctText').innerText = nhPct.toFixed(1) + '%';
-      document.getElementById('nhBar').style.width = Math.min(100, nhPct) + '%';
-
-      let ltRemain = Math.max(0, state.loans.lotte.total - state.loans.lotte.repaid);
-      let ltInterest = Math.floor(ltRemain * (state.loans.lotte.rate / 100) / 12);
-      let ltPct = state.loans.lotte.total > 0 ? (state.loans.lotte.repaid / state.loans.lotte.total * 100) : 0;
-      document.getElementById('ltInterest').innerText = `이번 달 이자: ${ltInterest.toLocaleString()}원`;
-      document.getElementById('ltRemainText').innerText = ltRemain.toLocaleString();
-      document.getElementById('ltRepaidText').innerText = state.loans.lotte.repaid.toLocaleString();
-      document.getElementById('ltPctText').innerText = ltPct.toFixed(1) + '%';
-      document.getElementById('ltBar').style.width = Math.min(100, ltPct) + '%';
+    function getCategoryEmoji(cat) {
+      if(cat.includes('식비')) return '🍔';
+      if(cat.includes('교통')) return '🚌';
+      if(cat.includes('주거')) return '🏠';
+      if(cat.includes('통신')) return '📱';
+      if(cat.includes('의료') || cat.includes('건강')) return '💊';
+      if(cat.includes('교육')) return '📚';
+      if(cat.includes('의류') || cat.includes('패션')) return '👕';
+      if(cat.includes('문화') || cat.includes('여가')) return '🎬';
+      if(cat.includes('술') || cat.includes('유흥')) return '🍻';
+      if(cat.includes('카페') || cat.includes('간식')) return '☕';
+      if(cat.includes('보험')) return '🛡️';
+      if(cat.includes('미용')) return '✂️';
+      if(cat.includes('경조')) return '💌';
+      if(cat.includes('여행')) return '✈️';
+      return '🛒';
     }
 
+    // 💡 날짜 선택 시 즉시 폼 업데이트를 위한 안전한 렌더링
     function renderDynamicForm() {
       const header = document.getElementById('dynamicFormHeader');
       const body = document.getElementById('dynamicFormBody');
@@ -635,13 +2009,12 @@
           </select>
           <label>결제 수단</label>
           <select id="expMethod">
-            <option>국민카드</option><option>신한카드</option><option>우리카드</option><option>삼성카드</option><option>롯데카드</option><option>현대카드</option><option>현금</option>
+            <option>국민카드</option><option>신한카드</option><option>우리카드</option><option>삼성카드</option><option>롯데카드</option><option>현금</option>
           </select>
           <button onclick="saveExpense()">지출 등록하기</button>
         `;
       } else {
         header.innerText = "🗓️ 일정 등록";
-        
         let recentColorsHtml = state.recentColors.map(c => 
           `<div style="width:18px; height:18px; border-radius:50%; background:${c}; cursor:pointer; border:1px solid #e5e8eb; box-shadow:0 1px 2px rgba(0,0,0,0.1);" onclick="setSchColor('${c}')" title="${c}"></div>`
         ).join('');
@@ -652,7 +2025,6 @@
             <div><label>종료일</label><input type="date" id="schEndDate" value="${selectedDate}"></div>
           </div>
           <label>일정 제목</label><input type="text" id="schTitle" placeholder="예: 제주도 여행, 회의">
-          
           <label>라벨 색상</label>
           <div style="display:flex; align-items:center; gap:12px;">
             <input type="color" id="schColor" value="${state.recentColors.length > 0 ? state.recentColors[0] : '#3182f6'}" style="width:36px; height:36px; border:none; padding:0; background:transparent; cursor:pointer; flex-shrink:0;">
@@ -662,12 +2034,15 @@
               </div>
             ` : '<span style="font-size:0.75rem; color:var(--sub);">클릭하여 색상을 선택하세요</span>'}
           </div>
-          
           <label>상세 메모</label><input type="text" id="schNote" placeholder="메모할 내용">
           <button onclick="saveSchedule()" class="btn-success">일정 등록하기</button>
         `;
       }
     }
+
+    // 💡 안전한 데이터 추출 함수들 (에러 방지)
+    const getStart = s => s.startDate || s.date || '';
+    const getEnd = s => s.endDate || s.startDate || s.date || '';
 
     /* 화면 전체 렌더링 */
     function render() {
@@ -682,17 +2057,16 @@
 
       const isLedger = (currentMode === 'ledger');
       
-      // 모드에 따른 카드 숨김/표시
+      // 카드 토글 처리
       document.getElementById('cardPayment').style.display = isLedger ? 'block' : 'none';
-      document.getElementById('cardLoan').style.display = isLedger ? 'block' : 'none';
       document.getElementById('cardFixedExpenses').style.display = isLedger ? 'block' : 'none';
       document.getElementById('cardBackup').style.display = isLedger ? 'block' : 'none';
       document.getElementById('cardBudget').style.display = isLedger ? 'block' : 'none';
       document.getElementById('cardTodo').style.display = isLedger ? 'none' : 'block';
 
-      /* 공통 계산 (지출, 카드) */
       const targetBudget = state.monthlyBudgets[monthKey] ?? 900000;
-      document.getElementById('budgetInput').value = targetBudget;
+      if(document.getElementById('budgetInput')) document.getElementById('budgetInput').value = targetBudget;
+      
       const fixedTotal = state.fixedItems.reduce((s, i) => s + i.amount, 0);
       const monthExpenses = state.expenses.filter(e => e.date && e.date.startsWith(monthKey));
       const totalSpent = monthExpenses.reduce((s, e) => s + e.actualAmount, 0);
@@ -707,16 +2081,15 @@
       const dailyTarget = remainVariableBudget > 0 ? Math.floor(remainVariableBudget / remainingDays) : 0;
       const avgSpent = pastDaysCount > 0 ? Math.floor(totalSpent / pastDaysCount) : 0;
 
-      let cardTotals = {};
-      monthExpenses.forEach(e => { cardTotals[e.method] = (cardTotals[e.method] || 0) + e.actualAmount; });
-      let totalCardSpent = Object.values(cardTotals).reduce((a,b)=>a+b, 0);
-      totalCardSpent -= (cardTotals['현금'] || 0);
-
-      // 💡 1. 상단 다이나믹 대시보드 렌더링
       if (isLedger) {
         document.getElementById('pageTitle').innerText = `${viewYear}년 ${viewMonth + 1}월 가계부`;
         document.getElementById('pageSubTitle').innerText = `고정지출 차감 후 순수 변동비 기준 일일 권장 지출액 자동 계산`;
         
+        let cardTotals = {};
+        monthExpenses.forEach(e => { cardTotals[e.method] = (cardTotals[e.method] || 0) + e.actualAmount; });
+        let totalCardSpent = Object.values(cardTotals).reduce((a,b)=>a+b, 0);
+        totalCardSpent -= (cardTotals['현금'] || 0);
+
         topSummaryGrid.innerHTML = `
           <div class="sum-box"><label>목표 예산</label><div class="val blue">${targetBudget.toLocaleString()}원</div><span class="sub-badge" id="fixedExpRatio">고정지출 ${fixedRatio}% (${fixedTotal.toLocaleString()}원)</span></div>
           <div class="sum-box"><label>이번 달 총 지출</label><div class="val">${totalSpent.toLocaleString()}원</div></div>
@@ -740,26 +2113,31 @@
         document.getElementById('pageTitle').innerText = `${viewYear}년 ${viewMonth + 1}월 대시보드`;
         document.getElementById('pageSubTitle').innerText = `이번 달 일정과 할 일 목표 달성 현황`;
 
-        const monthTodos = state.todos.filter(t => t.date.startsWith(monthKey));
+        const monthTodos = state.todos.filter(t => (t.date || '').startsWith(monthKey));
         const monthDone = monthTodos.filter(t => t.done).length;
         const monthTodoPct = monthTodos.length > 0 ? Math.round((monthDone / monthTodos.length) * 100) : 0;
 
         const todayTodos = state.todos.filter(t => t.date === systemTodayStr);
         const todayDone = todayTodos.filter(t => t.done).length;
 
-        const upcomingSchedules = state.schedules.filter(s => (s.startDate || s.date) >= systemTodayStr).sort((a,b) => (a.startDate||a.date).localeCompare(b.startDate||b.date));
+        // 💡 안정성을 강화한 다가오는 일정 계산
+        const upcomingSchedules = state.schedules
+            .filter(s => getStart(s) >= systemTodayStr)
+            .sort((a,b) => getStart(a).localeCompare(getStart(b)));
+
         let upcomingText = "일정 없음";
         let upcomingSub = "-";
         if (upcomingSchedules.length > 0) {
             const nextSch = upcomingSchedules[0];
             upcomingText = nextSch.title;
-            const diffTime = new Date(nextSch.startDate || nextSch.date).getTime() - new Date(systemTodayStr).getTime();
+            const diffTime = new Date(getStart(nextSch)).getTime() - new Date(systemTodayStr).getTime();
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            upcomingSub = diffDays === 0 ? "D-Day" : `D-${diffDays}`;
+            upcomingSub = diffDays <= 0 ? "D-Day" : `D-${diffDays}`;
         }
 
-        const monthSchCount = state.schedules.filter(s => (s.startDate || s.date) && (s.startDate || s.date).startsWith(monthKey)).length;
+        const monthSchCount = state.schedules.filter(s => getStart(s).startsWith(monthKey)).length;
 
+        // 💡 안정성을 강화한 연속 달성 (Streak) 계산
         let streak = 0;
         let checkDate = new Date(systemTodayStr);
         checkDate.setDate(checkDate.getDate() - 1);
@@ -782,7 +2160,10 @@
         let monDate = new Date(sysDate); monDate.setDate(sysDate.getDate() + diffToMon);
         let sunDate = new Date(monDate); sunDate.setDate(monDate.getDate() + 6);
         const formatD = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        const weekTodos = state.todos.filter(t => t.date >= formatD(monDate) && t.date <= formatD(sunDate));
+        const wStart = formatD(monDate);
+        const wEnd = formatD(sunDate);
+
+        const weekTodos = state.todos.filter(t => t.date >= wStart && t.date <= wEnd);
         const weekDone = weekTodos.filter(t => t.done).length;
         const weekPct = weekTodos.length > 0 ? Math.round((weekDone / weekTodos.length) * 100) : 0;
 
@@ -803,12 +2184,13 @@
         calTitleText.innerText = `${viewMonth + 1}월 일정 캘린더`;
         calModeBadge.innerText = `일정 모드 🔄`;
         calModeBadge.className = 'mode-badge schedule';
-        renderTodos();
+        
+        renderTodos(); // 투두리스트 영역 갱신
       }
 
       renderDynamicForm();
 
-      /* 캘린더 그리드 */
+      /* 캘린더 그리드 그리기 */
       const cal = document.getElementById('calendar');
       cal.innerHTML = '';
       ['일', '월', '화', '수', '목', '금', '토'].forEach(dh => cal.innerHTML += `<div class="day-header">${dh}</div>`);
@@ -824,24 +2206,27 @@
         if (isLedger) {
           const daySpent = monthExpenses.filter(e => e.date === dateStr).reduce((s, e) => s + e.actualAmount, 0);
           const isPastOrToday = dateStr <= systemTodayStr;
-          if (daySpent >= 40000) dayClass += ' high-expense';
+          
           if (isPastOrToday) {
-            if (daySpent === 0) contentHtml = `<div class="badge-no-spent">🎉</div>`;
-            else contentHtml = `<div class="day-spent">${daySpent.toLocaleString()}원</div>`;
+            if (daySpent === 0) {
+              dayClass += ' no-expense';
+              contentHtml = `<div class="badge-no-spent">🎉</div>`;
+            } else {
+              if (daySpent >= 40000) dayClass += ' high-expense';
+              contentHtml = `<div class="day-spent">${daySpent.toLocaleString()}원</div>`;
+            }
           }
         } else {
-          const daySchedules = state.schedules.filter(s => {
-            const start = s.startDate || s.date;
-            const end = s.endDate || s.startDate || s.date;
-            return dateStr >= start && dateStr <= end;
-          });
+          // 일정 바 표시 처리
+          const daySchedules = state.schedules.filter(s => dateStr >= getStart(s) && dateStr <= getEnd(s));
           let schHtml = daySchedules.map(sch => {
-            const start = sch.startDate || sch.date;
-            const end = sch.endDate || sch.startDate || sch.date;
+            const start = getStart(sch);
+            const end = getEnd(sch);
             const isStart = (dateStr === start);
             const isEnd = (dateStr === end);
             const isSat = ((firstDayIdx + i - 1) % 7 === 6);
             const isSun = ((firstDayIdx + i - 1) % 7 === 0);
+            
             let barType = '';
             if (start === end) barType = ''; 
             else if (isStart) barType = isSat ? '' : 'cont-start';
@@ -855,6 +2240,7 @@
             return `<div class="sch-bar ${barType}" style="background-color: ${sch.color || '#3182f6'};">${showText}</div>`;
           }).join('');
 
+          // 캘린더 내 투두 달성 배지
           const dayTodos = state.todos.filter(t => t.date === dateStr);
           let todoBadgeHtml = '';
           if (dayTodos.length > 0) {
@@ -888,36 +2274,89 @@
             <div><strong>${item.amount.toLocaleString()}원</strong><button class="action-btn btn-del" onclick="deleteFixedItem(${item.id})">삭제</button></div>
           </div>`).join('') || `<small style="color:var(--sub);">등록된 고정지출이 없습니다.</small>`;
 
-        const cards = [{id:'신한카드', elem:'shinhan'}, {id:'우리카드', elem:'woori'}, {id:'삼성카드', elem:'samsung'}, {id:'롯데카드', elem:'lotte'}, {id:'현대카드', elem:'hyundai'}];
-        cards.forEach(c => {
-          let spent = cardTotals[c.id] || 0;
-          let pct = Math.min(100, (spent / 300000) * 100);
-          document.getElementById(c.elem + 'Status').innerText = `${spent.toLocaleString()}원 / 30만`;
-          let bar = document.getElementById(c.elem + 'Bar');
-          bar.style.width = pct + '%';
-          bar.className = pct >= 100 ? 'progress-bar-fill achieved' : 'progress-bar-fill';
-        });
-        
-        let kbSpent = cardTotals['국민카드'] || 0;
-        document.getElementById('kbStatus').innerText = `${kbSpent.toLocaleString()}원 (포인트 적립)`;
-        document.getElementById('cashStatus').innerText = `${(cardTotals['현금'] || 0).toLocaleString()}원`;
+        let cardTotals = {};
+        monthExpenses.forEach(e => { cardTotals[e.method] = (cardTotals[e.method] || 0) + e.actualAmount; });
 
+        const paymentTargets = {
+          shinhan: { method: '신한카드', target: 300000, status: 'shinhanStatus', bar: 'shinhanBar' },
+          woori: { method: '우리카드', target: 300000, status: 'wooriStatus', bar: 'wooriBar' },
+          samsung: { method: '삼성카드', target: 300000, status: 'samsungStatus', bar: 'samsungBar' },
+          lotte: { method: '롯데카드', target: 300000, status: 'lotteStatus', bar: 'lotteBar' }
+        };
+
+        // KB국민카드는 실적 목표가 없는 카드지만, 실제 사용금액은 별도로 표시
+        const kookminSpent = cardTotals['국민카드'] || 0;
+        const kookminStatusEl = document.getElementById('kookminStatus');
+        if (kookminStatusEl) {
+          kookminStatusEl.innerText = `${kookminSpent.toLocaleString()}원 사용`;
+        }
+
+        Object.values(paymentTargets).forEach(card => {
+          const spent = cardTotals[card.method] || 0;
+          const pct = Math.min(100, (spent / card.target) * 100);
+          const statusEl = document.getElementById(card.status);
+          const barEl = document.getElementById(card.bar);
+          if (statusEl) statusEl.innerText = `${spent.toLocaleString()}원 / 30만`;
+          if (barEl) {
+            barEl.style.width = pct + '%';
+            barEl.className = pct >= 100 ? 'progress-bar-fill achieved' : 'progress-bar-fill';
+          }
+        });
+
+        document.getElementById('cashStatus').innerText = `${(cardTotals['현금'] || 0).toLocaleString()}원`;
         renderLoans();
       }
 
-      /* 하단 상세 내역 (모드에 따라 분기) */
+      /* 하단 상세 내역 (모드별 완벽 분기) */
       const bottomTitle = document.getElementById('bottomDetailTitle');
       const bottomContent = document.getElementById('bottomDetailContent');
 
       if (isLedger) {
         bottomTitle.innerText = "이 달의 지출 분석 & 내역 (금액순)";
+        
+        let prevYear = viewYear;
+        let prevMonth = viewMonth - 1;
+        if (prevMonth < 0) { prevMonth = 11; prevYear--; }
+        const prevMonthKey = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}`;
+        const prevMonthExpenses = state.expenses.filter(e => (e.date||'').startsWith(prevMonthKey));
+
         const catTotals = {};
+        const prevCatTotals = {};
         monthExpenses.forEach(e => { catTotals[e.category] = (catTotals[e.category] || 0) + e.actualAmount; });
+        prevMonthExpenses.forEach(e => { prevCatTotals[e.category] = (prevCatTotals[e.category] || 0) + e.actualAmount; });
+        
         const sortedCats = Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]);
-        let catChartHtml = sortedCats.length > 0 ? sortedCats.map(cat => {
-          const pct = Math.round((catTotals[cat] / (totalSpent || 1)) * 100);
-          return `<div class="cat-bar-item"><span class="cat-bar-name">${cat}</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width: ${pct}%;"></div></div><span style="width:40px; text-align:right; color:var(--sub);">${pct}%</span></div>`;
-        }).join('') : '<small style="color:var(--sub);">기록된 지출이 없습니다.</small>';
+        const catColors = ['#00c471', '#3182f6', '#ff9500', '#8b5cf6', '#ef4444', '#14b8a6', '#f43f5e'];
+
+        let catChartHtml = sortedCats.length > 0 ? sortedCats.map((cat, idx) => {
+          const amt = catTotals[cat];
+          const prevAmt = prevCatTotals[cat] || 0;
+          const diff = amt - prevAmt;
+          const pct = Math.round((amt / (totalSpent || 1)) * 100);
+          const color = catColors[idx % catColors.length];
+          const emoji = getCategoryEmoji(cat);
+
+          let diffHtml = '';
+          if (diff > 0) diffHtml = `<span style="color:var(--danger); font-weight:700;" title="전월대비 증가">▲ ${diff.toLocaleString()}</span>`;
+          else if (diff < 0) diffHtml = `<span style="color:var(--primary); font-weight:700;" title="전월대비 감소">▼ ${Math.abs(diff).toLocaleString()}</span>`;
+          else diffHtml = `<span style="color:var(--sub); font-weight:600;">-</span>`;
+          
+          const isLast = idx === sortedCats.length - 1;
+
+          return `
+          <div style="margin-bottom: ${isLast ? '0' : '12px'};">
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:4px; font-size:0.85rem;">
+              <span style="font-weight:700; color:var(--text);">${emoji} ${cat}</span>
+              <div style="text-align:right; display:flex; align-items:center; gap:6px;">
+                <span style="font-weight:800;">${amt.toLocaleString()}원 <span style="font-size:0.75rem; color:var(--sub);">(${pct}%)</span></span>
+                <span style="font-size:0.75rem; min-width:60px; text-align:right;">${diffHtml}</span>
+              </div>
+            </div>
+            <div style="height:6px; background:#e5e8eb; border-radius:3px; overflow:hidden;">
+              <div style="height:100%; width:${pct}%; background:${color}; border-radius:3px; transition:width 0.4s ease;"></div>
+            </div>
+          </div>`;
+        }).join('') : '<div style="text-align:center; color:var(--sub); padding:10px 0;">기록된 지출이 없습니다.</div>';
 
         const sortedExp = [...monthExpenses].sort((a,b) => b.actualAmount - a.actualAmount);
         let expListHtml = sortedExp.length > 0 ? sortedExp.map((e, idx) => `
@@ -925,16 +2364,19 @@
             <div><strong style="color:var(--primary); margin-right:6px;">${idx + 1}</strong><strong>${e.title || '내역 없음'}</strong><div style="font-size:0.75rem; color:var(--sub);">${e.date} | ${e.category} | ${e.method}</div></div>
             <div><strong style="margin-right:8px;">${e.actualAmount.toLocaleString()}원</strong><button class="action-btn btn-del" onclick="deleteExpense(${e.id})">삭제</button></div>
           </div>`).join('') : '<div style="text-align:center; color:var(--sub); padding:16px 0;">지출 내역이 없습니다.</div>';
+        
         bottomContent.innerHTML = `<div class="cat-chart-box">${catChartHtml}</div>${expListHtml}`;
       
       } else {
         bottomTitle.innerText = "🏆 이번 달 완료한 할 일";
-        const doneTodos = state.todos.filter(t => t.date.startsWith(monthKey) && t.done);
+        const doneTodos = state.todos.filter(t => (t.date||'').startsWith(monthKey) && t.done);
         
-        doneTodos.sort((a, b) => a.date.localeCompare(b.date));
+        doneTodos.sort((a, b) => (a.date||'').localeCompare(b.date||''));
 
         let todoListHtml = doneTodos.length > 0 ? doneTodos.map(t => {
-          const [, m, d] = t.date.split('-');
+          const parts = (t.date||'').split('-');
+          const m = parts.length === 3 ? parts[1] : '';
+          const d = parts.length === 3 ? parts[2] : '';
           const p = t.priority || 1;
           return `
           <div class="list-item" style="justify-content:flex-start; gap:12px;">
@@ -951,23 +2393,28 @@
       }
     }
 
+    // 💡 날짜 클릭 시 모든 UI(입력창 날짜 및 To-do)가 즉각 연동되도록 조치
     function selectDate(dateStr) {
       selectedDate = dateStr;
       document.querySelectorAll('.day-cell').forEach(el => el.classList.remove('selected-date'));
       const cell = document.querySelector(`.day-cell[data-date="${dateStr}"]`);
       if (cell) cell.classList.add('selected-date');
 
+      // 입력 폼에 즉시 날짜 바인딩
       if (document.getElementById('expDate')) document.getElementById('expDate').value = dateStr;
       if (document.getElementById('schStartDate')) document.getElementById('schStartDate').value = dateStr;
       if (document.getElementById('schEndDate')) document.getElementById('schEndDate').value = dateStr;
 
+      // 일정 모드일 경우 클릭 시 투두리스트 렌더링
       if (currentMode === 'schedule') {
         renderTodos();
         hideTodoInput(); 
       }
     }
 
+    // 초기화 및 실행
     render();
+    renderLoans();
   </script>
 </body>
 </html>
