@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>녕가계부</title>
+  <title>스마트 가계부 & 일정 관리 시스템</title>
   <style>
     :root { 
       --primary: #3182f6; 
@@ -105,14 +105,12 @@
     .action-btn { width: auto; padding: 4px 8px; font-size: 0.75rem; border-radius: 6px; margin-top: 0; }
     .btn-del { background: #fee2e2; color: var(--danger); }
     
-    /* 💡 결제 수단 (메인 카드 다크 디자인) */
+    /* 결제 수단 & 대출 전용 스타일 */
     .main-card-box { background: linear-gradient(135deg, #374151 0%, #111827 100%); border: 2px solid #1f2937; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); color: #ffffff; }
     .main-card-badge { background: #ffffff; color: #111827; font-size: 0.68rem; padding: 2px 6px; border-radius: 6px; font-weight: bold; }
     .progress-bar-bg { width: 100%; background: #e5e8eb; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 6px; }
     .progress-bar-fill { height: 100%; background: var(--primary); border-radius: 4px; }
     .progress-bar-fill.achieved { background: #9ca3af; }
-    
-    /* 다크모드 카드용 바(Bar) 스타일 */
     .dark-bar-bg { background: rgba(255,255,255,0.2); }
     .dark-bar-fill { background: #ffffff; }
 
@@ -237,11 +235,10 @@
         </div>
       </div>
 
-      <!-- 3. 결제 수단별 이용대금 (새로운 카드 리스트 적용) -->
+      <!-- 3. 결제 수단별 이용대금 -->
       <div class="card" id="cardPayment">
         <h2 style="margin:0 0 14px 0; font-size:1.05rem;">💳 결제 수단별 이용대금 & 실적</h2>
         
-        <!-- 현대카드 (메인) 다크 디자인 -->
         <div class="main-card-box">
           <div style="display:flex; justify-content:space-between; align-items:center; font-weight:800;">
             <span style="display:flex; align-items:center; gap:6px;"><span class="main-card-badge">BEST</span>⭐ 현대카드 (메인)</span>
@@ -250,13 +247,8 @@
           <div class="progress-bar-bg dark-bar-bg"><div class="progress-bar-fill dark-bar-fill" id="hyundaiBarMain" style="width: 0%;"></div></div>
         </div>
         
-        <!-- 국민카드 -->
         <div style="margin-bottom:10px;"><div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:bold;"><span>국민카드</span><span id="kookminStatus">0원 / 40만</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" id="kookminBar" style="width: 0%;"></div></div></div>
-        
-        <!-- 롯데카드 (무실적) -->
         <div style="margin-bottom:12px;"><div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:bold;"><span>롯데카드 <span style="color:var(--sub); font-weight:normal;">(무실적)</span></span><span id="lotteStatus">0원</span></div></div>
-        
-        <!-- 현금지출 -->
         <div><div style="display:flex; justify-content:space-between; font-size:0.83rem; font-weight:bold;"><span>💵 현금 지출</span><span id="cashStatus">0원</span></div></div>
       </div>
 
@@ -317,7 +309,7 @@
     let currentMode = 'ledger'; 
     
     let selectedDate = systemTodayStr;
-    const STORAGE_KEY = 'my_ledger_app_data_v5'; // 키 변경하여 초기화
+    const STORAGE_KEY = 'my_ledger_app_data_v6';
 
     function loadState() {
       let saved = localStorage.getItem(STORAGE_KEY);
@@ -343,7 +335,6 @@
       render();
     }
 
-    /* 캘린더 모드 전환 */
     function toggleCalendarMode() {
       currentMode = (currentMode === 'ledger') ? 'schedule' : 'ledger';
       render();
@@ -357,7 +348,6 @@
     }
     function getMonthKey() { return `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}`; }
 
-    /* 백업 및 복원 */
     function exportDataToFile() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
       const anchor = document.createElement('a');
@@ -381,7 +371,6 @@
       } catch(e) { alert("올바르지 않은 데이터 형식입니다."); }
     }
 
-    /* 투두리스트 액션 토글 기능 */
     function showTodoActions(id) {
       document.getElementById('todo-action-default-' + id).style.display = 'none';
       document.getElementById('todo-action-expanded-' + id).style.display = 'flex';
@@ -480,7 +469,6 @@
       }).join('');
     }
 
-    /* 지출, 일정, 예산 설정 등 기능 */
     function saveExpense() {
       const date = document.getElementById('expDate').value;
       const title = document.getElementById('expTitle').value.trim();
@@ -536,6 +524,25 @@
       alert('목표 예산이 저장되었습니다.');
     }
 
+    // 💡 카테고리별 이모지 반환 함수
+    function getCategoryEmoji(cat) {
+      if(cat.includes('식비')) return '🍔';
+      if(cat.includes('교통')) return '🚌';
+      if(cat.includes('주거')) return '🏠';
+      if(cat.includes('통신')) return '📱';
+      if(cat.includes('의료') || cat.includes('건강')) return '💊';
+      if(cat.includes('교육')) return '📚';
+      if(cat.includes('의류') || cat.includes('패션')) return '👕';
+      if(cat.includes('문화') || cat.includes('여가')) return '🎬';
+      if(cat.includes('술') || cat.includes('유흥')) return '🍻';
+      if(cat.includes('카페') || cat.includes('간식')) return '☕';
+      if(cat.includes('보험')) return '🛡️';
+      if(cat.includes('미용')) return '✂️';
+      if(cat.includes('경조')) return '💌';
+      if(cat.includes('여행')) return '✈️';
+      return '🛒';
+    }
+
     function renderDynamicForm() {
       const header = document.getElementById('dynamicFormHeader');
       const body = document.getElementById('dynamicFormBody');
@@ -586,7 +593,6 @@
       }
     }
 
-    /* 화면 전체 렌더링 */
     function render() {
       const monthKey = getMonthKey();
       
@@ -599,14 +605,12 @@
 
       const isLedger = (currentMode === 'ledger');
       
-      // 모드에 따른 카드 숨김/표시 (대출 카드는 완전 제거됨)
       document.getElementById('cardPayment').style.display = isLedger ? 'block' : 'none';
       document.getElementById('cardFixedExpenses').style.display = isLedger ? 'block' : 'none';
       document.getElementById('cardBackup').style.display = isLedger ? 'block' : 'none';
       document.getElementById('cardBudget').style.display = isLedger ? 'block' : 'none';
       document.getElementById('cardTodo').style.display = isLedger ? 'none' : 'block';
 
-      /* 공통 계산 (지출, 카드) */
       const targetBudget = state.monthlyBudgets[monthKey] ?? 900000;
       document.getElementById('budgetInput').value = targetBudget;
       const fixedTotal = state.fixedItems.reduce((s, i) => s + i.amount, 0);
@@ -623,7 +627,6 @@
       const dailyTarget = remainVariableBudget > 0 ? Math.floor(remainVariableBudget / remainingDays) : 0;
       const avgSpent = pastDaysCount > 0 ? Math.floor(totalSpent / pastDaysCount) : 0;
 
-      // 1. 상단 다이나믹 대시보드 렌더링
       if (isLedger) {
         document.getElementById('pageTitle').innerText = `${viewYear}년 ${viewMonth + 1}월 가계부`;
         document.getElementById('pageSubTitle').innerText = `고정지출 차감 후 순수 변동비 기준 일일 권장 지출액 자동 계산`;
@@ -724,7 +727,6 @@
 
       renderDynamicForm();
 
-      /* 캘린더 그리드 */
       const cal = document.getElementById('calendar');
       cal.innerHTML = '';
       ['일', '월', '화', '수', '목', '금', '토'].forEach(dh => cal.innerHTML += `<div class="day-header">${dh}</div>`);
@@ -800,7 +802,6 @@
           </div>`;
       }
 
-      /* 사이드바 실적/고정지출 업데이트 (새로운 카드 리스트 반영) */
       if (isLedger) {
         const fixedContainer = document.getElementById('fixedList');
         fixedContainer.innerHTML = state.fixedItems.map(item => `
@@ -812,7 +813,6 @@
         let cardTotals = {};
         monthExpenses.forEach(e => { cardTotals[e.method] = (cardTotals[e.method] || 0) + e.actualAmount; });
 
-        // 현대카드 (메인, 30만)
         let hyundaiSpent = cardTotals['현대카드'] || 0;
         let hyundaiPct = Math.min(100, (hyundaiSpent / 300000) * 100);
         document.getElementById('hyundaiStatusMain').innerText = `${hyundaiSpent.toLocaleString()}원 / 30만`;
@@ -820,7 +820,6 @@
         hdBar.style.width = hyundaiPct + '%';
         hdBar.className = hyundaiPct >= 100 ? 'progress-bar-fill dark-bar-fill achieved' : 'progress-bar-fill dark-bar-fill';
 
-        // 국민카드 (40만)
         let kookminSpent = cardTotals['국민카드'] || 0;
         let kookminPct = Math.min(100, (kookminSpent / 400000) * 100);
         document.getElementById('kookminStatus').innerText = `${kookminSpent.toLocaleString()}원 / 40만`;
@@ -828,27 +827,64 @@
         kmBar.style.width = kookminPct + '%';
         kmBar.className = kookminPct >= 100 ? 'progress-bar-fill achieved' : 'progress-bar-fill';
 
-        // 롯데카드 (무실적)
         let lotteSpent = cardTotals['롯데카드'] || 0;
         document.getElementById('lotteStatus').innerText = `${lotteSpent.toLocaleString()}원`;
 
-        // 현금 지출
         document.getElementById('cashStatus').innerText = `${(cardTotals['현금'] || 0).toLocaleString()}원`;
       }
 
-      /* 하단 상세 내역 (모드에 따라 분기) */
       const bottomTitle = document.getElementById('bottomDetailTitle');
       const bottomContent = document.getElementById('bottomDetailContent');
 
       if (isLedger) {
         bottomTitle.innerText = "이 달의 지출 분석 & 내역 (금액순)";
+        
+        // 💡 전월 데이터 계산 (전월 대비 표시용)
+        let prevYear = viewYear;
+        let prevMonth = viewMonth - 1;
+        if (prevMonth < 0) { prevMonth = 11; prevYear--; }
+        const prevMonthKey = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}`;
+        const prevMonthExpenses = state.expenses.filter(e => e.date && e.date.startsWith(prevMonthKey));
+
         const catTotals = {};
+        const prevCatTotals = {};
         monthExpenses.forEach(e => { catTotals[e.category] = (catTotals[e.category] || 0) + e.actualAmount; });
+        prevMonthExpenses.forEach(e => { prevCatTotals[e.category] = (prevCatTotals[e.category] || 0) + e.actualAmount; });
+        
         const sortedCats = Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]);
-        let catChartHtml = sortedCats.length > 0 ? sortedCats.map(cat => {
-          const pct = Math.round((catTotals[cat] / (totalSpent || 1)) * 100);
-          return `<div class="cat-bar-item"><span class="cat-bar-name">${cat}</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width: ${pct}%;"></div></div><span style="width:40px; text-align:right; color:var(--sub);">${pct}%</span></div>`;
-        }).join('') : '<small style="color:var(--sub);">기록된 지출이 없습니다.</small>';
+        const catColors = ['#3182f6', '#00c471', '#ff9500', '#8b5cf6', '#ef4444', '#14b8a6', '#f43f5e'];
+
+        // 💡 새로운 스타일의 바 차트 렌더링
+        let catChartHtml = sortedCats.length > 0 ? sortedCats.map((cat, idx) => {
+          const amt = catTotals[cat];
+          const prevAmt = prevCatTotals[cat] || 0;
+          const diff = amt - prevAmt;
+          const pct = Math.round((amt / (totalSpent || 1)) * 100);
+          const color = catColors[idx % catColors.length];
+          const emoji = getCategoryEmoji(cat);
+
+          let diffHtml = '';
+          if (diff > 0) diffHtml = `전월 대비 <span style="color:var(--danger); font-weight:bold;">▲ ${diff.toLocaleString()}원</span> 증가`;
+          else if (diff < 0) diffHtml = `전월 대비 <span style="color:var(--primary); font-weight:bold;">▼ ${Math.abs(diff).toLocaleString()}원</span> 감소`;
+          else diffHtml = `<span style="color:var(--sub);">전월과 지출액 동일</span>`;
+
+          return `
+          <div style="margin-bottom: 20px; background:#ffffff; border:1px solid #f2f4f6; padding:14px; border-radius:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:8px;">
+              <span style="font-weight:800; font-size:1rem; color:var(--text);">${emoji} ${cat}</span>
+              <div style="text-align:right;">
+                <span style="font-weight:900; font-size:1.05rem;">${amt.toLocaleString()}원</span>
+                <span style="font-size:0.85rem; color:var(--sub); margin-left:4px; font-weight:600;">(${pct}%)</span>
+              </div>
+            </div>
+            <div style="height:12px; background:#e5e8eb; border-radius:6px; overflow:hidden;">
+              <div style="height:100%; width:${pct}%; background:${color}; border-radius:6px; transition:width 0.4s ease;"></div>
+            </div>
+            <div style="margin-top:8px; font-size:0.8rem; color:var(--sub);">
+              ${diffHtml}
+            </div>
+          </div>`;
+        }).join('') : '<div style="text-align:center; color:var(--sub); padding:10px 0;">기록된 지출이 없습니다.</div>';
 
         const sortedExp = [...monthExpenses].sort((a,b) => b.actualAmount - a.actualAmount);
         let expListHtml = sortedExp.length > 0 ? sortedExp.map((e, idx) => `
@@ -856,7 +892,8 @@
             <div><strong style="color:var(--primary); margin-right:6px;">${idx + 1}</strong><strong>${e.title || '내역 없음'}</strong><div style="font-size:0.75rem; color:var(--sub);">${e.date} | ${e.category} | ${e.method}</div></div>
             <div><strong style="margin-right:8px;">${e.actualAmount.toLocaleString()}원</strong><button class="action-btn btn-del" onclick="deleteExpense(${e.id})">삭제</button></div>
           </div>`).join('') : '<div style="text-align:center; color:var(--sub); padding:16px 0;">지출 내역이 없습니다.</div>';
-        bottomContent.innerHTML = `<div class="cat-chart-box">${catChartHtml}</div>${expListHtml}`;
+        
+        bottomContent.innerHTML = `<div style="margin-bottom:24px;">${catChartHtml}</div>${expListHtml}`;
       
       } else {
         bottomTitle.innerText = "🏆 이번 달 완료한 할 일";
