@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>승환캘린더</title>
+  <title>스마트 가계부 & 일정 관리 시스템</title>
   <style>
     :root { 
       --primary: #3182f6; 
@@ -2063,6 +2063,8 @@ input,select,textarea,
       document.getElementById('cardBackup').style.display = isLedger ? 'block' : 'none';
       document.getElementById('cardBudget').style.display = isLedger ? 'block' : 'none';
       document.getElementById('cardTodo').style.display = isLedger ? 'none' : 'block';
+      // 일정 모드에서는 대출 관리 영역을 숨기고, 가계부 모드에서만 표시
+      document.getElementById('cardLoans').style.display = isLedger ? 'block' : 'none';
 
       const targetBudget = state.monthlyBudgets[monthKey] ?? 900000;
       if(document.getElementById('budgetInput')) document.getElementById('budgetInput').value = targetBudget;
