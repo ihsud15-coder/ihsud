@@ -1,877 +1,717 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>승환가계부 Pro (버전 2)</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <style>
-        :root {
-            --primary-color: #4a90e2;
-            --bg-color: #f4f7f6;
-            --card-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026년 9월 가계부 및 일정 관리</title>
+  <style>
+    :root {
+      --bg-color: #f3f4f6;
+      --card-bg: #ffffff;
+      --primary-color: #2563eb;
+      --primary-hover: #1d4ed8;
+      --text-main: #1f2937;
+      --text-sub: #6b7280;
+      --border-color: #e5e7eb;
+      --danger-color: #ef4444;
+      --accent-green: #10b981;
+    }
 
-        body {
-            background-color: var(--bg-color);
-            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-            color: #333;
-            padding-bottom: 50px;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
 
-        .header-title {
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
 
-        .dashboard-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: var(--card-shadow);
-            border: none;
-            margin-bottom: 20px;
-            transition: transform 0.2s ease;
-        }
+    .dashboard-container {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 20px;
+      max-width: 1200px;
+      width: 100%;
+    }
 
-        .card-title-custom {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+    /* 카드 기본 스타일 */
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
 
-        .card-collapsible {
-            cursor: pointer;
-        }
+    /* ----- 좌측 영역 ----- */
+    /* 헤더 요약 정보 */
+    .header-card {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
 
-        .card-collapsible .bi-chevron-down {
-            transition: transform 0.3s;
-        }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
 
-        .card-collapsible.collapsed .bi-chevron-down {
-            transform: rotate(-90deg);
-        }
+    .header-title h1 {
+      font-size: 22px;
+      font-weight: 800;
+    }
 
-        .card-content-collapsible {
-            display: block;
-        }
+    .header-title p {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-top: 4px;
+    }
 
-        .card-collapsible.collapsed + .card-content-collapsible {
-            display: none;
-        }
+    .meta-info {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
 
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #1a1a1a;
-        }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
 
-        .card-progress-item {
-            margin-bottom: 15px;
-        }
+    .summary-box {
+      background-color: #f9fafb;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
-        .card-progress-item:last-child {
-            margin-bottom: 0;
-        }
+    .summary-box.highlight {
+      background-color: #eff6ff;
+    }
 
-        .progress {
-            height: 10px;
-            border-radius: 5px;
-            background-color: #e9ecef;
-        }
+    .summary-label {
+      font-size: 11px;
+      color: var(--text-sub);
+      font-weight: 600;
+    }
 
-        .progress-bar-main {
-            background-color: #ff9f43;
-        }
+    .summary-value {
+      font-size: 16px;
+      font-weight: 800;
+    }
 
-        /* 캘린더 스타일 */
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
+    .summary-box.highlight .summary-value {
+      color: var(--primary-color);
+    }
 
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 6px;
-            text-align: center;
-        }
+    .summary-box .sub-text {
+      font-size: 10px;
+      color: var(--text-sub);
+    }
 
-        .calendar-day-head {
-            font-weight: 600;
-            padding: 8px 0;
-            color: #888;
-            font-size: 0.85rem;
-        }
+    .progress-bar-container {
+      background-color: #f3f4f6;
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
 
-        .calendar-day-head.sun { color: #e74c3c; }
-        .calendar-day-head.sat { color: #3498db; }
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+    }
 
-        .calendar-cell {
-            background: #fff;
-            border-radius: 10px;
-            padding: 6px 4px;
-            min-height: 72px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-            border: 1px solid #f0f0f0;
-            cursor: pointer;
-            position: relative;
-        }
+    .progress-bar {
+      height: 10px;
+      background-color: #e5e7eb;
+      border-radius: 5px;
+      overflow: hidden;
+    }
 
-        .calendar-cell.empty {
-            background: transparent;
-            border: none;
-            cursor: default;
-        }
+    .progress-fill {
+      width: 79%;
+      height: 100%;
+      background-color: #f59e0b;
+    }
 
-        .calendar-cell .day-number {
-            font-weight: 600;
-            color: #444;
-            margin-bottom: 2px;
-        }
+    /* 캘린더 영역 */
+    .calendar-card {
+      min-height: 520px;
+    }
 
-        .calendar-cell.sun .day-number { color: #e74c3c; }
-        .calendar-cell.sat .day-number { color: #3498db; }
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
 
-        .calendar-cell .day-icons {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1px;
-            font-size: 0.7rem;
-            line-height: 1;
-            margin-bottom: 2px;
-            min-height: 12px;
-        }
+    .nav-btn {
+      background-color: #eff6ff;
+      color: var(--primary-color);
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
 
-        .calendar-cell .day-amount {
-            font-size: 0.72rem;
-            font-weight: 700;
-            color: #333;
-        }
+    /* 캘린더 모드 수위칭 탭 */
+    .calendar-toggle-group {
+      display: flex;
+      background-color: #f3f4f6;
+      border-radius: 10px;
+      padding: 3px;
+    }
 
-        /* 과소비 & 무지출 하이라이트 */
-        .calendar-cell.no-expense {
-            background-color: #e8f8f5;
-            border: 1px solid #a3e4d7;
-        }
+    .toggle-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-sub);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
 
-        .calendar-cell.high-expense {
-            background-color: #fdedec;
-            border: 1px solid #fadbd8;
-        }
+    .toggle-btn.active {
+      background-color: #ffffff;
+      color: var(--primary-color);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
 
-        .calendar-cell.high-expense .day-amount {
-            color: #e74c3c;
-        }
+    /* 캘린더 그리드 */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+    }
 
-        .calendar-cell.today {
-            border: 2px solid #3498db;
-        }
+    .day-header {
+      font-size: 12px;
+      font-weight: 700;
+      padding-bottom: 8px;
+      color: var(--text-sub);
+    }
 
-        .badge-card {
-            font-size: 0.75rem;
-            padding: 3px 8px;
-            border-radius: 12px;
-        }
+    .day-header.sun { color: var(--danger-color); }
+    .day-header.sat { color: var(--primary-color); }
 
-        .badge-main {
-            background-color: #fff3e0;
-            color: #e67e22;
-            border: 1px solid #ffe0b2;
-        }
+    .day-cell {
+      background-color: #f9fafb;
+      border-radius: 10px;
+      min-height: 72px;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-size: 12px;
+      border: 1px solid transparent;
+      text-align: left;
+    }
 
-        .table-custom th {
-            background-color: #f8f9fa;
-            font-size: 0.85rem;
-            color: #666;
-        }
+    .day-cell.today {
+      border: 2px solid var(--primary-color);
+      background-color: #ffffff;
+    }
 
-        .table-custom td {
-            vertical-align: middle;
-            font-size: 0.9rem;
-        }
+    .day-num {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
 
-        optgroup {
-            font-weight: bold;
-            color: #2c3e50;
-        }
-    </style>
+    .day-num.sun { color: var(--danger-color); }
+    .day-num.sat { color: var(--primary-color); }
+
+    /* 가계부 모드 전용 금액 태그 */
+    .amount-tag {
+      font-size: 10px;
+      font-weight: 700;
+      text-align: right;
+    }
+    .amount-tag.high { color: var(--danger-color); }
+    .amount-tag.normal { color: var(--text-main); }
+
+    /* 일정 관리 모드 전용 칩 라벨 (첫 번째 참고 이미지 스타일) */
+    .event-chip {
+      font-size: 10px;
+      padding: 3px 6px;
+      border-radius: 6px;
+      color: white;
+      font-weight: 600;
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+    .chip-univ { background-color: #4b5563; }
+    .chip-blog { background-color: #2563eb; }
+    .chip-work { background-color: #d97706; }
+
+    /* collapsible 섹션 헤더 */
+    .collapsible-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    /* ----- 우측 영역 ----- */
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--text-sub);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .payment-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .payment-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+    }
+  </style>
 </head>
 <body>
 
-<div class="container py-4">
-    <!-- 헤더 -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="header-title mb-0">승환가계부 <span class="fs-6 badge bg-primary">v2.0</span></h2>
-            <p class="text-muted small mb-0">카드 실적 / 대출 이자 / 지출 구분 통합 관리</p>
+  <div class="dashboard-container">
+    <!-- 좌측 메인 영역 -->
+    <div class="main-content">
+      
+      <!-- 상단 가계부 요약 카드 -->
+      <div class="card header-card">
+        <div class="header-top">
+          <div class="header-title">
+            <h1>2026년 9월 가계부</h1>
+            <p>고정지출 목록 차감 후 순수 변동비 기준 일일 권장 지출액 계산</p>
+          </div>
+          <div class="meta-info">기준월: 2026년 9월</div>
         </div>
-        <button class="btn btn-primary btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
-            <i class="bi bi-plus-lg me-1"></i> 지출 입력
-        </button>
+
+        <div class="summary-grid">
+          <div class="summary-box highlight">
+            <span class="summary-label">목표 예산</span>
+            <span class="summary-value">900,000원</span>
+            <span class="sub-text">고정지출 0.0% (0원)</span>
+          </div>
+          <div class="summary-box">
+            <span class="summary-label">이번 달 총 지출</span>
+            <span class="summary-value">711,712원</span>
+          </div>
+          <div class="summary-box">
+            <span class="summary-label">남은 변동비 예산</span>
+            <span class="summary-value" style="color: var(--accent-green);">188,288원</span>
+          </div>
+          <div class="summary-box">
+            <span class="summary-label">오늘 권장 예산 🎮</span>
+            <span class="summary-value">188,288원</span>
+            <span class="sub-text">오늘 지출: 2,000원</span>
+          </div>
+          <div class="summary-box">
+            <span class="summary-label">일평균 지출</span>
+            <span class="summary-value">23,723원</span>
+          </div>
+        </div>
+
+        <div class="progress-bar-container">
+          <div class="progress-header">
+            <span>예산 사용률</span>
+            <span style="color: #d97706;">⚠️ 79% 사용 중</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 캘린더 카드 (모드 스위칭 지원) -->
+      <div class="card calendar-card">
+        <div class="calendar-header">
+          <button class="nav-btn">◀ 이전달</button>
+          
+          <!-- 스위칭 탭: 가계부 <-> 일정 관리 -->
+          <div class="calendar-toggle-group">
+            <button class="toggle-btn active" onclick="switchCalendarMode('expense')">9월 가계부</button>
+            <button class="toggle-btn" onclick="switchCalendarMode('schedule')">9월 일정표</button>
+          </div>
+
+          <button class="nav-btn">다음달 ▶</button>
+        </div>
+
+        <!-- 캘린더 그리드 -->
+        <div class="calendar-grid">
+          <div class="day-header sun">일</div>
+          <div class="day-header">월</div>
+          <div class="day-header">화</div>
+          <div class="day-header">수</div>
+          <div class="day-header">목</div>
+          <div class="day-header">금</div>
+          <div class="day-header sat">토</div>
+
+          <!-- 1주차 -->
+          <div class="day-cell"></div>
+          <div class="day-cell"></div>
+          <div class="day-cell">
+            <span class="day-num">1</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">2</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">3</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">4</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num sat">5</span>
+            <div class="cell-content"></div>
+          </div>
+
+          <!-- 2주차 -->
+          <div class="day-cell">
+            <span class="day-num sun">6</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">7</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">8</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">9</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">10</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">11</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num sat">12</span>
+            <div class="cell-content"></div>
+          </div>
+
+          <!-- 3주차 -->
+          <div class="day-cell">
+            <span class="day-num sun">13</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">14</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">15</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">16</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">17</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">18</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num sat">19</span>
+            <div class="cell-content"></div>
+          </div>
+
+          <!-- 4주차 -->
+          <div class="day-cell">
+            <span class="day-num sun">20</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">21</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">22</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">23</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">24</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">25</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num sat">26</span>
+            <div class="cell-content"></div>
+          </div>
+
+          <!-- 5주차 -->
+          <div class="day-cell">
+            <span class="day-num sun">27</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">28</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell">
+            <span class="day-num">29</span>
+            <div class="cell-content"></div>
+          </div>
+          <!-- 오늘 날짜 표시 -->
+          <div class="day-cell today">
+            <span class="day-num">30</span>
+            <div class="cell-content"></div>
+          </div>
+          <div class="day-cell"></div>
+          <div class="day-cell"></div>
+          <div class="day-cell"></div>
+
+        </div>
+      </div>
+
+      <!-- 하단 지출 분석 카드는 기존 UI 구조 유지 -->
+      <div class="card">
+        <div class="collapsible-header">
+          <span>이 달의 지출 분석 & 내역 (금액순)</span>
+          <span>▼</span>
+        </div>
+      </div>
     </div>
 
-    <!-- 대시보드 요약 (상단 3개 카드) -->
-    <div class="row g-3 mb-2">
-        <!-- 이번 달 총 지출 -->
-        <div class="col-md-4">
-            <div class="dashboard-card h-100">
-                <div class="card-title-custom">
-                    <span>이번 달 총 지출</span>
-                    <i class="bi bi-wallet2 text-primary fs-5"></i>
-                </div>
-                <div class="stat-value text-primary mb-2" id="totalExpenseDisplay">0원</div>
-                <p class="text-muted small mb-0">카드 총 이용대금 + 현금/기타 지출</p>
-            </div>
+    <!-- 우측 사이드바 영역 -->
+    <div class="sidebar">
+      
+      <!-- 지출 입력 폼 -->
+      <div class="card">
+        <div class="collapsible-header" style="margin-bottom: 14px;">
+          <span>지출 입력</span>
+          <span>▼</span>
         </div>
+        <form>
+          <div class="form-group">
+            <label>날짜</label>
+            <input type="date" class="form-control" value="2026-09-30">
+          </div>
+          <div class="form-group">
+            <label>내역 (태그 가능: 예: 편의점 #야식)</label>
+            <input type="text" class="form-control" placeholder="예: 카카오T #지각, 점심 #외식">
+          </div>
+          <div class="form-group">
+            <label>결제 금액</label>
+            <input type="text" class="form-control" placeholder="원">
+          </div>
+          <button type="button" class="btn-submit">등록하기</button>
+        </form>
+      </div>
 
-        <!-- 카드사 총 이용대금 (현금 제외) -->
-        <div class="col-md-4">
-            <div class="dashboard-card h-100">
-                <div class="card-title-custom">
-                    <span>카드사 총 이용대금</span>
-                    <i class="bi bi-credit-card-2-front text-success fs-5"></i>
-                </div>
-                <div class="stat-value text-success mb-2" id="cardTotalDisplay">0원</div>
-                <p class="text-muted small mb-0">6개 카드사 사용 금액 합계 (현금 제외)</p>
-            </div>
+      <!-- 고정지출 상세 관리 -->
+      <div class="card">
+        <div class="collapsible-header">
+          <span>📌 고정지출 상세 관리</span>
+          <span>▼</span>
         </div>
+      </div>
 
-        <!-- 이번 달 대출 이자 합계 -->
-        <div class="col-md-4">
-            <div class="dashboard-card h-100">
-                <div class="card-title-custom">
-                    <span>이번 달 예상 대출 이자</span>
-                    <i class="bi bi-percent text-danger fs-5"></i>
-                </div>
-                <div class="stat-value text-danger mb-2" id="loanInterestTotalDisplay">0원</div>
-                <p class="text-muted small mb-0">농협 + 롯데캐피탈 월 이자 자동 계산액</p>
-            </div>
+      <!-- 목표 예산 설정 -->
+      <div class="card">
+        <div class="collapsible-header">
+          <span>9월 목표 예산 설정</span>
+          <span>▼</span>
         </div>
+      </div>
+
+      <!-- 결제 수단별 실적 -->
+      <div class="card">
+        <div class="collapsible-header" style="margin-bottom: 10px;">
+          <span>결제 수단별 이용대금 & 실적</span>
+        </div>
+        <div class="payment-list">
+          <div class="payment-item">
+            <span>현대카드</span>
+            <span>325,212원 / 30만 (100%)</span>
+          </div>
+          <div class="payment-item">
+            <span>롯데카드 (총 이용)</span>
+            <span>330,900원</span>
+          </div>
+          <div class="payment-item">
+            <span>국민카드</span>
+            <span>0원 / 55만 (0%)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 데이터 백업 -->
+      <div class="card">
+        <div class="collapsible-header">
+          <span>데이터 백업 / 안전 이관</span>
+          <span>▼</span>
+        </div>
+      </div>
+
     </div>
+  </div>
 
-    <!-- 대출 관리 및 이자 자동 계산 (접기/펼치기 가능, 기본 접힘) -->
-    <div class="dashboard-card mb-4">
-        <div class="card-title-custom card-collapsible collapsed" id="loanHeader" onclick="toggleLoanSection()">
-            <div class="d-flex align-items-center">
-                <i class="bi bi-bank me-2 text-danger"></i>
-                <span>대출 관리 & 이자 자동 계산</span>
-            </div>
-            <i class="bi bi-chevron-down text-muted"></i>
-        </div>
-        <div class="card-content-collapsible" id="loanContent">
-            <div class="row g-3">
-                <!-- 농협 대출 -->
-                <div class="col-md-6">
-                    <div class="p-3 border rounded-3 bg-light">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="fw-bold mb-0">🏛️ 농협 대출</h6>
-                            <span class="badge bg-secondary" id="nhInterestBadge">월 이자: 0원</span>
-                        </div>
-                        <div class="row g-2 mb-2">
-                            <div class="col-6">
-                                <label class="form-label extra-small text-muted mb-1">대출 원금</label>
-                                <input type="number" class="form-control form-control-sm" id="nhOriginalAmount" value="20000000" oninput="updateLoans()">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label extra-small text-muted mb-1">현재 잔액 (남은금액)</label>
-                                <input type="number" class="form-control form-control-sm" id="nhBalance" value="15000000" oninput="updateLoans()">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label extra-small text-muted mb-1">연 금리 (%)</label>
-                                <input type="number" step="0.01" class="form-control form-control-sm" id="nhRate" value="4.5" oninput="updateLoans()">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label extra-small text-muted mb-1">이번 달 상환액</label>
-                                <input type="number" class="form-control form-control-sm" id="nhPaidThisMonth" value="500000" oninput="updateLoans()">
-                            </div>
-                        </div>
-                        <div class="mt-2">
-                            <div class="d-flex justify-content-between text-muted small mb-1">
-                                <span>상환 게이지</span>
-                                <span id="nhGaugeText">0%</span>
-                            </div>
-                            <div class="progress" style="height: 12px;">
-                                <div class="progress-bar bg-success" id="nhProgressBar" role="progressbar" style="width: 0%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 롯데캐피탈 -->
-                <div class="col-md-6">
-                    <div class="p-3 border rounded-3 bg-light">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="fw-bold mb-0">🏢 롯데 캐피탈</h6>
-                            <span class="badge bg-secondary" id="lotteInterestBadge">월 이자: 0원</span>
-                        </div>
-                        <div class="row g-2 mb-2">
-                            <div class="col-6">
-                                <label class="form-label extra-small text-muted mb-1">대출 원금</label>
-                                <input type="number" class="form-control form-control-sm" id="lotteOriginalAmount" value="10000000" oninput="updateLoans()">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label extra-small text-muted mb-1">현재 잔액 (남은금액)</label>
-                                <input type="number" class="form-control form-control-sm" id="lotteBalance" value="8000000" oninput="updateLoans()">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label extra-small text-muted mb-1">연 금리 (%)</label>
-                                <input type="number" step="0.01" class="form-control form-control-sm" id="lotteRate" value="9.8" oninput="updateLoans()">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label extra-small text-muted mb-1">이번 달 상환액</label>
-                                <input type="number" class="form-control form-control-sm" id="lottePaidThisMonth" value="200000" oninput="updateLoans()">
-                            </div>
-                        </div>
-                        <div class="mt-2">
-                            <div class="d-flex justify-content-between text-muted small mb-1">
-                                <span>상환 게이지</span>
-                                <span id="lotteGaugeText">0%</span>
-                            </div>
-                            <div class="progress" style="height: 12px;">
-                                <div class="progress-bar bg-info" id="lotteProgressBar" role="progressbar" style="width: 0%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 카드사별 실적 및 이용 현황 -->
-    <div class="dashboard-card mb-4">
-        <div class="card-title-custom">
-            <div>
-                <i class="bi bi-credit-card me-2 text-primary"></i>
-                <span>카드사별 실적 & 사용 현황</span>
-            </div>
-            <span class="small text-muted fw-normal">실적기준: 카드별 30만 원</span>
-        </div>
-
-        <div class="row g-3">
-            <!-- KB국민 (메인 - 무실적 적립) -->
-            <div class="col-md-4">
-                <div class="p-3 border rounded-3 h-100 bg-white">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span class="fw-bold">KB국민카드</span>
-                        <span class="badge badge-card badge-main">메인 (무실적 적립)</span>
-                    </div>
-                    <div class="fs-4 fw-bold text-dark mb-1" id="cardAmount_kb">0원</div>
-                    <div class="text-muted extra-small">포인트 적립 예정: <span class="fw-bold text-warning" id="kbPointDisplay">0p</span> (1% 산정)</div>
-                </div>
-            </div>
-
-            <!-- 신한카드 -->
-            <div class="col-md-4">
-                <div class="p-3 border rounded-3 h-100 bg-white">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="fw-bold">신한카드</span>
-                        <span class="small text-muted" id="cardStatus_shinhan">0 / 30만</span>
-                    </div>
-                    <div class="fs-5 fw-bold text-dark mb-2" id="cardAmount_shinhan">0원</div>
-                    <div class="progress">
-                        <div class="progress-bar bg-primary" id="cardBar_shinhan" style="width: 0%;"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 우리카드 -->
-            <div class="col-md-4">
-                <div class="p-3 border rounded-3 h-100 bg-white">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="fw-bold">우리카드</span>
-                        <span class="small text-muted" id="cardStatus_woori">0 / 30만</span>
-                    </div>
-                    <div class="fs-5 fw-bold text-dark mb-2" id="cardAmount_woori">0원</div>
-                    <div class="progress">
-                        <div class="progress-bar bg-primary" id="cardBar_woori" style="width: 0%;"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 삼성카드 -->
-            <div class="col-md-4">
-                <div class="p-3 border rounded-3 h-100 bg-white">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="fw-bold">삼성카드</span>
-                        <span class="small text-muted" id="cardStatus_samsung">0 / 30만</span>
-                    </div>
-                    <div class="fs-5 fw-bold text-dark mb-2" id="cardAmount_samsung">0원</div>
-                    <div class="progress">
-                        <div class="progress-bar bg-primary" id="cardBar_samsung" style="width: 0%;"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 롯데카드 -->
-            <div class="col-md-4">
-                <div class="p-3 border rounded-3 h-100 bg-white">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="fw-bold">롯데카드</span>
-                        <span class="small text-muted" id="cardStatus_lotte">0 / 30만</span>
-                    </div>
-                    <div class="fs-5 fw-bold text-dark mb-2" id="cardAmount_lotte">0원</div>
-                    <div class="progress">
-                        <div class="progress-bar bg-primary" id="cardBar_lotte" style="width: 0%;"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 현대카드 -->
-            <div class="col-md-4">
-                <div class="p-3 border rounded-3 h-100 bg-white">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="fw-bold">현대카드</span>
-                        <span class="small text-muted" id="cardStatus_hyundai">0 / 30만</span>
-                    </div>
-                    <div class="fs-5 fw-bold text-dark mb-2" id="cardAmount_hyundai">0원</div>
-                    <div class="progress">
-                        <div class="progress-bar bg-primary" id="cardBar_hyundai" style="width: 0%;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 캘린더 & 지출 내역 -->
-    <div class="row g-3">
-        <!-- 캘린더 (왼쪽) -->
-        <div class="col-lg-7">
-            <div class="dashboard-card">
-                <div class="calendar-header">
-                    <button class="btn btn-outline-secondary btn-sm" onclick="changeMonth(-1)"><i class="bi bi-chevron-left"></i> 이전달</button>
-                    <h5 class="fw-bold mb-0" id="calendarTitle">2026년 9월</h5>
-                    <button class="btn btn-outline-secondary btn-sm" onclick="changeMonth(1)">다음달 <i class="bi bi-chevron-right"></i></button>
-                </div>
-
-                <div class="calendar-grid">
-                    <div class="calendar-day-head sun">일</div>
-                    <div class="calendar-day-head">월</div>
-                    <div class="calendar-day-head">화</div>
-                    <div class="calendar-day-head">수</div>
-                    <div class="calendar-day-head">목</div>
-                    <div class="calendar-day-head">금</div>
-                    <div class="calendar-day-head sat">토</div>
-                </div>
-                <div class="calendar-grid" id="calendarBody">
-                    <!-- JS로 동적 생성 -->
-                </div>
-                <div class="mt-3 d-flex justify-content-end align-items-center gap-3 small text-muted">
-                    <span><span class="badge bg-success-subtle text-success border border-success me-1">🎉</span> 무지출</span>
-                    <span><span class="badge bg-danger-subtle text-danger border border-danger me-1">붉은색</span> 과소비 (일 4만원 초과)</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- 지출 리스트 (오른쪽) -->
-        <div class="col-lg-5">
-            <div class="dashboard-card">
-                <div class="card-title-custom">
-                    <span>이번 달 지출 상세 내역</span>
-                    <span class="badge bg-light text-dark border" id="itemCountBadge">0건</span>
-                </div>
-                <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
-                    <table class="table table-hover table-custom mb-0">
-                        <thead>
-                            <tr>
-                                <th>날짜</th>
-                                <th>내역 / 수단</th>
-                                <th class="text-end">금액</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="expenseTableBody">
-                            <!-- JS 생성 -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 지출 입력 모달 -->
-<div class="modal fade" id="addExpenseModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">지출 내역 추가</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="expenseForm">
-                    <div class="mb-3">
-                        <label class="form-label">날짜</label>
-                        <input type="date" class="form-control" id="expDate" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">카테고리</label>
-                        <select class="form-select" id="expCategory">
-                            <optgroup label="🍚 식비 & 카페">
-                                <option value="식비(식재료)">🛒 식비(식재료)</option>
-                                <option value="식비(외식/배달)">🍱 식비(외식/배달)</option>
-                                <option value="카페/간식" selected>☕ 카페/간식</option>
-                            </optgroup>
-                            <optgroup label="🚗 교통">
-                                <option value="교통(대중교통)">🚌 교통(대중교통)</option>
-                                <option value="교통(택시)">🚕 교통(택시)</option>
-                            </optgroup>
-                            <optgroup label="🏠 주거 & 고정비">
-                                <option value="주거(월세/관리비)">🏠 주거(월세/관리비)</option>
-                                <option value="통신(휴대폰/인터넷)">📱 통신(휴대폰/인터넷)</option>
-                                <option value="보험비">🛡️ 보험비</option>
-                            </optgroup>
-                            <optgroup label="🛒 일상 & 생활">
-                                <option value="생활">🛒 생활</option>
-                                <option value="의료/건강">🏥 의료/건강</option>
-                                <option value="뷰티미용">💇 뷰티미용</option>
-                                <option value="의류/패션">👔 의류/패션</option>
-                            </optgroup>
-                            <optgroup label="🎉 여가 & 기타">
-                                <option value="교육/자기계발">📚 교육/자기계발</option>
-                                <option value="문화여가">🎬 문화여가</option>
-                                <option value="술유흥">🍺 술유흥</option>
-                                <option value="경조선물">🎁 경조선물</option>
-                                <option value="여행숙박">✈️ 여행숙박</option>
-                            </optgroup>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">사용처 / 내용</label>
-                        <input type="text" class="form-control" id="expTitle" placeholder="예: 스타벅스, 버스요금" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">결제 수단</label>
-                        <select class="form-select" id="expPayment">
-                            <option value="국민">KB국민카드 (메인)</option>
-                            <option value="신한">신한카드</option>
-                            <option value="우리">우리카드</option>
-                            <option value="삼성">삼성카드</option>
-                            <option value="롯데">롯데카드</option>
-                            <option value="현대">현대카드</option>
-                            <option value="현금">현금 / 계좌이체</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">금액 (원)</label>
-                        <input type="number" class="form-control" id="expAmount" placeholder="0" required>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                <button type="button" class="btn btn-primary" onclick="saveExpense()">저장하기</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // 카테고리별 이모지 매핑
-    const CATEGORY_EMOJI = {
-        '식비(식재료)': '🛒',
-        '식비(외식/배달)': '🍱',
-        '카페/간식': '☕',
-        '교통(대중교통)': '🚌',
-        '교통(택시)': '🚕',
-        '주거(월세/관리비)': '🏠',
-        '통신(휴대폰/인터넷)': '📱',
-        '의료/건강': '🏥',
-        '교육/자기계발': '📚',
-        '의류/패션': '👔',
-        '문화여가': '🎬',
-        '술유흥': '🍺',
-        '생활': '🛒',
-        '보험비': '🛡️',
-        '뷰티미용': '💇',
-        '경조선물': '🎁',
-        '여행숙박': '✈️'
+  <!-- 스크립트: 가계부 <-> 일정표 데이터 전환 로직 -->
+  <script>
+    // 가계부 지출 데이터 모음
+    const expenseData = {
+      2: "8,111원", 3: "66,000원", 4: "8,000원", 5: "16,500원",
+      6: "3,750원", 7: "7,800원", 8: "5,000원", 10: "11,500원", 11: "4,100원", 12: "33,400원",
+      14: "2,400원", 15: "36,120원", 16: "1,500원", 17: "2,000원", 18: "4,977원", 19: "4,000원",
+      21: "68,600원", 22: "49,000원", 23: "103,400원", 24: "107,300원", 25: "56,000원", 26: "81,400원",
+      28: "17,554원", 29: "11,300원", 30: "2,000원"
     };
 
-    // 상태 데이터
-    let currentYear = 2026;
-    let currentMonth = 8; // 0-indexed (8 = 9월)
-    
-    // 초기 샘플 데이터
-    let expenses = [
-        { id: 1, date: '2026-09-02', category: '식비(식재료)', title: '마트 장보기', payment: '국민', amount: 8111 },
-        { id: 2, date: '2026-09-03', category: '카페/간식', title: '스타벅스', payment: '신한', amount: 66000 },
-        { id: 3, date: '2026-09-04', category: '교통(대중교통)', title: '지하철', payment: '우리', amount: 8000 },
-        { id: 4, date: '2026-09-05', category: '식비(외식/배달)', title: '점심 식사', payment: '삼성', amount: 16500 },
-        { id: 5, date: '2026-09-21', category: '교통(택시)', title: '택시 이동', payment: '롯데', amount: 68600 },
-        { id: 6, date: '2026-09-22', category: '술유흥', title: '저녁 모임', payment: '현대', amount: 49000 },
-        { id: 7, date: '2026-09-23', category: '의류/패션', title: '옷 구매', payment: '국민', amount: 103400 }
-    ];
+    // 일정표 데이터 모음 (첫 번째 질문 이미지 기준)
+    const scheduleData = {
+      1: [{ title: "[대학] 패션일러스트", type: "univ" }],
+      2: [{ title: "[블로그] 예약발행", type: "blog" }],
+      3: [{ title: "[대학] 캐릭터상품", type: "univ" }],
+      4: [{ title: "[산타]_졸작 끝", type: "work" }],
+      5: [{ title: "[대학] 웹툰콘티", type: "univ" }],
+      7: [{ title: "[대학] 패션일러스트", type: "univ" }, { title: "[대학교] 원서 접수", type: "blog" }],
+      8: [{ title: "[선화] 60화 4/3", type: "work" }],
+      9: [{ title: "[대학] 캐릭터상품", type: "univ" }],
+      12: [{ title: "[대학] 웹툰콘티", type: "univ" }],
+      14: [{ title: "[대학] 패션일러스트", type: "univ" }],
+      16: [{ title: "[대학] 캐릭터상품", type: "univ" }],
+      19: [{ title: "[대학] 웹툰콘티", type: "univ" }],
+      20: [{ title: "[선화] 61화 4/4", type: "work" }],
+      23: [{ title: "[대학] 캐릭터상품", type: "univ" }],
+      30: [{ title: "[대학] 캐릭터상품", type: "univ" }, { title: "[시즌2 복귀]", type: "work" }]
+    };
 
+    // 모드 전환 함수
+    function switchCalendarMode(mode) {
+      const buttons = document.querySelectorAll('.toggle-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      if (mode === 'expense') {
+        buttons[0].classList.add('active');
+        renderExpenseCalendar();
+      } else {
+        buttons[1].classList.add('active');
+        renderScheduleCalendar();
+      }
+    }
+
+    // 가계부 모드 렌더링
+    function renderExpenseCalendar() {
+      const cells = document.querySelectorAll('.day-cell');
+      cells.forEach(cell => {
+        const dayNumSpan = cell.querySelector('.day-num');
+        const contentDiv = cell.querySelector('.cell-content');
+        if (!dayNumSpan || !contentDiv) return;
+
+        const day = parseInt(dayNumSpan.innerText);
+        if (expenseData[day]) {
+          const isHigh = parseInt(expenseData[day].replace(/[^0-9]/g, '')) > 50000;
+          contentDiv.innerHTML = `<div class="amount-tag ${isHigh ? 'high' : 'normal'}">${expenseData[day]}</div>`;
+        } else {
+          contentDiv.innerHTML = '';
+        }
+      });
+    }
+
+    // 일정 모드 렌더링
+    function renderScheduleCalendar() {
+      const cells = document.querySelectorAll('.day-cell');
+      cells.forEach(cell => {
+        const dayNumSpan = cell.querySelector('.day-num');
+        const contentDiv = cell.querySelector('.cell-content');
+        if (!dayNumSpan || !contentDiv) return;
+
+        const day = parseInt(dayNumSpan.innerText);
+        if (scheduleData[day]) {
+          let html = '';
+          scheduleData[day].forEach(item => {
+            let classType = 'chip-univ';
+            if (item.type === 'blog') classType = 'chip-blog';
+            if (item.type === 'work') classType = 'chip-work';
+            html += `<div class="event-chip ${classType}">${item.title}</div>`;
+          });
+          contentDiv.innerHTML = html;
+        } else {
+          contentDiv.innerHTML = '';
+        }
+      });
+    }
+
+    // 초기 실행: 가계부 모드로 초기화
     document.addEventListener('DOMContentLoaded', () => {
-        // 오늘 날짜 설정
-        const todayStr = new Date().toISOString().split('T')[0];
-        document.getElementById('expDate').value = todayStr;
-
-        updateLoans();
-        renderApp();
+      renderExpenseCalendar();
     });
-
-    function toggleLoanSection() {
-        const header = document.getElementById('loanHeader');
-        header.classList.toggle('collapsed');
-    }
-
-    // 대출 이자 및 게이지 계산
-    function updateLoans() {
-        // 농협
-        const nhOrig = parseFloat(document.getElementById('nhOriginalAmount').value) || 0;
-        const nhBal = parseFloat(document.getElementById('nhBalance').value) || 0;
-        const nhRate = parseFloat(document.getElementById('nhRate').value) || 0;
-        
-        const nhRepaid = Math.max(0, nhOrig - nhBal);
-        const nhGauge = nhOrig > 0 ? Math.min(100, (nhRepaid / nhOrig) * 100) : 0;
-        const nhMonthlyInterest = Math.round((nhBal * (nhRate / 100)) / 12);
-
-        document.getElementById('nhProgressBar').style.width = nhGauge + '%';
-        document.getElementById('nhGaugeText').innerText = nhGauge.toFixed(1) + '% 상환 (' + nhRepaid.toLocaleString() + '원 갚음)';
-        document.getElementById('nhInterestBadge').innerText = '월 이자: ' + nhMonthlyInterest.toLocaleString() + '원';
-
-        // 롯데캐피탈
-        const lotteOrig = parseFloat(document.getElementById('lotteOriginalAmount').value) || 0;
-        const lotteBal = parseFloat(document.getElementById('lotteBalance').value) || 0;
-        const lotteRate = parseFloat(document.getElementById('lotteRate').value) || 0;
-        
-        const lotteRepaid = Math.max(0, lotteOrig - lotteBal);
-        const lotteGauge = lotteOrig > 0 ? Math.min(100, (lotteRepaid / lotteOrig) * 100) : 0;
-        const lotteMonthlyInterest = Math.round((lotteBal * (lotteRate / 100)) / 12);
-
-        document.getElementById('lotteProgressBar').style.width = lotteGauge + '%';
-        document.getElementById('lotteGaugeText').innerText = lotteGauge.toFixed(1) + '% 상환 (' + lotteRepaid.toLocaleString() + '원 갚음)';
-        document.getElementById('lotteInterestBadge').innerText = '월 이자: ' + lotteMonthlyInterest.toLocaleString() + '원';
-
-        // 총 이자
-        const totalInterest = nhMonthlyInterest + lotteMonthlyInterest;
-        document.getElementById('loanInterestTotalDisplay').innerText = totalInterest.toLocaleString() + '원';
-
-        renderApp();
-    }
-
-    // 메인 데이터 렌더링
-    function renderApp() {
-        renderCalendar();
-        renderTable();
-        calculateTotals();
-    }
-
-    function changeMonth(delta) {
-        currentMonth += delta;
-        if (currentMonth < 0) {
-            currentMonth = 11;
-            currentYear--;
-        } else if (currentMonth > 11) {
-            currentMonth = 0;
-            currentYear++;
-        }
-        renderApp();
-    }
-
-    function renderCalendar() {
-        document.getElementById('calendarTitle').innerText = `${currentYear}년 ${currentMonth + 1}월`;
-        const calendarBody = document.getElementById('calendarBody');
-        calendarBody.innerHTML = '';
-
-        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-
-        // 빈 칸
-        for (let i = 0; i < firstDay; i++) {
-            const emptyCell = document.createElement('div');
-            emptyCell.className = 'calendar-cell empty';
-            calendarBody.appendChild(emptyCell);
-        }
-
-        // 날짜 생성
-        for (let day = 1; day <= daysInMonth; day++) {
-            const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const dayOfWeek = new Date(currentYear, currentMonth, day).getDay();
-            
-            // 당일 지출 계산
-            const dayExpenses = expenses.filter(e => e.date === dateStr);
-            const totalDayAmount = dayExpenses.reduce((sum, e) => sum + e.amount, 0);
-
-            // 해당 날짜 카테고리 대표 이모지 추출 (중복 제거)
-            const categories = [...new Set(dayExpenses.map(e => e.category))];
-            const icons = categories.map(cat => CATEGORY_EMOJI[cat] || '💸').slice(0, 3); // 최대 3개 표시
-
-            const cell = document.createElement('div');
-            let cellClass = 'calendar-cell';
-            if (dayOfWeek === 0) cellClass += ' sun';
-            if (dayOfWeek === 6) cellClass += ' sat';
-
-            // 과소비(4만원 초과) 및 무지출 설정
-            if (totalDayAmount === 0) {
-                cellClass += ' no-expense';
-            } else if (totalDayAmount > 40000) {
-                cellClass += ' high-expense';
-            }
-
-            cell.className = cellClass;
-            cell.onclick = () => openAddModalWithDate(dateStr);
-
-            let iconHTML = '';
-            if (totalDayAmount === 0) {
-                iconHTML = '<span class="day-icons">🎉</span>';
-            } else {
-                iconHTML = `<span class="day-icons">${icons.join('')}</span>`;
-            }
-
-            cell.innerHTML = `
-                <span class="day-number">${day}</span>
-                ${iconHTML}
-                <span class="day-amount">${totalDayAmount > 0 ? totalDayAmount.toLocaleString() + '원' : ''}</span>
-            `;
-
-            calendarBody.appendChild(cell);
-        }
-    }
-
-    function renderTable() {
-        const tbody = document.getElementById('expenseTableBody');
-        tbody.innerHTML = '';
-
-        // 현재 달 데이터만 필터링
-        const currentMonthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-        const filtered = expenses.filter(e => e.date.startsWith(currentMonthPrefix));
-        filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        document.getElementById('itemCountBadge').innerText = `${filtered.length}건`;
-
-        filtered.forEach(e => {
-            const tr = document.createElement('tr');
-            const emoji = CATEGORY_EMOJI[e.category] || '💸';
-            tr.innerHTML = `
-                <td class="small text-muted">${e.date.slice(5)}</td>
-                <td>
-                    <div class="fw-bold">${emoji} ${e.title}</div>
-                    <div class="extra-small text-muted">${e.category} | <span class="badge bg-light text-dark border">${e.payment}</span></div>
-                </td>
-                <td class="text-end fw-bold">${e.amount.toLocaleString()}원</td>
-                <td class="text-end">
-                    <button class="btn btn-link text-danger p-0" onclick="deleteExpense(${e.id})"><i class="bi bi-x-circle"></i></button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    function calculateTotals() {
-        const currentMonthPrefix = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
-        const filtered = expenses.filter(e => e.date.startsWith(currentMonthPrefix));
-
-        // 카드사별 집계
-        const cardSums = {
-            '국민': 0, '신한': 0, '우리': 0, '삼성': 0, '롯데': 0, '현대': 0, '현금': 0
-        };
-
-        filtered.forEach(e => {
-            if (cardSums[e.payment] !== undefined) {
-                cardSums[e.payment] += e.amount;
-            }
-        });
-
-        // 카드사 총 이용대금 (현금 제외)
-        const totalCardAmount = cardSums['국민'] + cardSums['신한'] + cardSums['우리'] + cardSums['삼성'] + cardSums['롯데'] + cardSums['현대'];
-        
-        // 대출 이자
-        const nhBal = parseFloat(document.getElementById('nhBalance').value) || 0;
-        const nhRate = parseFloat(document.getElementById('nhRate').value) || 0;
-        const lotteBal = parseFloat(document.getElementById('lotteBalance').value) || 0;
-        const lotteRate = parseFloat(document.getElementById('lotteRate').value) || 0;
-        const totalInterest = Math.round((nhBal * (nhRate / 100)) / 12) + Math.round((lotteBal * (lotteRate / 100)) / 12);
-
-        // 총 지출 (카드 + 현금 + 이자)
-        const grandTotal = totalCardAmount + cardSums['현금'] + totalInterest;
-
-        // UI 반영
-        document.getElementById('totalExpenseDisplay').innerText = grandTotal.toLocaleString() + '원';
-        document.getElementById('cardTotalDisplay').innerText = totalCardAmount.toLocaleString() + '원';
-
-        // KB국민 (메인)
-        document.getElementById('cardAmount_kb').innerText = cardSums['국민'].toLocaleString() + '원';
-        document.getElementById('kbPointDisplay').innerText = Math.round(cardSums['국민'] * 0.01).toLocaleString() + 'p';
-
-        // 서브 카드 5종 (목표 30만 원)
-        const target = 300000;
-        const subCards = ['shinhan', 'woori', 'samsung', 'lotte', 'hyundai'];
-        const nameMap = { 'shinhan': '신한', 'woori': '우리', 'samsung': '삼성', 'lotte': '롯데', 'hyundai': '현대' };
-
-        subCards.forEach(key => {
-            const amt = cardSums[nameMap[key]];
-            const pct = Math.min(100, Math.round((amt / target) * 100));
-            document.getElementById(`cardAmount_${key}`).innerText = amt.toLocaleString() + '원';
-            document.getElementById(`cardStatus_${key}`).innerText = `${(amt/10000).toFixed(1)}만 / 30만 (${pct}%)`;
-            
-            const bar = document.getElementById(`cardBar_${key}`);
-            bar.style.width = pct + '%';
-            if (pct >= 100) {
-                bar.className = 'progress-bar bg-success';
-            } else {
-                bar.className = 'progress-bar bg-primary';
-            }
-        });
-    }
-
-    function saveExpense() {
-        const date = document.getElementById('expDate').value;
-        const category = document.getElementById('expCategory').value;
-        const title = document.getElementById('expTitle').value;
-        const payment = document.getElementById('expPayment').value;
-        const amount = parseInt(document.getElementById('expAmount').value);
-
-        if (!date || !title || isNaN(amount)) {
-            alert('모든 필드를 올바르게 입력해주세요.');
-            return;
-        }
-
-        expenses.push({
-            id: Date.now(),
-            date, category, title, payment, amount
-        });
-
-        // 모달 닫기
-        const modalEl = document.getElementById('addExpenseModal');
-        const modal = bootstrap.Modal.getInstance(modalEl);
-        modal.hide();
-
-        // 폼 초기화
-        document.getElementById('expTitle').value = '';
-        document.getElementById('expAmount').value = '';
-
-        renderApp();
-    }
-
-    function deleteExpense(id) {
-        if (confirm('해당 지출 내역을 삭제하시겠습니까?')) {
-            expenses = expenses.filter(e => e.id !== id);
-            renderApp();
-        }
-    }
-
-    function openAddModalWithDate(dateStr) {
-        document.getElementById('expDate').value = dateStr;
-        const modal = new bootstrap.Modal(document.getElementById('addExpenseModal'));
-        modal.show();
-    }
-</script>
+  </script>
 </body>
 </html>
