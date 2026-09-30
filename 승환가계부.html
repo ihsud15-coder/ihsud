@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>승환캘린더</title>
+  <title>승환가계부</title>
   <style>
     :root { 
       --primary: #3182f6; 
@@ -1468,6 +1468,109 @@ input,select,textarea,
   white-space: nowrap;
 }
 </style>
+
+<style>
+/* 이 달의 지출 분석 - 고정지출 표시 전용
+   ※ 목표예산/카테고리 분석에는 포함하지 않고 시각적으로만 별도 표시 */
+.fixed-expense-analysis{
+  margin-top:14px;
+  padding:14px 16px;
+  border:1px solid rgba(239,102,116,.28);
+  border-radius:14px;
+  background:linear-gradient(145deg,rgba(255,246,247,.92),rgba(255,250,250,.88));
+  box-shadow:0 5px 16px rgba(239,102,116,.045);
+}
+.fixed-expense-analysis-title{
+  margin-bottom:9px;
+  color:#c95867;
+  font-size:.82rem;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+.fixed-expense-analysis-list{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.fixed-expense-analysis-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-height:30px;
+  padding:5px 8px;
+  border-radius:8px;
+  background:rgba(255,255,255,.62);
+  color:#596174;
+  font-size:.82rem;
+}
+.fixed-expense-analysis-item strong{
+  color:#c95867;
+  font-weight:750;
+}
+</style>
+
+<style>
+/* 지출 분석: 고정지출은 게이지 아래, 상세 내역은 가장 아래 */
+.fixed-expense-analysis{
+  margin-top:16px !important;
+  margin-bottom:18px !important;
+}
+.expense-detail-section{
+  margin-top:6px;
+  padding-top:16px;
+  border-top:1px solid #eceff4;
+}
+.expense-detail-title{
+  margin:0 0 8px;
+  color:#273148;
+  font-size:.88rem;
+  font-weight:800;
+  letter-spacing:-.025em;
+}
+.expense-detail-list{
+  display:flex;
+  flex-direction:column;
+}
+.expense-detail-item{
+  margin:0 !important;
+}
+.expense-more-wrap{
+  display:flex;
+  justify-content:center;
+  padding:10px 0 2px;
+}
+.expense-more-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-width:170px;
+  padding:8px 15px;
+  border:1px solid #e0e4ec !important;
+  border-radius:999px !important;
+  background:linear-gradient(135deg,#fff,#f7f8fb) !important;
+  color:#59647a !important;
+  font-size:.76rem;
+  font-weight:750;
+  box-shadow:0 3px 10px rgba(31,40,69,.045) !important;
+}
+.expense-more-btn:hover{
+  color:#5664d7 !important;
+  border-color:rgba(91,103,241,.22) !important;
+  background:linear-gradient(135deg,#fff,#f2f3ff) !important;
+}
+.expense-more-arrow{
+  font-size:.68rem;
+  transition:transform .18s ease;
+}
+.expense-hidden-list{
+  animation:expenseReveal .18s ease;
+}
+@keyframes expenseReveal{
+  from{opacity:0; transform:translateY(-3px)}
+  to{opacity:1; transform:translateY(0)}
+}
+</style>
 </head>
 <body>
 
@@ -2067,13 +2170,16 @@ input,select,textarea,
       document.getElementById('cardLoans').style.display = isLedger ? 'block' : 'none';
 
       const targetBudget = state.monthlyBudgets[monthKey] ?? 900000;
-      if(document.getElementById('budgetInput')) document.getElementById('budgetInput').value = targetBudget;
-      
-      const fixedTotal = state.fixedItems.reduce((s, i) => s + i.amount, 0);
+      // 선택한 월에 맞춰 예산 설정 제목과 입력값을 함께 갱신
+      const budgetMonthLabel = document.getElementById('budgetSettingMonth');
+      if (budgetMonthLabel) budgetMonthLabel.innerText = `${viewMonth + 1}월`;
+      if (document.getElementById('budgetInput')) document.getElementById('budgetInput').value = targetBudget;
+
+      const fixedTotal = state.fixedItems.reduce((s, i) => s + (Number(i.amount) || 0), 0);
       const monthExpenses = state.expenses.filter(e => e.date && e.date.startsWith(monthKey));
-      const totalSpent = monthExpenses.reduce((s, e) => s + e.actualAmount, 0);
-      const fixedRatio = targetBudget > 0 ? ((fixedTotal / targetBudget) * 100).toFixed(1) : 0;
-      const remainVariableBudget = targetBudget - fixedTotal - totalSpent;
+      const totalSpent = monthExpenses.reduce((s, e) => s + (Number(e.actualAmount ?? e.cardAmount) || 0), 0);
+      // 목표 예산은 월 생활비(변동 지출) 기준: 고정지출은 차감하거나 사용률에 포함하지 않음
+      const remainVariableBudget = targetBudget - totalSpent;
       
       const lastDay = new Date(viewYear, viewMonth + 1, 0).getDate();
       let pastDaysCount = (viewYear === systemToday.getFullYear() && viewMonth === systemToday.getMonth()) ? systemToday.getDate() : lastDay;
@@ -2085,7 +2191,7 @@ input,select,textarea,
 
       if (isLedger) {
         document.getElementById('pageTitle').innerText = `${viewYear}년 ${viewMonth + 1}월 가계부`;
-        document.getElementById('pageSubTitle').innerText = `고정지출 차감 후 순수 변동비 기준 일일 권장 지출액 자동 계산`;
+        document.getElementById('pageSubTitle').innerText = `고정지출을 제외한 월 생활비 예산 기준으로 일일 권장 지출액을 계산합니다`;
         
         let cardTotals = {};
         monthExpenses.forEach(e => { cardTotals[e.method] = (cardTotals[e.method] || 0) + e.actualAmount; });
@@ -2093,16 +2199,16 @@ input,select,textarea,
         totalCardSpent -= (cardTotals['현금'] || 0);
 
         topSummaryGrid.innerHTML = `
-          <div class="sum-box"><label>목표 예산</label><div class="val blue">${targetBudget.toLocaleString()}원</div><span class="sub-badge" id="fixedExpRatio">고정지출 ${fixedRatio}% (${fixedTotal.toLocaleString()}원)</span></div>
+          <div class="sum-box"><label>목표 생활비 예산</label><div class="val blue">${targetBudget.toLocaleString()}원</div><span class="sub-badge">고정지출 제외</span></div>
           <div class="sum-box"><label>이번 달 총 지출</label><div class="val">${totalSpent.toLocaleString()}원</div></div>
           <div class="sum-box"><label style="color:var(--primary);">카드사 총 이용대금</label><div class="val blue">${totalCardSpent.toLocaleString()}원</div></div>
-          <div class="sum-box"><label>남은 변동비 예산</label><div class="val green">${remainVariableBudget.toLocaleString()}원</div></div>
+          <div class="sum-box"><label>남은 생활비 예산</label><div class="val green">${remainVariableBudget.toLocaleString()}원</div></div>
           <div class="sum-box"><label>오늘 권장 예산 🎮</label><div class="val">${dailyTarget.toLocaleString()}원</div></div>
           <div class="sum-box"><label>일평균 지출</label><div class="val">${avgSpent.toLocaleString()}원</div></div>
         `;
         
-        gaugeLabel.innerText = "예산 사용률";
-        const usedPercent = targetBudget > 0 ? Math.min(100, Math.round(((totalSpent + fixedTotal) / targetBudget) * 100)) : 0;
+        gaugeLabel.innerText = "생활비 예산 사용률";
+        const usedPercent = targetBudget > 0 ? Math.min(100, Math.round((totalSpent / targetBudget) * 100)) : 0;
         gaugeBar.style.width = `${usedPercent}%`;
         gaugeBar.style.backgroundColor = usedPercent >= 90 ? 'var(--danger)' : usedPercent >= 70 ? 'var(--warning)' : 'var(--success)';
         gaugeStatus.innerText = `${usedPercent}% 사용 중`;
@@ -2206,17 +2312,16 @@ input,select,textarea,
         let contentHtml = '';
 
         if (isLedger) {
-          const daySpent = monthExpenses.filter(e => e.date === dateStr).reduce((s, e) => s + e.actualAmount, 0);
+          const daySpent = monthExpenses.filter(e => e.date === dateStr).reduce((s, e) => s + (Number(e.actualAmount ?? e.cardAmount ?? e.amount) || 0), 0);
           const isPastOrToday = dateStr <= systemTodayStr;
           
-          if (isPastOrToday) {
-            if (daySpent === 0) {
-              dayClass += ' no-expense';
-              contentHtml = `<div class="badge-no-spent">🎉</div>`;
-            } else {
-              if (daySpent >= 40000) dayClass += ' high-expense';
-              contentHtml = `<div class="day-spent">${daySpent.toLocaleString()}원</div>`;
-            }
+          // 날짜가 미래여도 해당 날짜에 등록된 지출은 항상 표시
+          if (daySpent > 0) {
+            if (daySpent >= 40000) dayClass += ' high-expense';
+            contentHtml = `<div class="day-spent">${daySpent.toLocaleString()}원</div>`;
+          } else if (isPastOrToday) {
+            dayClass += ' no-expense';
+            contentHtml = `<div class="badge-no-spent">🎉</div>`;
           }
         } else {
           // 일정 바 표시 처리
@@ -2360,14 +2465,53 @@ input,select,textarea,
           </div>`;
         }).join('') : '<div style="text-align:center; color:var(--sub); padding:10px 0;">기록된 지출이 없습니다.</div>';
 
+        // 지출 상세 내역은 복잡도를 줄이기 위해 처음 5개만 노출하고,
+        // 5개 초과분은 "더보기"를 눌러야 펼쳐지도록 구성합니다.
         const sortedExp = [...monthExpenses].sort((a,b) => b.actualAmount - a.actualAmount);
-        let expListHtml = sortedExp.length > 0 ? sortedExp.map((e, idx) => `
-          <div class="list-item">
+        const renderExpenseItem = (e, idx) => `
+          <div class="list-item expense-detail-item">
             <div><strong style="color:var(--primary); margin-right:6px;">${idx + 1}</strong><strong>${e.title || '내역 없음'}</strong><div style="font-size:0.75rem; color:var(--sub);">${e.date} | ${e.category} | ${e.method}</div></div>
             <div><strong style="margin-right:8px;">${e.actualAmount.toLocaleString()}원</strong><button class="action-btn btn-del" onclick="deleteExpense(${e.id})">삭제</button></div>
-          </div>`).join('') : '<div style="text-align:center; color:var(--sub); padding:16px 0;">지출 내역이 없습니다.</div>';
+          </div>`;
+
+        const visibleExpenses = sortedExp.slice(0, 5);
+        const hiddenExpenses = sortedExp.slice(5);
+        const visibleExpHtml = visibleExpenses.map(renderExpenseItem).join('');
+        const hiddenExpHtml = hiddenExpenses.map((e, i) => renderExpenseItem(e, i + 5)).join('');
+
+        let expListHtml = sortedExp.length > 0 ? `
+          <div class="expense-detail-section">
+            <div class="expense-detail-title">🧾 지출 상세 내역</div>
+            <div class="expense-detail-list">${visibleExpHtml}</div>
+            ${hiddenExpenses.length > 0 ? `
+              <div class="expense-more-wrap">
+                <button type="button" class="expense-more-btn" onclick="toggleExpenseDetails(this)">
+                  <span>지출 내역 ${hiddenExpenses.length}개 더보기</span><span class="expense-more-arrow">▼</span>
+                </button>
+              </div>
+              <div class="expense-detail-list expense-hidden-list" style="display:none;">${hiddenExpHtml}</div>
+            ` : ''}
+          </div>
+        ` : '<div class="expense-detail-section"><div class="expense-detail-title">🧾 지출 상세 내역</div><div style="text-align:center; color:var(--sub); padding:16px 0;">지출 내역이 없습니다.</div></div>';
         
-        bottomContent.innerHTML = `<div class="cat-chart-box">${catChartHtml}</div>${expListHtml}`;
+        // 고정지출은 목표 생활비/지출 분석 계산에는 포함하지 않고,
+        // 항목별 게이지 아래에서 참고용으로 보여준 뒤 지출 상세 내역은 가장 아래에 배치합니다.
+        const fixedAnalysisHtml = state.fixedItems.length > 0 ? `
+          <div class="fixed-expense-analysis">
+            <div class="fixed-expense-analysis-title">📌 이번 달 고정지출</div>
+            <div class="fixed-expense-analysis-list">
+              ${state.fixedItems.map(item => `
+                <div class="fixed-expense-analysis-item">
+                  <span>${item.name}</span>
+                  <strong>${item.amount.toLocaleString()}원</strong>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : '';
+
+        // 순서: 항목별 게이지 → 고정지출 → 지출 상세 내역
+        bottomContent.innerHTML = `<div class="cat-chart-box">${catChartHtml}</div>${fixedAnalysisHtml}${expListHtml}`;
       
       } else {
         bottomTitle.innerText = "🏆 이번 달 완료한 할 일";
@@ -2393,6 +2537,22 @@ input,select,textarea,
         
         bottomContent.innerHTML = todoListHtml;
       }
+    }
+
+    // 지출 상세 내역 5개 초과분 펼치기/접기
+    function toggleExpenseDetails(button) {
+      const section = button.closest('.expense-detail-section');
+      if (!section) return;
+      const hiddenList = section.querySelector('.expense-hidden-list');
+      if (!hiddenList) return;
+
+      const isHidden = hiddenList.style.display === 'none' || hiddenList.style.display === '';
+      hiddenList.style.display = isHidden ? 'block' : 'none';
+
+      const arrow = button.querySelector('.expense-more-arrow');
+      const label = button.querySelector('span:first-child');
+      if (arrow) arrow.textContent = isHidden ? '▲' : '▼';
+      if (label) label.textContent = isHidden ? '지출 내역 접기' : `지출 내역 ${hiddenList.children.length}개 더보기`;
     }
 
     // 💡 날짜 클릭 시 모든 UI(입력창 날짜 및 To-do)가 즉각 연동되도록 조치
