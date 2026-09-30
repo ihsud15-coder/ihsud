@@ -1470,42 +1470,263 @@ input,select,textarea,
 </style>
 
 <style>
-/* 이 달의 지출 분석 - 고정지출 표시 전용
-   ※ 목표예산/카테고리 분석에는 포함하지 않고 시각적으로만 별도 표시 */
+/* 월별 고정지출 — 분석 영역은 접힘/펼침 + 미니 카드 그리드 */
 .fixed-expense-analysis{
-  margin-top:14px;
-  padding:14px 16px;
+  margin-top:16px;
+  margin-bottom:18px;
+  padding:0;
   border:1px solid rgba(239,102,116,.28);
-  border-radius:14px;
-  background:linear-gradient(145deg,rgba(255,246,247,.92),rgba(255,250,250,.88));
+  border-radius:16px;
+  background:linear-gradient(145deg,rgba(255,246,247,.94),rgba(255,250,250,.9));
   box-shadow:0 5px 16px rgba(239,102,116,.045);
+  overflow:hidden;
 }
-.fixed-expense-analysis-title{
-  margin-bottom:9px;
-  color:#c95867;
-  font-size:.82rem;
-  font-weight:800;
-  letter-spacing:-.02em;
-}
-.fixed-expense-analysis-list{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-}
-.fixed-expense-analysis-item{
+.fixed-expense-analysis-header{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  min-height:30px;
-  padding:5px 8px;
-  border-radius:8px;
-  background:rgba(255,255,255,.62);
+  gap:12px;
+  padding:13px 15px;
+  cursor:pointer;
+  user-select:none;
+}
+.fixed-expense-analysis-title{
+  margin:0;
+  color:#c95867;
+  font-size:.84rem;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+.fixed-expense-analysis-total{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-left:auto;
+  color:#b84e5d;
+  font-size:.84rem;
+  font-weight:850;
+  white-space:nowrap;
+}
+.fixed-expense-analysis-chevron{
+  color:#c95867;
+  font-size:.7rem;
+  transition:transform .18s ease;
+}
+.fixed-expense-analysis.open .fixed-expense-analysis-chevron{
+  transform:rotate(180deg);
+}
+.fixed-expense-analysis-list{
+  display:none;
+  grid-template-columns:repeat(auto-fit,minmax(135px,1fr));
+  gap:7px;
+  padding:0 12px 12px;
+}
+.fixed-expense-analysis.open .fixed-expense-analysis-list{
+  display:grid;
+}
+.fixed-expense-analysis-item{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:7px;
+  min-height:38px;
+  padding:7px 9px;
+  border:1px solid rgba(239,102,116,.15);
+  border-radius:9px;
+  background:rgba(255,255,255,.76);
   color:#596174;
-  font-size:.82rem;
+  font-size:.76rem;
+  box-sizing:border-box;
+}
+.fixed-expense-analysis-item span{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 .fixed-expense-analysis-item strong{
+  flex-shrink:0;
   color:#c95867;
-  font-weight:750;
+  font-size:.76rem;
+  font-weight:800;
+}
+
+/* 월별 고정지출 상세관리 */
+
+/* 고정지출 추가 — 정보는 늘리고 화면은 간결하게 */
+.fixed-add-form{
+  padding:10px;
+  border:1px solid #e7eaf0;
+  border-radius:12px;
+  background:linear-gradient(145deg,#fbfcff,#fff);
+}
+.fixed-add-main,
+.fixed-add-sub{
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(0,.85fr);
+  gap:6px;
+}
+.fixed-add-sub{
+  grid-template-columns:minmax(0,1fr) 92px;
+  margin-top:6px;
+}
+.fixed-add-form button{
+  margin-top:7px;
+}
+.fixed-add-hint{
+  margin-top:6px;
+  color:#8991a2;
+  font-size:.68rem;
+  line-height:1.4;
+}
+.fixed-management-item{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) auto auto;
+  align-items:center;
+  gap:6px;
+}
+.fixed-management-meta{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:4px;
+  min-width:0;
+}
+.fixed-management-name{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-weight:700;
+  color:#3d4659;
+}
+.fixed-management-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:2px;
+  padding:2px 6px;
+  border-radius:6px;
+  border:1px solid #e4e7ee;
+  background:#f7f8fb;
+  color:#70798b;
+  font-size:.64rem;
+  font-weight:700;
+  white-space:nowrap;
+}
+.fixed-management-chip.card-linked{
+  color:#5662cf;
+  background:#f2f3ff;
+  border-color:#dfe2ff;
+}
+.fixed-management-chip.day-chip{
+  color:#8a5d4c;
+  background:#fff7f2;
+  border-color:#f3e1d8;
+}
+.fixed-expense-analysis-item{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  justify-content:center;
+  min-height:52px;
+}
+.fixed-analysis-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  min-width:0;
+}
+.fixed-analysis-meta{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  margin-top:4px;
+  min-width:0;
+}
+.fixed-analysis-meta span{
+  overflow:visible;
+  text-overflow:clip;
+}
+.fixed-analysis-item-method{
+  color:#5965d5 !important;
+  font-size:.62rem !important;
+  font-weight:700;
+}
+.fixed-analysis-item-day{
+  color:#8a5d4c !important;
+  font-size:.62rem !important;
+  font-weight:700;
+}
+@media(max-width:600px){
+  .fixed-add-main{
+    grid-template-columns:1fr 1fr;
+  }
+  .fixed-management-item{
+    grid-template-columns:minmax(0,1fr) auto auto;
+  }
+}
+
+.fixed-month-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+}
+.fixed-month-label{
+  color:#7b8495;
+  font-size:.72rem;
+  font-weight:700;
+}
+.fixed-import-btn{
+  padding:6px 9px !important;
+  border-radius:8px !important;
+  background:#fff !important;
+  color:#5965d5 !important;
+  border:1px solid rgba(91,103,241,.18) !important;
+  font-size:.72rem !important;
+  box-shadow:none !important;
+}
+.fixed-management-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:7px;
+  margin-top:10px;
+}
+.fixed-management-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:7px;
+  min-width:0;
+  padding:8px 9px;
+  border:1px solid #e9dfe1;
+  border-radius:9px;
+  background:#fffafa;
+}
+.fixed-management-item .fixed-name{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#596174;
+  font-size:.77rem;
+}
+.fixed-management-item .fixed-amount{
+  flex-shrink:0;
+  color:#c95867;
+  font-size:.77rem;
+  font-weight:800;
+}
+.fixed-management-item .fixed-delete{
+  flex-shrink:0;
+  padding:2px 5px !important;
+  font-size:.65rem !important;
+}
+@media(max-width:600px){
+  .fixed-expense-analysis-list,
+  .fixed-management-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
 }
 </style>
 
@@ -1750,11 +1971,63 @@ input,select,textarea,
           <span>▼</span>
         </div>
         <div class="collapsible-content">
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
-            <input type="text" id="fixedName" placeholder="항목명">
-            <input type="number" id="fixedAmount" placeholder="금액">
+          <div class="fixed-month-toolbar">
+            <span class="fixed-month-label"><span id="fixedSettingMonth">9월</span> 고정지출을 관리합니다.</span>
+            <button type="button" class="fixed-import-btn" onclick="importPreviousFixedExpenses(event)">↙ 전월 불러오기</button>
           </div>
-          <button onclick="addFixedItem()">고정지출 추가</button>
+          <div class="fixed-add-form">
+            <div class="fixed-add-main">
+              <input type="text" id="fixedName" placeholder="항목명">
+              <input type="number" id="fixedAmount" placeholder="금액">
+            </div>
+            <div class="fixed-add-sub">
+              <select id="fixedMethod" aria-label="고정지출 결제 수단">
+                <option value="">결제수단 선택</option>
+                <option value="국민카드">💳 국민카드</option>
+                <option value="신한카드">💳 신한카드</option>
+                <option value="우리카드">💳 우리카드</option>
+                <option value="삼성카드">💳 삼성카드</option>
+                <option value="롯데카드">💳 롯데카드</option>
+                <option value="현금">💵 현금</option>
+              </select>
+              <select id="fixedDay" aria-label="고정지출 결제일">
+                <option value="">결제일</option>
+                                <option value="1">1일</option>
+                <option value="2">2일</option>
+                <option value="3">3일</option>
+                <option value="4">4일</option>
+                <option value="5">5일</option>
+                <option value="6">6일</option>
+                <option value="7">7일</option>
+                <option value="8">8일</option>
+                <option value="9">9일</option>
+                <option value="10">10일</option>
+                <option value="11">11일</option>
+                <option value="12">12일</option>
+                <option value="13">13일</option>
+                <option value="14">14일</option>
+                <option value="15">15일</option>
+                <option value="16">16일</option>
+                <option value="17">17일</option>
+                <option value="18">18일</option>
+                <option value="19">19일</option>
+                <option value="20">20일</option>
+                <option value="21">21일</option>
+                <option value="22">22일</option>
+                <option value="23">23일</option>
+                <option value="24">24일</option>
+                <option value="25">25일</option>
+                <option value="26">26일</option>
+                <option value="27">27일</option>
+                <option value="28">28일</option>
+                <option value="29">29일</option>
+                <option value="30">30일</option>
+                <option value="31">31일</option>
+              </select>
+            </div>
+            <button onclick="addFixedItem()">+ 고정지출 추가</button>
+            <div class="fixed-add-hint">카드를 연결하면 이번 달 카드 실적에 자동으로 포함됩니다.</div>
+          </div>
           <div id="fixedList" style="margin-top:10px;"></div>
         </div>
       </div>
@@ -1806,6 +2079,11 @@ input,select,textarea,
       if (saved) {
         try { 
           const parsed = JSON.parse(saved);
+          if (!parsed.monthlyFixedItems) parsed.monthlyFixedItems = {};
+          // 기존 버전의 전역 고정지출 데이터는 현재 월 데이터로 1회 이전합니다.
+          if (Array.isArray(parsed.fixedItems) && parsed.fixedItems.length > 0 && Object.keys(parsed.monthlyFixedItems).length === 0) {
+            parsed.monthlyFixedItems[`${systemToday.getFullYear()}-${String(systemToday.getMonth()+1).padStart(2,'0')}`] = parsed.fixedItems;
+          }
           if (!parsed.fixedItems) parsed.fixedItems = [];
           if (!parsed.schedules) parsed.schedules = [];
           if (!parsed.todos) parsed.todos = []; 
@@ -1823,6 +2101,11 @@ input,select,textarea,
     let state = loadState();
 
     function toggleCard(id) { document.getElementById(id).classList.toggle('collapsed'); }
+
+    function toggleFixedAnalysis() {
+      const el = document.getElementById('fixedExpenseAnalysis');
+      if (el) el.classList.toggle('open');
+    }
 
     function toggleLoanDetail(id) {
       const el = document.getElementById(id);
@@ -2060,15 +2343,62 @@ input,select,textarea,
     }
     function deleteSchedule(id) { if (confirm('일정을 삭제하시겠습니까?')) { state.schedules = state.schedules.filter(s => s.id !== id); save(); } }
     
+    function getFixedItemsForMonth(monthKey = getMonthKey()) {
+      if (!state.monthlyFixedItems) state.monthlyFixedItems = {};
+      return Array.isArray(state.monthlyFixedItems[monthKey]) ? state.monthlyFixedItems[monthKey] : [];
+    }
+
+    function setFixedItemsForMonth(monthKey, items) {
+      if (!state.monthlyFixedItems) state.monthlyFixedItems = {};
+      state.monthlyFixedItems[monthKey] = items;
+      // 하위 호환: 기존 코드가 참조하는 fixedItems에도 현재 화면의 월 데이터를 반영
+      state.fixedItems = items;
+    }
+
+    function getPreviousMonthKey(monthKey = getMonthKey()) {
+      const [y,m] = monthKey.split('-').map(Number);
+      const d = new Date(y, m - 2, 1);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    }
+
+    function importPreviousFixedExpenses(event) {
+      if (event) event.stopPropagation();
+      const currentKey = getMonthKey();
+      const prevKey = getPreviousMonthKey(currentKey);
+      const prevItems = getFixedItemsForMonth(prevKey);
+      if (!prevItems.length) {
+        alert('전월에 등록된 고정지출이 없습니다.');
+        return;
+      }
+      const currentItems = getFixedItemsForMonth(currentKey);
+      if (currentItems.length && !confirm('현재 월의 고정지출이 있습니다. 전월 항목으로 교체할까요?')) return;
+      const copied = prevItems.map(item => ({ id: Date.now() + Math.random(), name: item.name, amount: Number(item.amount) || 0, method: item.method || '', day: item.day || '' }));
+      setFixedItemsForMonth(currentKey, copied);
+      save();
+    }
+
     function addFixedItem() {
       const name = document.getElementById('fixedName').value.trim();
       const amount = Number(document.getElementById('fixedAmount').value);
+      const method = document.getElementById('fixedMethod').value || '';
+      const day = document.getElementById('fixedDay').value || '';
       if (!name || !amount) return;
-      state.fixedItems.push({ id: Date.now(), name, amount });
-      document.getElementById('fixedName').value = ''; document.getElementById('fixedAmount').value = '';
+      const monthKey = getMonthKey();
+      const items = getFixedItemsForMonth(monthKey);
+      items.push({ id: Date.now(), name, amount, method, day });
+      setFixedItemsForMonth(monthKey, items);
+      document.getElementById('fixedName').value = '';
+      document.getElementById('fixedAmount').value = '';
+      document.getElementById('fixedMethod').value = '';
+      document.getElementById('fixedDay').value = '';
       save();
     }
-    function deleteFixedItem(id) { state.fixedItems = state.fixedItems.filter(i => i.id !== id); save(); }
+    function deleteFixedItem(id) {
+      const monthKey = getMonthKey();
+      const items = getFixedItemsForMonth(monthKey).filter(i => i.id !== id);
+      setFixedItemsForMonth(monthKey, items);
+      save();
+    }
     
     function updateMonthBudget() {
       const val = Number(document.getElementById('budgetInput').value);
@@ -2173,9 +2503,14 @@ input,select,textarea,
       // 선택한 월에 맞춰 예산 설정 제목과 입력값을 함께 갱신
       const budgetMonthLabel = document.getElementById('budgetSettingMonth');
       if (budgetMonthLabel) budgetMonthLabel.innerText = `${viewMonth + 1}월`;
+      const fixedMonthLabel = document.getElementById('fixedSettingMonth');
+      if (fixedMonthLabel) fixedMonthLabel.innerText = `${viewMonth + 1}월`;
       if (document.getElementById('budgetInput')) document.getElementById('budgetInput').value = targetBudget;
 
-      const fixedTotal = state.fixedItems.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+      const monthFixedItems = getFixedItemsForMonth(monthKey);
+      // 기존 버전 호환용 현재월 참조
+      state.fixedItems = monthFixedItems;
+      const fixedTotal = monthFixedItems.reduce((s, i) => s + (Number(i.amount) || 0), 0);
       const monthExpenses = state.expenses.filter(e => e.date && e.date.startsWith(monthKey));
       const totalSpent = monthExpenses.reduce((s, e) => s + (Number(e.actualAmount ?? e.cardAmount) || 0), 0);
       // 목표 예산은 월 생활비(변동 지출) 기준: 고정지출은 차감하거나 사용률에 포함하지 않음
@@ -2195,6 +2530,12 @@ input,select,textarea,
         
         let cardTotals = {};
         monthExpenses.forEach(e => { cardTotals[e.method] = (cardTotals[e.method] || 0) + e.actualAmount; });
+        // 카드가 연결된 월 고정지출도 해당 카드의 이번 달 실적에 자동 포함합니다.
+        monthFixedItems.forEach(item => {
+          if (item.method && item.method !== '현금') {
+            cardTotals[item.method] = (cardTotals[item.method] || 0) + (Number(item.amount) || 0);
+          }
+        });
         let totalCardSpent = Object.values(cardTotals).reduce((a,b)=>a+b, 0);
         totalCardSpent -= (cardTotals['현금'] || 0);
 
@@ -2375,11 +2716,16 @@ input,select,textarea,
       /* 사이드바 실적/고정지출 업데이트 */
       if (isLedger) {
         const fixedContainer = document.getElementById('fixedList');
-        fixedContainer.innerHTML = state.fixedItems.map(item => `
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:4px 0;">
-            <span>📌 ${item.name}</span>
-            <div><strong>${item.amount.toLocaleString()}원</strong><button class="action-btn btn-del" onclick="deleteFixedItem(${item.id})">삭제</button></div>
-          </div>`).join('') || `<small style="color:var(--sub);">등록된 고정지출이 없습니다.</small>`;
+        fixedContainer.innerHTML = monthFixedItems.map(item => `
+          <div class="fixed-management-item">
+            <div class="fixed-management-meta">
+              <span class="fixed-management-name">📌 ${item.name}</span>
+              ${item.method ? `<span class="fixed-management-chip card-linked">💳 ${item.method}</span>` : ''}
+              ${item.day ? `<span class="fixed-management-chip day-chip">📅 ${item.day}일</span>` : ''}
+            </div>
+            <span class="fixed-amount">${Number(item.amount).toLocaleString()}원</span>
+            <button class="action-btn btn-del fixed-delete" onclick="deleteFixedItem(${item.id})">삭제</button>
+          </div>`).join('') || `<small style="color:var(--sub);">이 달에 등록된 고정지출이 없습니다.</small>`;
 
         let cardTotals = {};
         monthExpenses.forEach(e => { cardTotals[e.method] = (cardTotals[e.method] || 0) + e.actualAmount; });
@@ -2496,14 +2842,24 @@ input,select,textarea,
         
         // 고정지출은 목표 생활비/지출 분석 계산에는 포함하지 않고,
         // 항목별 게이지 아래에서 참고용으로 보여준 뒤 지출 상세 내역은 가장 아래에 배치합니다.
-        const fixedAnalysisHtml = state.fixedItems.length > 0 ? `
-          <div class="fixed-expense-analysis">
-            <div class="fixed-expense-analysis-title">📌 이번 달 고정지출</div>
+        const fixedAnalysisHtml = monthFixedItems.length > 0 ? `
+          <div class="fixed-expense-analysis" id="fixedExpenseAnalysis">
+            <div class="fixed-expense-analysis-header" onclick="toggleFixedAnalysis()">
+              <div class="fixed-expense-analysis-title">📌 이번 달 고정지출</div>
+              <div class="fixed-expense-analysis-total">${fixedTotal.toLocaleString()}원 <span class="fixed-expense-analysis-chevron">▼</span></div>
+            </div>
             <div class="fixed-expense-analysis-list">
-              ${state.fixedItems.map(item => `
+              ${monthFixedItems.map(item => `
                 <div class="fixed-expense-analysis-item">
-                  <span>${item.name}</span>
-                  <strong>${item.amount.toLocaleString()}원</strong>
+                  <div class="fixed-analysis-top">
+                    <span>${item.name}</span>
+                    <strong>${Number(item.amount).toLocaleString()}원</strong>
+                  </div>
+                  ${(item.method || item.day) ? `
+                    <div class="fixed-analysis-meta">
+                      ${item.method ? `<span class="fixed-analysis-item-method">💳 ${item.method}</span>` : ''}
+                      ${item.day ? `<span class="fixed-analysis-item-day">· ${item.day}일</span>` : ''}
+                    </div>` : ''}
                 </div>
               `).join('')}
             </div>
