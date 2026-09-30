@@ -143,7 +143,1236 @@
     .pri-radio:checked + .pri-label.pl-2 { background: #fffbeb; border-color: var(--warning); color: var(--warning); }
     .pri-radio:checked + .pri-label.pl-3 { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
     .pri-radio { display: none; }
-  </style>
+  
+    /* ==================== Premium UI Refresh ====================
+       기존 HTML/JS/문구/데이터 구조는 유지하고 시각 스타일만 재정의합니다.
+    =============================================================== */
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f4f7fb;
+      --card: rgba(255,255,255,0.96);
+      --text: #172033;
+      --sub: #7b8799;
+      --danger: #e5484d;
+      --danger-bg: #fff4f4;
+      --warning: #e59a24;
+      --success: #12a875;
+      --badge-green: #effaf5;
+      --badge-green-border: #9be2c4;
+      --sun-red: #e25555;
+      --sat-blue: #4778d8;
+      --line: #e7ebf1;
+      --soft: #f5f7fa;
+      --soft-blue: #eef5ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { background: var(--bg); }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Segoe UI", Roboto, sans-serif;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(37,99,235,.055), transparent 28%),
+        radial-gradient(circle at 92% 8%, rgba(18,168,117,.04), transparent 24%),
+        var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 34px 24px 48px;
+      letter-spacing: -0.015em;
+    }
+
+    .container {
+      max-width: 1320px;
+      grid-template-columns: minmax(0, 1fr) 390px;
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow:
+        0 1px 2px rgba(20,35,60,.025),
+        0 10px 30px rgba(32,52,84,.055);
+      margin-bottom: 22px;
+      border: 1px solid rgba(226,231,239,.9);
+      position: relative;
+      transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .card:hover {
+      border-color: #dfe5ee;
+      box-shadow:
+        0 2px 4px rgba(20,35,60,.03),
+        0 14px 34px rgba(32,52,84,.07);
+    }
+
+    .card-header {
+      min-height: 26px;
+      gap: 12px;
+    }
+
+    .card-header h2 {
+      font-size: 1rem;
+      letter-spacing: -0.025em;
+    }
+
+    .card-header > span:last-child {
+      color: #9aa5b5;
+      font-size: .78rem;
+      transition: transform .2s ease;
+    }
+
+    .summary-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .sum-box {
+      background: linear-gradient(145deg, #f8fafc, #f2f5f9);
+      border: 1px solid #e9edf3;
+      border-radius: 16px;
+      padding: 15px 16px;
+      min-height: 92px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+      transition: transform .2s ease, border-color .2s ease;
+    }
+
+    .sum-box:hover {
+      transform: translateY(-1px);
+      border-color: #dfe5ed;
+    }
+
+    .sum-box label {
+      color: #8995a6;
+      font-size: .72rem;
+      letter-spacing: -.01em;
+    }
+
+    .sum-box .val {
+      font-size: 1.22rem;
+      letter-spacing: -.035em;
+    }
+
+    .sub-badge {
+      font-size: .69rem;
+      color: #64748b;
+    }
+
+    .budget-gauge-box {
+      margin-top: 18px;
+      background: #f7f9fc;
+      padding: 14px 16px 15px;
+      border-radius: 15px;
+      border: 1px solid #e9edf3;
+    }
+
+    .gauge-bg {
+      height: 9px;
+      background: #e5eaf1;
+      border-radius: 999px;
+      margin-top: 9px;
+    }
+
+    .gauge-fill {
+      border-radius: 999px;
+      box-shadow: 0 1px 5px rgba(0,0,0,.08);
+    }
+
+    .month-picker {
+      margin-bottom: 18px;
+      gap: 10px;
+    }
+
+    .month-btn {
+      width: auto;
+      min-width: 84px;
+      padding: 8px 13px;
+      background: #f1f5fb;
+      color: #48617f;
+      border: 1px solid #e4eaf2;
+      font-size: .76rem;
+      border-radius: 10px;
+      box-shadow: none;
+    }
+
+    .month-btn:hover {
+      background: #e8eef7;
+      color: var(--primary);
+    }
+
+    .calendar-toggle-title {
+      font-size: 1.18rem;
+      letter-spacing: -.04em;
+    }
+
+    .mode-badge {
+      font-size: .67rem;
+      padding: 4px 8px;
+      border-radius: 8px;
+      letter-spacing: -.015em;
+    }
+
+    .mode-badge.ledger {
+      background: #edf4ff;
+      color: #2563eb;
+    }
+
+    .mode-badge.schedule {
+      background: #fff6df;
+      color: #b97912;
+    }
+
+    .calendar {
+      gap: 6px;
+    }
+
+    .day-header {
+      font-size: .72rem;
+      color: #96a0af;
+      padding: 3px 0 7px;
+      font-weight: 700;
+    }
+
+    .day-cell {
+      background: #f7f9fb;
+      border-radius: 13px;
+      padding: 8px;
+      min-height: 82px;
+      font-size: .78rem;
+      border: 1px solid #edf0f4;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+      transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease;
+    }
+
+    .day-cell:hover {
+      transform: translateY(-1px);
+      border-color: #dbe3ed;
+      box-shadow: 0 5px 14px rgba(35,55,80,.06);
+      z-index: 4;
+    }
+
+    .day-cell.today {
+      border: 1px dashed #9eabbc;
+      background: #fbfcfe;
+    }
+
+    .day-cell.selected-date {
+      border: 1.5px solid var(--primary) !important;
+      background: #fff !important;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.10), 0 7px 18px rgba(37,99,235,.10);
+      transform: translateY(-1px) scale(1.005);
+    }
+
+    .day-cell.high-expense {
+      background: #fff7f7;
+      border: 1px solid #f2b5b5;
+    }
+
+    .day-cell.no-expense {
+      background: #f3fbf7;
+      border: 1px solid #b9e7d2;
+    }
+
+    .day-spent {
+      color: #273449;
+      font-size: .73rem;
+      margin-top: 7px;
+    }
+
+    .badge-no-spent {
+      font-size: .95rem;
+      opacity: .8;
+    }
+
+    .sch-bar {
+      font-size: .66rem;
+      padding: 3px 6px;
+      margin-top: 4px;
+      height: 22px;
+      line-height: 16px;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,.10);
+    }
+
+    .cat-chart-box {
+      padding: 18px;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      background: #fbfcfe;
+      border: 1px solid #e8edf3;
+      box-shadow: none;
+    }
+
+    label {
+      font-size: .73rem;
+      color: #7d899a;
+      margin-top: 12px;
+      margin-bottom: 6px;
+      letter-spacing: -.01em;
+    }
+
+    input, select, textarea, button {
+      padding: 11px 13px;
+      border-radius: 11px;
+      border: 1px solid #e1e7ef;
+      background: #fff;
+      color: var(--text);
+      font-size: .84rem;
+      box-shadow: 0 1px 1px rgba(20,35,60,.02);
+    }
+
+    input::placeholder, textarea::placeholder { color: #b0b8c5; }
+
+    input:hover, select:hover, textarea:hover {
+      border-color: #d2dbe7;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #8bb2f5;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.09);
+    }
+
+    button {
+      background: var(--primary);
+      font-weight: 750;
+      margin-top: 12px;
+      box-shadow: 0 4px 10px rgba(37,99,235,.14);
+    }
+
+    button:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 6px 14px rgba(37,99,235,.18);
+    }
+
+    button:active { transform: translateY(1px) scale(.99); }
+
+    .btn-secondary {
+      background: #eef1f5 !important;
+      color: #5f6b7a !important;
+      box-shadow: none !important;
+    }
+
+    .btn-secondary:hover { background: #e6eaf0 !important; }
+
+    .btn-success {
+      background: #12a875 !important;
+      box-shadow: 0 4px 10px rgba(18,168,117,.14) !important;
+    }
+
+    .btn-warning {
+      background: #d99122 !important;
+      box-shadow: 0 4px 10px rgba(217,145,34,.14) !important;
+    }
+
+    .list-item {
+      padding: 12px 4px;
+      border-bottom: 1px solid #edf0f4;
+      font-size: .84rem;
+    }
+
+    .action-btn {
+      padding: 5px 8px;
+      font-size: .7rem;
+      border-radius: 7px;
+      box-shadow: none;
+    }
+
+    .btn-del {
+      background: #fff0f0 !important;
+      color: var(--danger) !important;
+      border: 1px solid #ffd6d6 !important;
+    }
+
+    .main-card-box {
+      background: linear-gradient(135deg, #273449 0%, #111827 100%);
+      border: 1px solid #263246;
+      border-radius: 16px;
+      padding: 14px 15px;
+      margin-bottom: 13px;
+      box-shadow: 0 8px 18px rgba(17,24,39,.15);
+    }
+
+    .main-card-badge {
+      background: rgba(255,255,255,.95);
+      color: #263246;
+      padding: 3px 7px;
+      border-radius: 6px;
+      font-size: .64rem;
+    }
+
+    .progress-bar-bg {
+      background: #e8edf3;
+      height: 7px;
+      border-radius: 999px;
+      margin-top: 7px;
+    }
+
+    .progress-bar-fill {
+      border-radius: 999px;
+    }
+
+    .todo-item {
+      gap: 11px;
+      margin-bottom: 13px;
+      font-size: .88rem;
+    }
+
+    .todo-check {
+      width: 19px;
+      height: 19px;
+      border: 2px solid #cbd4df;
+      box-shadow: 0 1px 2px rgba(0,0,0,.03);
+    }
+
+    .todo-item.done .todo-check {
+      box-shadow: 0 3px 8px rgba(37,99,235,.20);
+    }
+
+    .pri-icon { opacity: .9; }
+    .pri-bar { width: 3.5px; border-radius: 3px; }
+
+    .pri-label {
+      padding: 7px 11px;
+      border-radius: 10px;
+      border: 1px solid #e4e9ef;
+      background: #fff;
+      box-shadow: none;
+    }
+
+    .pri-radio:checked + .pri-label.pl-1 { background: #effaf5; }
+    .pri-radio:checked + .pri-label.pl-2 { background: #fff8e9; }
+    .pri-radio:checked + .pri-label.pl-3 { background: #fff1f1; }
+
+    /* 우측 주요 입력 카드에만 살짝 강조 */
+    #cardDynamicInput {
+      border-color: #dce6f5;
+      box-shadow: 0 10px 30px rgba(37,99,235,.065);
+    }
+
+    #cardDynamicInput .card-header {
+      padding-bottom: 2px;
+    }
+
+    /* 투두/입력 영역의 인라인 배경도 전체 톤에 맞춤 */
+    #todoInputContainer {
+      background: #f7f9fc !important;
+      border-color: #e5eaf1 !important;
+    }
+
+    /* 모바일 */
+    @media (max-width: 960px) {
+      body { padding: 20px 14px 36px; }
+      .container { gap: 16px; }
+      .card { padding: 18px; border-radius: 18px; }
+    }
+
+    @media (max-width: 600px) {
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .day-cell { min-height: 68px; padding: 6px; }
+      .month-picker { flex-wrap: wrap; }
+      .calendar-toggle-title { order: -1; width: 100%; justify-content: center; margin-bottom: 2px; }
+    }
+
+  
+
+/* =========================================================
+   PREMIUM FINANCE DASHBOARD UI — VISUAL POLISH v2
+   Content / HTML structure / JS behavior intentionally untouched.
+   ========================================================= */
+
+:root{
+  --primary:#5b67f1;
+  --primary-2:#7c5cff;
+  --primary-soft:#eef0ff;
+  --accent:#23b8a9;
+  --accent-soft:#e8faf7;
+  --danger:#ef6674;
+  --danger-soft:#fff0f2;
+  --warning:#f2ad45;
+  --warning-soft:#fff6e7;
+  --ink:#172033;
+  --ink-2:#475166;
+  --muted:#8790a3;
+  --line:#e8ebf2;
+  --line-strong:#dfe3ec;
+  --bg:#f5f7fb;
+  --card:rgba(255,255,255,.94);
+  --shadow-sm:0 4px 16px rgba(29,38,68,.055);
+  --shadow-md:0 14px 38px rgba(29,38,68,.075);
+  --shadow-lg:0 24px 60px rgba(29,38,68,.10);
+}
+
+/* Background / overall atmosphere */
+html{
+  background:#f5f7fb;
+}
+body{
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 7% 0%, rgba(124,92,255,.10), transparent 27%),
+    radial-gradient(circle at 93% 4%, rgba(35,184,169,.075), transparent 24%),
+    radial-gradient(circle at 50% 100%, rgba(91,103,241,.055), transparent 35%),
+    linear-gradient(180deg,#f8f9fd 0%,#f4f6fa 58%,#f7f8fb 100%);
+  letter-spacing:-.012em;
+}
+
+/* Header becomes a premium glass surface */
+header,
+.header{
+  position:relative;
+  isolation:isolate;
+  border:1px solid rgba(255,255,255,.9) !important;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.97),rgba(248,249,255,.92)) !important;
+  box-shadow:
+    0 10px 35px rgba(31,41,75,.065),
+    inset 0 1px 0 rgba(255,255,255,.95) !important;
+  overflow:hidden;
+}
+header::before,
+.header::before{
+  content:"";
+  position:absolute;
+  width:230px;
+  height:230px;
+  right:-95px;
+  top:-130px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(124,92,255,.12),transparent 68%);
+  pointer-events:none;
+}
+header::after,
+.header::after{
+  content:"";
+  position:absolute;
+  width:170px;
+  height:170px;
+  left:-90px;
+  bottom:-115px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(35,184,169,.09),transparent 68%);
+  pointer-events:none;
+}
+
+/* Brand / title hierarchy */
+h1,h2,h3{
+  color:var(--ink);
+  letter-spacing:-.035em;
+}
+h1{
+  font-weight:800;
+}
+h2{
+  font-weight:760;
+}
+h3{
+  font-weight:720;
+}
+
+/* Cards */
+.card{
+  position:relative;
+  background:var(--card) !important;
+  border:1px solid rgba(224,228,237,.82) !important;
+  box-shadow:var(--shadow-sm) !important;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+}
+.card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(91,103,241,.16) !important;
+  box-shadow:var(--shadow-md) !important;
+}
+.card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.92);
+}
+
+/* Section headings — elegant micro accent */
+.card h2,
+.card h3{
+  position:relative;
+}
+.card h2::after,
+.card h3::after{
+  content:"";
+  display:inline-block;
+  width:24px;
+  height:3px;
+  margin-left:9px;
+  vertical-align:middle;
+  border-radius:99px;
+  background:linear-gradient(90deg,var(--primary),var(--primary-2));
+  opacity:.72;
+}
+
+/* Summary / KPI blocks */
+.summary-box,
+.summary-item,
+.stat-card{
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(224,228,237,.75) !important;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.98),rgba(247,248,253,.92)) !important;
+  box-shadow:0 7px 24px rgba(30,39,69,.055) !important;
+}
+.summary-box::before,
+.summary-item::before,
+.stat-card::before{
+  content:"";
+  position:absolute;
+  width:92px;
+  height:92px;
+  right:-36px;
+  top:-42px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(91,103,241,.11),transparent 68%);
+  pointer-events:none;
+}
+
+/* Strong numbers */
+.summary-box strong,
+.summary-item strong,
+.stat-card strong,
+.amount,
+.total{
+  letter-spacing:-.045em;
+}
+
+/* Budget gauge / progress */
+.progress,
+.budget-progress,
+.progress-bar,
+.gauge{
+  overflow:hidden;
+  border:1px solid rgba(221,225,235,.7) !important;
+  background:#edf0f5 !important;
+  box-shadow:inset 0 1px 3px rgba(24,31,52,.05);
+}
+.progress-bar,
+.gauge-fill{
+  background:
+    linear-gradient(90deg,var(--primary),#7867f5 55%,var(--primary-2)) !important;
+  box-shadow:0 3px 12px rgba(91,103,241,.22);
+}
+
+/* Buttons — gradient only where emphasis is needed */
+button,
+.btn{
+  border:1px solid rgba(220,224,234,.9);
+  box-shadow:0 3px 10px rgba(31,40,69,.035);
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease;
+}
+button:hover,
+.btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 7px 18px rgba(31,40,69,.08);
+}
+button:active,
+.btn:active{
+  transform:translateY(0);
+}
+button.primary,
+.btn-primary,
+button[type="submit"]{
+  background:linear-gradient(135deg,var(--primary),var(--primary-2)) !important;
+  border-color:transparent !important;
+  box-shadow:0 7px 18px rgba(91,103,241,.20);
+}
+
+/* Month / tab controls */
+.month-btn,
+.month-button,
+.tab-btn,
+.mode-btn{
+  background:rgba(255,255,255,.82) !important;
+  border-color:var(--line) !important;
+}
+.month-btn.active,
+.month-button.active,
+.tab-btn.active,
+.mode-btn.active,
+.month-btn.selected,
+.month-button.selected{
+  color:var(--primary) !important;
+  background:linear-gradient(135deg,#f1f2ff,#e9e7ff) !important;
+  border-color:rgba(91,103,241,.18) !important;
+  box-shadow:0 5px 15px rgba(91,103,241,.09);
+}
+
+/* Inputs */
+input,select,textarea{
+  color:var(--ink) !important;
+  background:rgba(255,255,255,.9) !important;
+  border:1px solid #e1e5ee !important;
+  box-shadow:inset 0 1px 2px rgba(24,31,52,.025);
+  transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+}
+input:hover,select:hover,textarea:hover{
+  border-color:#cfd5e3 !important;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none !important;
+  background:#fff !important;
+  border-color:rgba(91,103,241,.55) !important;
+  box-shadow:0 0 0 4px rgba(91,103,241,.10) !important;
+}
+
+/* Calendar */
+.calendar{
+  background:transparent;
+}
+.calendar-header,
+.week-header{
+  color:#788195;
+  font-weight:700;
+}
+.day-cell{
+  position:relative;
+  min-height:82px;
+  border:1px solid #eceef4 !important;
+  background:linear-gradient(145deg,#fff,#fafbfc) !important;
+  border-radius:15px !important;
+  transition:background .18s ease,border-color .18s ease,transform .18s ease,box-shadow .18s ease;
+}
+.day-cell:hover{
+  transform:translateY(-1px);
+  border-color:rgba(91,103,241,.22) !important;
+  box-shadow:0 6px 17px rgba(31,40,69,.06);
+}
+.day-cell.today{
+  background:linear-gradient(145deg,#f4f3ff,#eef0ff) !important;
+  border-color:rgba(91,103,241,.38) !important;
+}
+.day-cell.selected{
+  background:linear-gradient(145deg,#ecebff,#f5f3ff) !important;
+  border-color:rgba(124,92,255,.46) !important;
+  box-shadow:0 8px 22px rgba(91,103,241,.11);
+}
+.day-cell.has-expense{
+  box-shadow:inset 0 -3px 0 rgba(239,102,116,.62);
+}
+
+/* Schedule / expense chips */
+.schedule-item,
+.schedule-bar,
+.expense-item,
+.expense-chip{
+  border:1px solid rgba(222,226,235,.82) !important;
+  box-shadow:0 3px 9px rgba(31,40,69,.04);
+  background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(248,249,252,.96)) !important;
+}
+.schedule-item{
+  border-left:3px solid var(--primary) !important;
+}
+.expense-item{
+  border-left:3px solid var(--danger) !important;
+}
+
+/* Pills / badges — outline style */
+.badge,
+.tag,
+.mode-badge,
+.status-badge,
+.category-badge{
+  background:rgba(255,255,255,.72) !important;
+  border:1px solid currentColor !important;
+  box-shadow:none !important;
+  font-weight:700;
+}
+
+/* Icons / pictograms: line-art treatment */
+.icon,
+.icon-wrap,
+.menu-icon,
+.action-icon,
+.category-icon,
+.payment-icon,
+.pictogram{
+  background:transparent !important;
+  background-image:none !important;
+  box-shadow:none !important;
+  border:0 !important;
+  color:var(--primary);
+  filter:none !important;
+}
+.icon svg,
+.icon-wrap svg,
+.menu-icon svg,
+.action-icon svg,
+.category-icon svg,
+.payment-icon svg,
+.pictogram svg{
+  fill:none !important;
+  stroke:currentColor !important;
+  stroke-width:1.7 !important;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.icon.primary,
+.icon-wrap.primary,
+.menu-icon.primary,
+.category-icon.primary{
+  color:var(--primary);
+}
+.icon.success,
+.icon-wrap.success,
+.category-icon.success{
+  color:var(--accent);
+}
+.icon.danger,
+.icon-wrap.danger,
+.category-icon.danger{
+  color:var(--danger);
+}
+.icon.warning,
+.icon-wrap.warning,
+.category-icon.warning{
+  color:var(--warning);
+}
+
+/* Payment method cards */
+.payment-card,
+.payment-method,
+.pay-card{
+  position:relative;
+  overflow:hidden;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.98),rgba(246,247,251,.95)) !important;
+  border:1px solid #e5e8ef !important;
+  box-shadow:0 7px 20px rgba(30,39,69,.05) !important;
+}
+.payment-card::before,
+.payment-method::before,
+.pay-card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:3px;
+  background:linear-gradient(180deg,var(--primary),var(--primary-2));
+  opacity:.85;
+}
+
+/* Todo */
+.todo-item,
+.task-item{
+  background:rgba(255,255,255,.72) !important;
+  border-bottom:1px solid #edf0f4 !important;
+}
+.todo-item:hover,
+.task-item:hover{
+  background:#fff !important;
+}
+.todo-item input[type="checkbox"],
+.task-item input[type="checkbox"]{
+  accent-color:var(--primary);
+}
+
+/* Dynamic input card */
+.dynamic-input,
+.input-card,
+.expense-input-card,
+.schedule-input-card{
+  background:
+    linear-gradient(145deg,rgba(246,247,255,.92),rgba(255,255,255,.96)) !important;
+  border:1px solid rgba(91,103,241,.13) !important;
+  box-shadow:0 10px 28px rgba(91,103,241,.065) !important;
+}
+
+/* Chart area */
+.chart-container,
+.chart-box,
+.chart-wrap{
+  background:
+    radial-gradient(circle at 85% 15%,rgba(124,92,255,.07),transparent 30%),
+    linear-gradient(145deg,#fff,#f9fafc) !important;
+  border:1px solid #e8ebf1 !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 8px 25px rgba(31,40,69,.045);
+}
+
+/* Fixed expense / secondary cards */
+.fixed-expense,
+.fixed-item,
+.budget-card{
+  background:linear-gradient(145deg,#fff,#fafbfc) !important;
+  border:1px solid #e7eaf0 !important;
+  box-shadow:0 6px 18px rgba(31,40,69,.045) !important;
+}
+
+/* Dividers */
+hr{
+  border:0 !important;
+  border-top:1px solid rgba(225,228,236,.8) !important;
+}
+
+/* Scrollbars */
+*{
+  scrollbar-width:thin;
+  scrollbar-color:#cfd4df transparent;
+}
+*::-webkit-scrollbar{
+  width:7px;
+  height:7px;
+}
+*::-webkit-scrollbar-track{
+  background:transparent;
+}
+*::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#cfd4df,#bfc5d2);
+  border-radius:99px;
+}
+
+/* Responsive */
+@media (max-width:900px){
+  .card{
+    box-shadow:0 7px 24px rgba(29,38,68,.06) !important;
+  }
+  .day-cell{
+    min-height:68px;
+    border-radius:12px !important;
+  }
+}
+@media (max-width:600px){
+  body{
+    background:
+      radial-gradient(circle at 10% 0%,rgba(124,92,255,.09),transparent 32%),
+      linear-gradient(180deg,#f8f9fd,#f5f7fb);
+  }
+  .card{
+    border-radius:17px !important;
+  }
+  .day-cell{
+    min-height:58px;
+    border-radius:10px !important;
+  }
+}
+
+</style>
+
+<style>
+
+/* =========================================================
+   PREMIUM UI v2 — Urban / Clean / Rewarding
+   ========================================================= */
+
+/* 1. Remove decorative purple bars beside every heading */
+.card h2::after,
+.card h3::after{
+  display:none !important;
+  content:none !important;
+}
+
+/* 2. Sharper, more urban typography */
+body{
+  color:#172033;
+  font-family:Inter,"Pretendard","Noto Sans KR",-apple-system,BlinkMacSystemFont,
+               "Segoe UI",sans-serif;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+h1,h2,h3,h4,h5,h6,
+strong,b,
+.amount,.total,
+.summary-box strong,
+.summary-item strong,
+.stat-card strong{
+  color:#26304a;
+  font-weight:750;
+  letter-spacing:-.045em;
+}
+
+/* Gradient typography only for strong/high-emphasis text */
+h1,
+.summary-box strong,
+.summary-item strong,
+.stat-card strong,
+.amount,
+.total,
+.card .value,
+.card .total-value{
+  background:linear-gradient(100deg,#26304a 0%,#5b67d9 48%,#7458cf 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  color:transparent;
+}
+
+/* Keep small/body bold text highly readable rather than over-stylized */
+h2,h3,h4,h5,h6,
+label,
+button,
+.badge,
+.tag,
+.status-badge,
+.category-badge{
+  color:#273148;
+}
+
+/* 3. More sophisticated surface system */
+.card{
+  border-color:rgba(220,224,234,.86) !important;
+  box-shadow:
+    0 1px 2px rgba(20,28,49,.025),
+    0 10px 32px rgba(29,38,68,.055) !important;
+}
+
+.card:hover{
+  box-shadow:
+    0 2px 4px rgba(20,28,49,.025),
+    0 17px 42px rgba(29,38,68,.085) !important;
+}
+
+/* 4. Premium accent colors */
+:root{
+  --success:#1fb88f;
+  --success-deep:#138d72;
+  --success-soft:#e9faf4;
+  --blue:#4f75e8;
+  --blue-soft:#edf3ff;
+  --violet:#6958d9;
+}
+
+/* 5. Zero-spend / no-expense success states
+      Support common class names used by the existing UI. */
+.zero-expense,
+.no-expense,
+.no-spending,
+.spend-zero,
+.expense-zero,
+.no-spend,
+.success-day,
+.zero-day,
+.day-cell.zero-expense,
+.day-cell.no-expense,
+.day-cell.no-spending{
+  background:
+    radial-gradient(circle at 86% 12%,rgba(31,184,143,.16),transparent 32%),
+    linear-gradient(145deg,#f7fffc,#eefaf7) !important;
+  border-color:rgba(31,184,143,.34) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(31,184,143,.035),
+    0 8px 24px rgba(31,184,143,.075) !important;
+}
+
+/* A small positive visual signal without changing content */
+.zero-expense::before,
+.no-expense::before,
+.no-spending::before,
+.success-day::before,
+.zero-day::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  border-radius:inherit;
+  background:
+    linear-gradient(120deg,transparent 0%,rgba(31,184,143,.035) 50%,transparent 100%);
+}
+
+.zero-expense *,
+.no-expense *,
+.no-spending *,
+.success-day *,
+.zero-day *{
+  color:#15856d;
+}
+
+/* Calendar zero-spend day: blue-green, rewarding but not childish */
+.day-cell.zero-expense,
+.day-cell.no-expense,
+.day-cell.no-spending{
+  position:relative;
+}
+
+.day-cell.zero-expense::after,
+.day-cell.no-expense::after,
+.day-cell.no-spending::after{
+  content:"";
+  position:absolute;
+  top:9px;
+  right:9px;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#32c6a1,#4f9ce8);
+  box-shadow:0 0 0 4px rgba(31,184,143,.08);
+}
+
+/* 6. Success / positive money values */
+.success,
+.positive,
+.income,
+.income-value,
+.balance-positive{
+  color:#158a72 !important;
+}
+.success strong,
+.positive strong,
+.income strong,
+.income-value strong,
+.balance-positive strong{
+  background:linear-gradient(100deg,#12866e,#319dc1);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+/* 7. Negative spending remains restrained and readable */
+.negative,
+.expense,
+.expense-value,
+.spending{
+  color:#d85c6b;
+}
+
+/* 8. Calendar becomes more editorial / premium */
+.day-cell{
+  background:
+    linear-gradient(145deg,#ffffff 0%,#fafbfd 100%) !important;
+}
+.day-cell.today{
+  background:
+    radial-gradient(circle at 85% 12%,rgba(91,103,241,.11),transparent 35%),
+    linear-gradient(145deg,#f7f7ff,#eef0ff) !important;
+}
+.day-cell.selected{
+  background:
+    radial-gradient(circle at 86% 14%,rgba(124,92,255,.12),transparent 35%),
+    linear-gradient(145deg,#f2f1ff,#faf9ff) !important;
+}
+
+/* 9. Month controls: restrained premium highlight */
+.month-btn.active,
+.month-button.active,
+.tab-btn.active,
+.mode-btn.active,
+.month-btn.selected,
+.month-button.selected{
+  color:#564bc2 !important;
+  background:
+    linear-gradient(135deg,#f4f3ff,#eceaff) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),
+    0 5px 16px rgba(91,103,241,.075);
+}
+
+/* 10. Input cards — more like a modern product UI */
+.dynamic-input,
+.input-card,
+.expense-input-card,
+.schedule-input-card{
+  background:
+    radial-gradient(circle at 95% 0%,rgba(124,92,255,.08),transparent 30%),
+    linear-gradient(145deg,#f9f9ff,#ffffff) !important;
+  border-color:rgba(91,103,241,.13) !important;
+}
+
+/* 11. Buttons: cleaner, less toy-like */
+button,
+.btn{
+  font-weight:650;
+  letter-spacing:-.02em;
+}
+button.primary,
+.btn-primary,
+button[type="submit"]{
+  background:linear-gradient(120deg,#5868e9,#7058d8) !important;
+  box-shadow:
+    0 6px 16px rgba(91,103,241,.18),
+    inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+/* 12. Outline icons: consistent, thin, urban */
+.icon,
+.icon-wrap,
+.menu-icon,
+.action-icon,
+.category-icon,
+.payment-icon,
+.pictogram{
+  color:#5c68d7 !important;
+}
+.icon svg,
+.icon-wrap svg,
+.menu-icon svg,
+.action-icon svg,
+.category-icon svg,
+.payment-icon svg,
+.pictogram svg{
+  fill:none !important;
+  stroke:currentColor !important;
+  stroke-width:1.65 !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+}
+
+/* Don't put a colored tile behind line icons */
+.icon-wrap,
+.category-icon,
+.payment-icon,
+.pictogram{
+  background:transparent !important;
+}
+
+/* 13. Payment / fixed / todo surfaces */
+.payment-card,
+.payment-method,
+.pay-card,
+.fixed-expense,
+.fixed-item,
+.budget-card{
+  box-shadow:
+    0 5px 18px rgba(31,40,69,.042),
+    inset 0 1px 0 rgba(255,255,255,.9) !important;
+}
+
+/* 14. Fine divider language */
+hr{
+  border-top-color:#e9ecf2 !important;
+}
+
+/* 15. Reward-like success badge */
+.success-badge,
+.zero-badge,
+.no-spend-badge{
+  color:#16886f !important;
+  background:linear-gradient(135deg,#eafaf5,#edf8ff) !important;
+  border:1px solid rgba(31,184,143,.24) !important;
+  box-shadow:0 4px 12px rgba(31,184,143,.07) !important;
+}
+
+/* 16. Accessibility / contrast safeguard */
+.muted,
+.secondary,
+.helper-text,
+.description,
+small{
+  color:#7c8495;
+}
+
+/* Avoid gradients on tiny text where readability matters */
+input,select,textarea,
+.day-cell,
+.schedule-item,
+.expense-item{
+  -webkit-text-fill-color:initial;
+}
+
+</style>
 </head>
 <body>
 
