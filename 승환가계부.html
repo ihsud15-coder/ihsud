@@ -1552,121 +1552,6 @@ input,select,textarea,
 }
 
 /* 월별 고정지출 상세관리 */
-
-/* 고정지출 추가 — 정보는 늘리고 화면은 간결하게 */
-.fixed-add-form{
-  padding:10px;
-  border:1px solid #e7eaf0;
-  border-radius:12px;
-  background:linear-gradient(145deg,#fbfcff,#fff);
-}
-.fixed-add-main,
-.fixed-add-sub{
-  display:grid;
-  grid-template-columns:minmax(0,1.35fr) minmax(0,.85fr);
-  gap:6px;
-}
-.fixed-add-sub{
-  grid-template-columns:minmax(0,1fr) 92px;
-  margin-top:6px;
-}
-.fixed-add-form button{
-  margin-top:7px;
-}
-.fixed-add-hint{
-  margin-top:6px;
-  color:#8991a2;
-  font-size:.68rem;
-  line-height:1.4;
-}
-.fixed-management-item{
-  display:grid !important;
-  grid-template-columns:minmax(0,1fr) auto auto;
-  align-items:center;
-  gap:6px;
-}
-.fixed-management-meta{
-  display:flex;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:4px;
-  min-width:0;
-}
-.fixed-management-name{
-  min-width:0;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  font-weight:700;
-  color:#3d4659;
-}
-.fixed-management-chip{
-  display:inline-flex;
-  align-items:center;
-  gap:2px;
-  padding:2px 6px;
-  border-radius:6px;
-  border:1px solid #e4e7ee;
-  background:#f7f8fb;
-  color:#70798b;
-  font-size:.64rem;
-  font-weight:700;
-  white-space:nowrap;
-}
-.fixed-management-chip.card-linked{
-  color:#5662cf;
-  background:#f2f3ff;
-  border-color:#dfe2ff;
-}
-.fixed-management-chip.day-chip{
-  color:#8a5d4c;
-  background:#fff7f2;
-  border-color:#f3e1d8;
-}
-.fixed-expense-analysis-item{
-  display:flex;
-  flex-direction:column;
-  align-items:stretch;
-  justify-content:center;
-  min-height:52px;
-}
-.fixed-analysis-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:6px;
-  min-width:0;
-}
-.fixed-analysis-meta{
-  display:flex;
-  align-items:center;
-  gap:4px;
-  margin-top:4px;
-  min-width:0;
-}
-.fixed-analysis-meta span{
-  overflow:visible;
-  text-overflow:clip;
-}
-.fixed-analysis-item-method{
-  color:#5965d5 !important;
-  font-size:.62rem !important;
-  font-weight:700;
-}
-.fixed-analysis-item-day{
-  color:#8a5d4c !important;
-  font-size:.62rem !important;
-  font-weight:700;
-}
-@media(max-width:600px){
-  .fixed-add-main{
-    grid-template-columns:1fr 1fr;
-  }
-  .fixed-management-item{
-    grid-template-columns:minmax(0,1fr) auto auto;
-  }
-}
-
 .fixed-month-toolbar{
   display:flex;
   align-items:center;
@@ -1792,6 +1677,197 @@ input,select,textarea,
   to{opacity:1; transform:translateY(0)}
 }
 </style>
+
+<style id="swan-additions-style">
+/* 승환가계부 V1 추가 기능 — 기존 스타일/구조는 유지하고 기능용 스타일만 추가 */
+.expense-split-box{
+  margin-top:8px;
+  padding:10px 11px;
+  border:1px solid #e4e7ee;
+  border-radius:11px;
+  background:linear-gradient(145deg,#fbfcff,#ffffff);
+}
+.expense-split-toggle{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:0;
+  color:#59647a;
+  font-size:.77rem;
+  font-weight:750;
+  cursor:pointer;
+  user-select:none;
+}
+.expense-split-toggle input{
+  width:16px;
+  height:16px;
+  margin:0;
+  accent-color:var(--primary);
+}
+.expense-split-fields{
+  display:none;
+  margin-top:8px;
+  gap:6px;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  align-items:end;
+}
+.expense-split-fields.open{display:grid;}
+.expense-split-note{
+  grid-column:1 / -1;
+  color:#8a92a2;
+  font-size:.67rem;
+  line-height:1.4;
+}
+.split-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  margin-top:4px;
+  padding:2px 6px;
+  border-radius:6px;
+  color:#5664c8;
+  background:#f1f3ff;
+  border:1px solid #dfe3ff;
+  font-size:.63rem;
+  font-weight:750;
+}
+.sch-bar{
+  cursor:grab;
+  user-select:none;
+}
+.sch-bar:active{cursor:grabbing;}
+.sch-bar.dragging{opacity:.45;}
+.day-cell.schedule-drag-over{
+  border-color:rgba(91,103,241,.55) !important;
+  background:linear-gradient(145deg,#f0f1ff,#faf9ff) !important;
+  box-shadow:0 0 0 3px rgba(91,103,241,.10), 0 7px 18px rgba(91,103,241,.10) !important;
+}
+.schedule-detail-popover{
+  position:fixed;
+  z-index:9999;
+  width:min(330px,calc(100vw - 28px));
+  background:rgba(255,255,255,.98);
+  border:1px solid #e2e6ef;
+  border-radius:16px;
+  box-shadow:0 18px 45px rgba(31,40,69,.16), 0 3px 10px rgba(31,40,69,.06);
+  padding:14px;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  animation:schedulePopIn .14s ease-out;
+}
+.schedule-detail-popover::before{
+  content:"";
+  position:absolute;
+  width:8px;height:8px;
+  background:#fff;
+  border-left:1px solid #e2e6ef;
+  border-top:1px solid #e2e6ef;
+  transform:rotate(45deg);
+  top:-5px;
+  left:24px;
+}
+.schedule-detail-head{
+  display:flex;
+  align-items:flex-start;
+  gap:9px;
+}
+.schedule-detail-dot{
+  width:10px;height:10px;border-radius:50%;flex:0 0 10px;margin-top:5px;
+  box-shadow:0 0 0 4px rgba(91,103,241,.08);
+}
+.schedule-detail-title{
+  flex:1;
+  min-width:0;
+  font-size:.93rem;
+  font-weight:800;
+  color:#26304a;
+  letter-spacing:-.03em;
+  word-break:break-word;
+}
+.schedule-detail-close{
+  width:auto !important;
+  margin:0 !important;
+  padding:2px 5px !important;
+  background:transparent !important;
+  color:#9aa3b2 !important;
+  border:0 !important;
+  box-shadow:none !important;
+  font-size:.9rem !important;
+}
+.schedule-detail-meta{
+  margin-top:8px;
+  color:#697386;
+  font-size:.72rem;
+  line-height:1.55;
+}
+.schedule-detail-note{
+  margin-top:9px;
+  padding:9px 10px;
+  border-radius:9px;
+  background:#f7f8fb;
+  color:#596275;
+  font-size:.72rem;
+  line-height:1.5;
+  white-space:pre-wrap;
+}
+.schedule-detail-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  margin-top:11px;
+}
+.schedule-detail-actions button{
+  margin:0 !important;
+  padding:8px 10px !important;
+  font-size:.73rem !important;
+  border-radius:9px !important;
+}
+.schedule-detail-actions .edit-btn{
+  color:#5261cf !important;
+  background:#f0f2ff !important;
+  border:1px solid #dfe3ff !important;
+  box-shadow:none !important;
+}
+.schedule-detail-actions .delete-btn{
+  color:#d85c6b !important;
+  background:#fff2f2 !important;
+  border:1px solid #ffdede !important;
+  box-shadow:none !important;
+}
+.schedule-editing-badge{
+  display:inline-flex;
+  margin-left:6px;
+  padding:3px 7px;
+  border-radius:7px;
+  background:#eef0ff;
+  color:#5a61c8;
+  font-size:.64rem;
+  font-weight:800;
+  vertical-align:middle;
+}
+.schedule-edit-cancel{
+  margin-top:7px !important;
+  background:#eef1f5 !important;
+  color:#5f6b7a !important;
+  box-shadow:none !important;
+}
+@keyframes schedulePopIn{
+  from{opacity:0;transform:translateY(-4px) scale(.985)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@media(max-width:600px){
+  .schedule-detail-popover{
+    position:fixed;
+    left:14px !important;
+    right:14px;
+    bottom:14px;
+    top:auto !important;
+    width:auto;
+  }
+  .schedule-detail-popover::before{display:none;}
+}
+</style>
+
 </head>
 <body>
 
@@ -1975,59 +2051,11 @@ input,select,textarea,
             <span class="fixed-month-label"><span id="fixedSettingMonth">9월</span> 고정지출을 관리합니다.</span>
             <button type="button" class="fixed-import-btn" onclick="importPreviousFixedExpenses(event)">↙ 전월 불러오기</button>
           </div>
-          <div class="fixed-add-form">
-            <div class="fixed-add-main">
-              <input type="text" id="fixedName" placeholder="항목명">
-              <input type="number" id="fixedAmount" placeholder="금액">
-            </div>
-            <div class="fixed-add-sub">
-              <select id="fixedMethod" aria-label="고정지출 결제 수단">
-                <option value="">결제수단 선택</option>
-                <option value="국민카드">💳 국민카드</option>
-                <option value="신한카드">💳 신한카드</option>
-                <option value="우리카드">💳 우리카드</option>
-                <option value="삼성카드">💳 삼성카드</option>
-                <option value="롯데카드">💳 롯데카드</option>
-                <option value="현금">💵 현금</option>
-              </select>
-              <select id="fixedDay" aria-label="고정지출 결제일">
-                <option value="">결제일</option>
-                                <option value="1">1일</option>
-                <option value="2">2일</option>
-                <option value="3">3일</option>
-                <option value="4">4일</option>
-                <option value="5">5일</option>
-                <option value="6">6일</option>
-                <option value="7">7일</option>
-                <option value="8">8일</option>
-                <option value="9">9일</option>
-                <option value="10">10일</option>
-                <option value="11">11일</option>
-                <option value="12">12일</option>
-                <option value="13">13일</option>
-                <option value="14">14일</option>
-                <option value="15">15일</option>
-                <option value="16">16일</option>
-                <option value="17">17일</option>
-                <option value="18">18일</option>
-                <option value="19">19일</option>
-                <option value="20">20일</option>
-                <option value="21">21일</option>
-                <option value="22">22일</option>
-                <option value="23">23일</option>
-                <option value="24">24일</option>
-                <option value="25">25일</option>
-                <option value="26">26일</option>
-                <option value="27">27일</option>
-                <option value="28">28일</option>
-                <option value="29">29일</option>
-                <option value="30">30일</option>
-                <option value="31">31일</option>
-              </select>
-            </div>
-            <button onclick="addFixedItem()">+ 고정지출 추가</button>
-            <div class="fixed-add-hint">카드를 연결하면 이번 달 카드 실적에 자동으로 포함됩니다.</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+            <input type="text" id="fixedName" placeholder="항목명">
+            <input type="number" id="fixedAmount" placeholder="금액">
           </div>
+          <button onclick="addFixedItem()">고정지출 추가</button>
           <div id="fixedList" style="margin-top:10px;"></div>
         </div>
       </div>
@@ -2073,6 +2101,40 @@ input,select,textarea,
     let currentMode = 'ledger'; 
     let selectedDate = systemTodayStr;
     const STORAGE_KEY = 'my_ledger_app_data_v8';
+
+
+    // ===== 승환가계부 추가 기능 상태 =====
+    let editingScheduleId = null;
+    let draggingScheduleId = null;
+    let scheduleDragMoved = false;
+    let scheduleDragSuppressUntil = 0;
+
+    function getActualExpenseAmount(expense) {
+      return Number(expense.actualAmount ?? expense.cardAmount ?? expense.amount) || 0;
+    }
+
+    // 카드/결제 실적에는 실제 부담액이 아니라 '카드에 찍힌 전체 결제금액'을 사용합니다.
+    function getCardChargeAmount(expense) {
+      return Number(expense.cardAmount ?? expense.actualAmount ?? expense.amount) || 0;
+    }
+
+    function formatScheduleDateRange(start, end) {
+      if (!start) return '';
+      if (!end || end === start) return start;
+      return `${start} ~ ${end}`;
+    }
+
+    function dateDiffDays(fromStr, toStr) {
+      const a = new Date(fromStr + 'T00:00:00');
+      const b = new Date(toStr + 'T00:00:00');
+      return Math.round((b - a) / 86400000);
+    }
+
+    function addDaysToDate(dateStr, days) {
+      const d = new Date(dateStr + 'T00:00:00');
+      d.setDate(d.getDate() + days);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
 
     function loadState() {
       let saved = localStorage.getItem(STORAGE_KEY);
@@ -2305,16 +2367,42 @@ input,select,textarea,
       }).join('');
     }
 
+    function toggleSplitExpenseFields() {
+      const checked = document.getElementById('expSplit')?.checked;
+      const box = document.getElementById('expSplitFields');
+      if (box) box.classList.toggle('open', !!checked);
+    }
+
     function saveExpense() {
       const date = document.getElementById('expDate').value;
       const title = document.getElementById('expTitle').value.trim();
       const amount = Number(document.getElementById('expAmount').value);
       const category = document.getElementById('expCategory').value;
       const method = document.getElementById('expMethod').value;
-      if (!date || !amount) return alert('결제 금액을 올바르게 입력해주세요.');
-      state.expenses.push({ id: Date.now(), date, title, cardAmount: amount, actualAmount: amount, category, method });
+      const isSplit = !!document.getElementById('expSplit')?.checked;
+      const splitCount = isSplit ? Math.max(2, Math.floor(Number(document.getElementById('expSplitCount')?.value) || 2)) : 1;
+      if (!date || !amount || amount <= 0) return alert('결제 금액을 올바르게 입력해주세요.');
+
+      const actualAmount = isSplit ? Math.round(amount / splitCount) : amount;
+      state.expenses.push({
+        id: Date.now(),
+        date,
+        title,
+        cardAmount: amount,
+        actualAmount,
+        category,
+        method,
+        isSplit,
+        splitCount
+      });
       save();
-      document.getElementById('expTitle').value = ''; document.getElementById('expAmount').value = '';
+      document.getElementById('expTitle').value = '';
+      document.getElementById('expAmount').value = '';
+      const splitEl = document.getElementById('expSplit');
+      if (splitEl) splitEl.checked = false;
+      const countEl = document.getElementById('expSplitCount');
+      if (countEl) countEl.value = 2;
+      toggleSplitExpenseFields();
     }
     function deleteExpense(id) { if (confirm('해당 내역을 삭제하시겠습니까?')) { state.expenses = state.expenses.filter(e => e.id !== id); save(); } }
     
@@ -2337,9 +2425,164 @@ input,select,textarea,
       state.recentColors.unshift(color);
       if (state.recentColors.length > 3) state.recentColors.pop();
 
-      state.schedules.push({ id: Date.now(), title, startDate, endDate, color, note });
+      if (editingScheduleId !== null) {
+        const target = state.schedules.find(s => s.id === editingScheduleId);
+        if (target) {
+          target.title = title;
+          target.startDate = startDate;
+          target.endDate = endDate;
+          target.color = color;
+          target.note = note;
+        }
+        editingScheduleId = null;
+        closeScheduleDetail();
+      } else {
+        state.schedules.push({ id: Date.now(), title, startDate, endDate, color, note });
+      }
+
       save();
-      document.getElementById('schTitle').value = ''; document.getElementById('schNote').value = '';
+      document.getElementById('schTitle').value = '';
+      document.getElementById('schNote').value = '';
+    }
+
+    function openScheduleEditor(id) {
+      const sch = state.schedules.find(s => s.id === id);
+      if (!sch) return;
+      editingScheduleId = id;
+      currentMode = 'schedule';
+      selectedDate = getStart(sch) || selectedDate;
+      closeScheduleDetail();
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelScheduleEdit() {
+      editingScheduleId = null;
+      render();
+    }
+
+    function closeScheduleDetail() {
+      const el = document.getElementById('scheduleDetailPopover');
+      if (el) el.remove();
+    }
+
+    function showScheduleDetail(id, event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      if (scheduleDragMoved || Date.now() < scheduleDragSuppressUntil) {
+        scheduleDragMoved = false;
+        return;
+      }
+      const sch = state.schedules.find(s => s.id === id);
+      if (!sch) return;
+
+      closeScheduleDetail();
+      const pop = document.createElement('div');
+      pop.id = 'scheduleDetailPopover';
+      pop.className = 'schedule-detail-popover';
+      pop.dataset.scheduleId = id;
+      const anchor = event?.currentTarget || event?.target;
+      const noteHtml = sch.note ? `<div class="schedule-detail-note">${escapeHtml(sch.note)}</div>` : '';
+      pop.innerHTML = `
+        <div class="schedule-detail-head">
+          <span class="schedule-detail-dot" style="background:${sch.color || '#3182f6'};"></span>
+          <div class="schedule-detail-title">${escapeHtml(sch.title)}</div>
+          <button class="schedule-detail-close" onclick="closeScheduleDetail()">✕</button>
+        </div>
+        <div class="schedule-detail-meta">📅 ${formatScheduleDateRange(getStart(sch), getEnd(sch))}</div>
+        ${noteHtml}
+        <div class="schedule-detail-actions">
+          <button class="edit-btn" onclick="openScheduleEditor(${id})">✏️ 수정</button>
+          <button class="delete-btn" onclick="deleteScheduleFromDetail(${id})">🗑 삭제</button>
+        </div>
+      `;
+      document.body.appendChild(pop);
+
+      if (window.matchMedia('(max-width: 600px)').matches) return;
+      const rect = anchor?.getBoundingClientRect?.();
+      if (rect) {
+        const margin = 10;
+        const popW = Math.min(330, window.innerWidth - 28);
+        let left = rect.left;
+        let top = rect.bottom + 10;
+        if (left + popW > window.innerWidth - margin) left = window.innerWidth - popW - margin;
+        if (left < margin) left = margin;
+        const popH = pop.offsetHeight;
+        if (top + popH > window.innerHeight - margin) top = Math.max(margin, rect.top - popH - 10);
+        pop.style.left = `${left}px`;
+        pop.style.top = `${top}px`;
+      }
+    }
+
+    function deleteScheduleFromDetail(id) {
+      closeScheduleDetail();
+      deleteSchedule(id);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>'"]/g, ch => ({
+        '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;'
+      })[ch]);
+    }
+
+    function scheduleDragStart(event, id) {
+      draggingScheduleId = id;
+      scheduleDragMoved = false;
+      if (event.dataTransfer) {
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', String(id));
+      }
+      event.currentTarget.classList.add('dragging');
+      event.stopPropagation();
+    }
+
+    function scheduleDragOver(event) {
+      if (draggingScheduleId === null) return;
+      event.preventDefault();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+      const cell = event.currentTarget;
+      document.querySelectorAll('.day-cell.schedule-drag-over').forEach(el => {
+        if (el !== cell) el.classList.remove('schedule-drag-over');
+      });
+      cell.classList.add('schedule-drag-over');
+    }
+
+    function scheduleDragLeave(event) {
+      const cell = event.currentTarget;
+      if (!cell.contains(event.relatedTarget)) cell.classList.remove('schedule-drag-over');
+    }
+
+    function scheduleDrop(event, dateStr) {
+      if (draggingScheduleId === null) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const id = Number(event.dataTransfer?.getData('text/plain')) || draggingScheduleId;
+      const sch = state.schedules.find(s => s.id === id);
+      document.querySelectorAll('.day-cell.schedule-drag-over').forEach(el => el.classList.remove('schedule-drag-over'));
+      if (!sch) { draggingScheduleId = null; return; }
+
+      const duration = Math.max(0, dateDiffDays(getStart(sch), getEnd(sch)));
+      const newStart = dateStr;
+      const newEnd = addDaysToDate(newStart, duration);
+      const changed = getStart(sch) !== newStart || getEnd(sch) !== newEnd;
+      if (changed) {
+        sch.startDate = newStart;
+        sch.endDate = newEnd;
+        scheduleDragMoved = true;
+        scheduleDragSuppressUntil = Date.now() + 350;
+        closeScheduleDetail();
+        save();
+      }
+      draggingScheduleId = null;
+    }
+
+    function scheduleDragEnd(event) {
+      event.currentTarget.classList.remove('dragging');
+      document.querySelectorAll('.day-cell.schedule-drag-over').forEach(el => el.classList.remove('schedule-drag-over'));
+      draggingScheduleId = null;
+      if (scheduleDragMoved) setTimeout(() => { scheduleDragMoved = false; }, 250);
     }
     function deleteSchedule(id) { if (confirm('일정을 삭제하시겠습니까?')) { state.schedules = state.schedules.filter(s => s.id !== id); save(); } }
     
@@ -2372,7 +2615,7 @@ input,select,textarea,
       }
       const currentItems = getFixedItemsForMonth(currentKey);
       if (currentItems.length && !confirm('현재 월의 고정지출이 있습니다. 전월 항목으로 교체할까요?')) return;
-      const copied = prevItems.map(item => ({ id: Date.now() + Math.random(), name: item.name, amount: Number(item.amount) || 0, method: item.method || '', day: item.day || '' }));
+      const copied = prevItems.map(item => ({ id: Date.now() + Math.random(), name: item.name, amount: Number(item.amount) || 0 }));
       setFixedItemsForMonth(currentKey, copied);
       save();
     }
@@ -2380,17 +2623,12 @@ input,select,textarea,
     function addFixedItem() {
       const name = document.getElementById('fixedName').value.trim();
       const amount = Number(document.getElementById('fixedAmount').value);
-      const method = document.getElementById('fixedMethod').value || '';
-      const day = document.getElementById('fixedDay').value || '';
       if (!name || !amount) return;
       const monthKey = getMonthKey();
       const items = getFixedItemsForMonth(monthKey);
-      items.push({ id: Date.now(), name, amount, method, day });
+      items.push({ id: Date.now(), name, amount });
       setFixedItemsForMonth(monthKey, items);
-      document.getElementById('fixedName').value = '';
-      document.getElementById('fixedAmount').value = '';
-      document.getElementById('fixedMethod').value = '';
-      document.getElementById('fixedDay').value = '';
+      document.getElementById('fixedName').value = ''; document.getElementById('fixedAmount').value = '';
       save();
     }
     function deleteFixedItem(id) {
@@ -2444,31 +2682,50 @@ input,select,textarea,
           <select id="expMethod">
             <option>국민카드</option><option>신한카드</option><option>우리카드</option><option>삼성카드</option><option>롯데카드</option><option>현금</option>
           </select>
+          <div class="expense-split-box">
+            <label class="expense-split-toggle">
+              <input type="checkbox" id="expSplit" onchange="toggleSplitExpenseFields()">
+              친구들과 공동결제 / N빵
+            </label>
+            <div id="expSplitFields" class="expense-split-fields">
+              <div>
+                <label style="margin-top:0;">총 결제 인원</label>
+                <input type="number" id="expSplitCount" value="2" min="2" step="1">
+              </div>
+              <div>
+                <label style="margin-top:0;">내 실제 부담액</label>
+                <input type="text" id="expSplitPreview" value="0원" readonly>
+              </div>
+              <div class="expense-split-note">카드 실적에는 전체 결제금액이 들어가고, 예산·지출 분석에는 내 몫만 반영됩니다.</div>
+            </div>
+          </div>
           <button onclick="saveExpense()">지출 등록하기</button>
         `;
       } else {
-        header.innerText = "🗓️ 일정 등록";
+        header.innerText = editingScheduleId !== null ? "🗓️ 일정 수정" : "🗓️ 일정 등록";
+        let editingSchedule = editingScheduleId !== null ? state.schedules.find(s => s.id === editingScheduleId) : null;
         let recentColorsHtml = state.recentColors.map(c => 
           `<div style="width:18px; height:18px; border-radius:50%; background:${c}; cursor:pointer; border:1px solid #e5e8eb; box-shadow:0 1px 2px rgba(0,0,0,0.1);" onclick="setSchColor('${c}')" title="${c}"></div>`
         ).join('');
 
         body.innerHTML = `
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
-            <div><label>시작일</label><input type="date" id="schStartDate" value="${selectedDate}"></div>
-            <div><label>종료일</label><input type="date" id="schEndDate" value="${selectedDate}"></div>
+            <div><label>시작일</label><input type="date" id="schStartDate" value="${editingSchedule ? getStart(editingSchedule) : selectedDate}"></div>
+            <div><label>종료일</label><input type="date" id="schEndDate" value="${editingSchedule ? getEnd(editingSchedule) : selectedDate}"></div>
           </div>
-          <label>일정 제목</label><input type="text" id="schTitle" placeholder="예: 제주도 여행, 회의">
+          <label>일정 제목</label><input type="text" id="schTitle" value="${editingSchedule ? escapeHtml(editingSchedule.title) : ''}" placeholder="예: 제주도 여행, 회의">
           <label>라벨 색상</label>
           <div style="display:flex; align-items:center; gap:12px;">
-            <input type="color" id="schColor" value="${state.recentColors.length > 0 ? state.recentColors[0] : '#3182f6'}" style="width:36px; height:36px; border:none; padding:0; background:transparent; cursor:pointer; flex-shrink:0;">
+            <input type="color" id="schColor" value="${editingSchedule ? (editingSchedule.color || '#3182f6') : (state.recentColors.length > 0 ? state.recentColors[0] : '#3182f6')}" style="width:36px; height:36px; border:none; padding:0; background:transparent; cursor:pointer; flex-shrink:0;">
             ${state.recentColors.length > 0 ? `
               <div style="display:flex; gap:6px; align-items:center; border-left:2px solid #e5e8eb; padding-left:12px;">
                 ${recentColorsHtml}
               </div>
             ` : '<span style="font-size:0.75rem; color:var(--sub);">클릭하여 색상을 선택하세요</span>'}
           </div>
-          <label>상세 메모</label><input type="text" id="schNote" placeholder="메모할 내용">
-          <button onclick="saveSchedule()" class="btn-success">일정 등록하기</button>
+          <label>상세 메모</label><input type="text" id="schNote" value="${editingSchedule ? escapeHtml(editingSchedule.note || '') : ''}" placeholder="메모할 내용">
+          <button onclick="saveSchedule()" class="btn-success">${editingSchedule ? '수정 내용 저장' : '일정 등록하기'}</button>
+          ${editingSchedule ? '<button type="button" onclick="cancelScheduleEdit()" class="schedule-edit-cancel">수정 취소</button>' : ''}
         `;
       }
     }
@@ -2529,13 +2786,7 @@ input,select,textarea,
         document.getElementById('pageSubTitle').innerText = `고정지출을 제외한 월 생활비 예산 기준으로 일일 권장 지출액을 계산합니다`;
         
         let cardTotals = {};
-        monthExpenses.forEach(e => { cardTotals[e.method] = (cardTotals[e.method] || 0) + e.actualAmount; });
-        // 카드가 연결된 월 고정지출도 해당 카드의 이번 달 실적에 자동 포함합니다.
-        monthFixedItems.forEach(item => {
-          if (item.method && item.method !== '현금') {
-            cardTotals[item.method] = (cardTotals[item.method] || 0) + (Number(item.amount) || 0);
-          }
-        });
+        monthExpenses.forEach(e => { cardTotals[e.method] = (cardTotals[e.method] || 0) + getCardChargeAmount(e); });
         let totalCardSpent = Object.values(cardTotals).reduce((a,b)=>a+b, 0);
         totalCardSpent -= (cardTotals['현금'] || 0);
 
@@ -2639,6 +2890,22 @@ input,select,textarea,
 
       renderDynamicForm();
 
+      const splitAmountEl = document.getElementById('expAmount');
+      const splitCountEl = document.getElementById('expSplitCount');
+      const splitPreviewEl = document.getElementById('expSplitPreview');
+      if (splitAmountEl && splitCountEl && splitPreviewEl) {
+        const updateSplitPreview = () => {
+          const checked = !!document.getElementById('expSplit')?.checked;
+          const amount = Number(splitAmountEl.value) || 0;
+          const count = Math.max(2, Math.floor(Number(splitCountEl.value) || 2));
+          splitPreviewEl.value = checked ? `${Math.round(amount / count).toLocaleString()}원` : `${amount.toLocaleString()}원`;
+        };
+        splitAmountEl.addEventListener('input', updateSplitPreview);
+        splitCountEl.addEventListener('input', updateSplitPreview);
+        document.getElementById('expSplit')?.addEventListener('change', updateSplitPreview);
+        updateSplitPreview();
+      }
+
       /* 캘린더 그리드 그리기 */
       const cal = document.getElementById('calendar');
       cal.innerHTML = '';
@@ -2685,7 +2952,7 @@ input,select,textarea,
               else barType = 'cont-mid';
             }
             const showText = (isStart || isSun) ? sch.title : '&nbsp;';
-            return `<div class="sch-bar ${barType}" style="background-color: ${sch.color || '#3182f6'};">${showText}</div>`;
+            return `<div class="sch-bar ${barType}" draggable="true" onclick="showScheduleDetail(${sch.id}, event)" ondragstart="scheduleDragStart(event, ${sch.id})" ondragend="scheduleDragEnd(event)" style="background-color: ${sch.color || '#3182f6'};">${showText}</div>`;
           }).join('');
 
           // 캘린더 내 투두 달성 배지
@@ -2707,7 +2974,7 @@ input,select,textarea,
         }
 
         cal.innerHTML += `
-          <div class="day-cell ${dayClass} ${dateStr === systemTodayStr ? 'today' : ''} ${dateStr === selectedDate ? 'selected-date' : ''}" data-date="${dateStr}" onclick="selectDate('${dateStr}')">
+          <div class="day-cell ${dayClass} ${dateStr === systemTodayStr ? 'today' : ''} ${dateStr === selectedDate ? 'selected-date' : ''}" data-date="${dateStr}" onclick="selectDate('${dateStr}')" ondragover="scheduleDragOver(event)" ondragleave="scheduleDragLeave(event)" ondrop="scheduleDrop(event, '${dateStr}')">
             <div style="font-weight:bold;">${i}</div>
             ${contentHtml}
           </div>`;
@@ -2718,17 +2985,13 @@ input,select,textarea,
         const fixedContainer = document.getElementById('fixedList');
         fixedContainer.innerHTML = monthFixedItems.map(item => `
           <div class="fixed-management-item">
-            <div class="fixed-management-meta">
-              <span class="fixed-management-name">📌 ${item.name}</span>
-              ${item.method ? `<span class="fixed-management-chip card-linked">💳 ${item.method}</span>` : ''}
-              ${item.day ? `<span class="fixed-management-chip day-chip">📅 ${item.day}일</span>` : ''}
-            </div>
+            <span class="fixed-name">📌 ${item.name}</span>
             <span class="fixed-amount">${Number(item.amount).toLocaleString()}원</span>
             <button class="action-btn btn-del fixed-delete" onclick="deleteFixedItem(${item.id})">삭제</button>
           </div>`).join('') || `<small style="color:var(--sub);">이 달에 등록된 고정지출이 없습니다.</small>`;
 
         let cardTotals = {};
-        monthExpenses.forEach(e => { cardTotals[e.method] = (cardTotals[e.method] || 0) + e.actualAmount; });
+        monthExpenses.forEach(e => { cardTotals[e.method] = (cardTotals[e.method] || 0) + getCardChargeAmount(e); });
 
         const paymentTargets = {
           shinhan: { method: '신한카드', target: 300000, status: 'shinhanStatus', bar: 'shinhanBar' },
@@ -2775,8 +3038,8 @@ input,select,textarea,
 
         const catTotals = {};
         const prevCatTotals = {};
-        monthExpenses.forEach(e => { catTotals[e.category] = (catTotals[e.category] || 0) + e.actualAmount; });
-        prevMonthExpenses.forEach(e => { prevCatTotals[e.category] = (prevCatTotals[e.category] || 0) + e.actualAmount; });
+        monthExpenses.forEach(e => { catTotals[e.category] = (catTotals[e.category] || 0) + getActualExpenseAmount(e); });
+        prevMonthExpenses.forEach(e => { prevCatTotals[e.category] = (prevCatTotals[e.category] || 0) + getActualExpenseAmount(e); });
         
         const sortedCats = Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]);
         const catColors = ['#00c471', '#3182f6', '#ff9500', '#8b5cf6', '#ef4444', '#14b8a6', '#f43f5e'];
@@ -2813,11 +3076,15 @@ input,select,textarea,
 
         // 지출 상세 내역은 복잡도를 줄이기 위해 처음 5개만 노출하고,
         // 5개 초과분은 "더보기"를 눌러야 펼쳐지도록 구성합니다.
-        const sortedExp = [...monthExpenses].sort((a,b) => b.actualAmount - a.actualAmount);
+        const sortedExp = [...monthExpenses].sort((a,b) => getActualExpenseAmount(b) - getActualExpenseAmount(a));
         const renderExpenseItem = (e, idx) => `
           <div class="list-item expense-detail-item">
-            <div><strong style="color:var(--primary); margin-right:6px;">${idx + 1}</strong><strong>${e.title || '내역 없음'}</strong><div style="font-size:0.75rem; color:var(--sub);">${e.date} | ${e.category} | ${e.method}</div></div>
-            <div><strong style="margin-right:8px;">${e.actualAmount.toLocaleString()}원</strong><button class="action-btn btn-del" onclick="deleteExpense(${e.id})">삭제</button></div>
+            <div>
+              <strong style="color:var(--primary); margin-right:6px;">${idx + 1}</strong><strong>${e.title || '내역 없음'}</strong>
+              <div style="font-size:0.75rem; color:var(--sub);">${e.date} | ${e.category} | ${e.method}</div>
+              ${e.isSplit ? `<span class="split-badge">N빵 ${e.splitCount}인 · 카드 ${getCardChargeAmount(e).toLocaleString()}원 · 내 부담 ${getActualExpenseAmount(e).toLocaleString()}원</span>` : ''}
+            </div>
+            <div><strong style="margin-right:8px;">${getActualExpenseAmount(e).toLocaleString()}원</strong><button class="action-btn btn-del" onclick="deleteExpense(${e.id})">삭제</button></div>
           </div>`;
 
         const visibleExpenses = sortedExp.slice(0, 5);
@@ -2851,15 +3118,8 @@ input,select,textarea,
             <div class="fixed-expense-analysis-list">
               ${monthFixedItems.map(item => `
                 <div class="fixed-expense-analysis-item">
-                  <div class="fixed-analysis-top">
-                    <span>${item.name}</span>
-                    <strong>${Number(item.amount).toLocaleString()}원</strong>
-                  </div>
-                  ${(item.method || item.day) ? `
-                    <div class="fixed-analysis-meta">
-                      ${item.method ? `<span class="fixed-analysis-item-method">💳 ${item.method}</span>` : ''}
-                      ${item.day ? `<span class="fixed-analysis-item-day">· ${item.day}일</span>` : ''}
-                    </div>` : ''}
+                  <span>${item.name}</span>
+                  <strong>${Number(item.amount).toLocaleString()}원</strong>
                 </div>
               `).join('')}
             </div>
@@ -2913,6 +3173,7 @@ input,select,textarea,
 
     // 💡 날짜 클릭 시 모든 UI(입력창 날짜 및 To-do)가 즉각 연동되도록 조치
     function selectDate(dateStr) {
+      closeScheduleDetail();
       selectedDate = dateStr;
       document.querySelectorAll('.day-cell').forEach(el => el.classList.remove('selected-date'));
       const cell = document.querySelector(`.day-cell[data-date="${dateStr}"]`);
@@ -2929,6 +3190,18 @@ input,select,textarea,
         hideTodoInput(); 
       }
     }
+
+    // 팝오버 바깥 클릭 / ESC로 일정 상세 닫기
+    document.addEventListener('click', (event) => {
+      const pop = document.getElementById('scheduleDetailPopover');
+      if (!pop) return;
+      if (pop.contains(event.target)) return;
+      if (event.target.closest && event.target.closest('.sch-bar')) return;
+      closeScheduleDetail();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeScheduleDetail();
+    });
 
     // 초기화 및 실행
     render();
