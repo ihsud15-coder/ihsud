@@ -60,6 +60,230 @@ button:disabled{cursor:not-allowed;opacity:.55}
 @media(max-width:1050px){.layout{grid-template-columns:1fr}.topbar{align-items:flex-start}.topbar-actions{max-width:55%}}
 @media(max-width:760px){body{padding:12px}.topbar{padding:14px;border-radius:18px;flex-direction:column;align-items:stretch}.topbar-actions{max-width:none;justify-content:stretch}.topbar-actions .btn{flex:1}.hero-head{flex-direction:column;align-items:stretch}.hero-actions{justify-content:flex-start}.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.calendar-card{padding:11px}.calendar-head{flex-direction:column;align-items:stretch}.month-nav{justify-content:space-between}.month-title{justify-content:center;order:-1}.day{min-height:64px;padding:6px;border-radius:11px}.sch-bar{font-size:.56rem;height:19px}.field-grid,.setup-type-grid,.setup-grid{grid-template-columns:1fr}.setup-grid>.field:last-child{padding-top:0}.credit-issuer-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.credit-detail-row{grid-template-columns:1fr}.setup-foot{flex-direction:column;align-items:stretch}.setup-foot .btn{width:100%}}
 @media(max-width:480px){.card{padding:15px;border-radius:17px}.summary{min-height:84px;padding:12px}.summary-value{font-size:1rem}.day{min-height:55px}.day-spend{font-size:.61rem}.weekday{font-size:.61rem}.brand-title{font-size:.95rem}}
+
+
+/* =========================================================
+   FIXED EXPENSE MANAGER — FINAL UI POLISH
+   고정지출 영역 전용 스타일. 전역 .field / .label 영향 차단.
+   ========================================================= */
+.fixed-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin:0 0 10px;
+  min-height:32px;
+}
+.fixed-month-title{
+  margin:0;
+  color:#364057;
+  font-size:.78rem;
+  line-height:1.25;
+  font-weight:850;
+  letter-spacing:-.025em;
+}
+.fixed-import-btn{
+  flex:0 0 auto;
+  width:auto !important;
+  margin:0 !important;
+  padding:7px 9px !important;
+  border-radius:9px !important;
+  background:#f6f7fb !important;
+  color:#5d66c9 !important;
+  border:1px solid #e1e5ef !important;
+  font-size:.67rem !important;
+  font-weight:800 !important;
+  line-height:1 !important;
+  white-space:nowrap;
+  box-shadow:none !important;
+}
+.fixed-import-btn:hover{
+  background:#eef0ff !important;
+  border-color:#d7daf7 !important;
+  color:#4f58bf !important;
+  transform:none !important;
+  box-shadow:none !important;
+}
+.fixed-add-card{
+  padding:13px;
+  border:1px solid #e4e8f0;
+  border-radius:15px;
+  background:linear-gradient(145deg,#fbfcff 0%,#ffffff 100%);
+  box-shadow:0 5px 16px rgba(31,40,69,.035);
+}
+.fixed-input-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);
+  gap:9px;
+}
+.fixed-input-grid .field{
+  min-width:0;
+  margin-top:0 !important;
+}
+.fixed-add-card .field label{
+  display:block;
+  margin:0 0 6px !important;
+  color:#707a8d !important;
+  font-size:.67rem !important;
+  line-height:1.2;
+  font-weight:800 !important;
+  letter-spacing:-.01em;
+}
+.fixed-add-card .field input{
+  width:100%;
+  min-height:40px;
+  padding:9px 11px;
+  border:1px solid #dde3ec;
+  border-radius:10px;
+  background:#fff;
+  color:#263149;
+  font-size:.79rem;
+  line-height:1.2;
+}
+.fixed-add-card .field input::placeholder{color:#afb6c2}
+.fixed-add-card .field input:focus{
+  border-color:#8991eb;
+  box-shadow:0 0 0 3px rgba(91,99,232,.08);
+}
+.fixed-split-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:10px;
+  padding:10px 11px;
+  border:1px solid #e2e6ee;
+  border-radius:11px;
+  background:#f8f9fc;
+}
+.fixed-split-row .split-line{
+  flex:1 1 auto;
+  min-width:0;
+  margin:0 !important;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:#4e586d !important;
+  font-size:.72rem !important;
+  line-height:1.25;
+  font-weight:850 !important;
+}
+.fixed-split-row .split-line input{
+  width:16px !important;
+  height:16px !important;
+  margin:0 !important;
+  flex:0 0 16px;
+  accent-color:#5b63e8;
+}
+.fixed-split-help{
+  flex:0 1 185px;
+  color:#8b93a2;
+  font-size:.62rem;
+  line-height:1.4;
+  text-align:right;
+  letter-spacing:-.01em;
+}
+.fixed-split-fields{
+  display:none;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:8px;
+  margin-top:8px;
+}
+.fixed-split-fields.open{display:grid}
+.fixed-split-fields .field{margin-top:0 !important}
+.fixed-split-fields .field input[readonly]{
+  background:#f5f6fb;
+  color:#5b63d4;
+  font-weight:850;
+}
+.fixed-split-note{
+  grid-column:1 / -1;
+  margin:1px 2px 0;
+  color:#8992a2;
+  font-size:.64rem;
+  line-height:1.5;
+  letter-spacing:-.012em;
+}
+.fixed-split-note b{
+  color:#6570c9;
+  font-weight:850;
+}
+.fixed-add-btn{
+  width:100% !important;
+  margin:10px 0 0 !important;
+  min-height:40px;
+  font-size:.76rem !important;
+}
+.fixed-list-empty{
+  padding:12px 2px 3px;
+  color:#9aa2b0 !important;
+  font-size:.69rem !important;
+  text-align:center;
+}
+.fixed-item-main{
+  min-width:0;
+  flex:1;
+}
+.fixed-item-line{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+}
+.fixed-item-line .list-title{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  color:#3d465a;
+  font-size:.74rem;
+  font-weight:800;
+}
+.fixed-split-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  flex:0 0 auto;
+  padding:2px 6px;
+  border-radius:6px;
+  color:#5963c7;
+  background:#f0f2ff;
+  border:1px solid #dde1ff;
+  font-size:.57rem;
+  line-height:1.2;
+  font-weight:850;
+}
+.fixed-item-amounts{
+  flex:0 0 auto;
+  min-width:68px;
+  text-align:right;
+}
+.fixed-item-total{
+  margin-bottom:2px;
+  color:#9aa1af;
+  font-size:.6rem;
+  line-height:1.15;
+}
+.fixed-item-my{
+  color:#c45e6b;
+  font-size:.79rem;
+  line-height:1.2;
+  font-weight:900;
+  white-space:nowrap;
+}
+@media(max-width:760px){
+  .fixed-toolbar{align-items:center}
+  .fixed-month-title{font-size:.75rem}
+  .fixed-input-grid{grid-template-columns:1fr}
+  .fixed-split-row{align-items:flex-start;flex-direction:column;gap:6px}
+  .fixed-split-help{flex:0 0 auto;text-align:left}
+  .fixed-split-fields{grid-template-columns:1fr 1fr}
+}
+@media(max-width:440px){
+  .fixed-split-fields{grid-template-columns:1fr}
+  .fixed-split-note{font-size:.62rem}
+}
+
 </style>
 </head>
 <body>
@@ -132,12 +356,35 @@ button:disabled{cursor:not-allowed;opacity:.55}
       </section>
 
       <section class="card collapsed" id="fixedCard">
-        <div class="card-header" onclick="toggleCollapsible('fixedCard')"><div><h2 class="card-title">📌 고정지출 관리</h2><div class="card-sub">월별로 따로 저장됩니다.</div></div><span>⌄</span></div>
-        <div class="collapsible"><div class="toolbar"><span id="fixedMonthLabel">10월 고정지출</span><button class="btn soft tiny" onclick="importPreviousFixed(event)">전월 불러오기</button></div><div class="field-grid"><div class="field"><input id="fixedName" placeholder="항목명"></div><div class="field"><input id="fixedAmount" type="number" placeholder="금액"></div></div><button class="btn primary" style="width:100%;margin-top:9px" onclick="addFixedItem()">고정지출 추가</button><div id="fixedList" class="list" style="margin-top:8px"></div></div>
+        <div class="card-header" onclick="toggleCollapsible('fixedCard')"><div><h2 class="card-title">📌 고정지출 관리</h2><div class="card-sub">월 생활비와 분리해 월별로 관리합니다.</div></div><span>⌄</span></div>
+        <div class="collapsible">
+          <div class="fixed-toolbar">
+            <div class="fixed-month-title" id="fixedMonthLabel">10월 고정지출</div>
+            <button class="btn soft tiny fixed-import-btn" onclick="importPreviousFixed(event)">↙ 전월 불러오기</button>
+          </div>
+          <div class="fixed-add-card">
+            <div class="field-grid fixed-input-grid">
+              <div class="field"><label>항목명</label><input id="fixedName" placeholder="예: 넷플릭스, 월세, 보험"></div>
+              <div class="field"><label>금액</label><input id="fixedAmount" type="number" min="0" step="100" placeholder="월 금액" oninput="updateFixedSplitPreview()"></div>
+            </div>
+            <div class="fixed-split-row">
+              <label class="split-line"><input type="checkbox" id="fixedSplitToggle" onchange="toggleFixedSplitFields()"> 공동결제 / N빵</label>
+              <div class="fixed-split-help">OTT처럼 친구·가족과 나눠 내는 고정비에 사용</div>
+            </div>
+            <div class="fixed-split-fields" id="fixedSplitFields">
+              <div class="field"><label>총 인원</label><input id="fixedSplitCount" type="number" min="2" step="1" value="2" oninput="updateFixedSplitPreview()"></div>
+              <div class="field"><label>내 실제 부담액</label><input id="fixedSplitPreview" value="0원" readonly></div>
+              <div class="fixed-split-note">총 결제금액과 별도로 <b>내가 실제 부담하는 금액</b>만 고정지출 합계에 반영합니다.</div>
+            </div>
+            <button class="btn primary fixed-add-btn" onclick="addFixedItem()">＋ 고정지출 추가</button>
+          </div>
+          <div id="fixedList" class="list" style="margin-top:8px"></div>
+        </div>
       </section>
 
+
       <section class="card collapsed" id="budgetCard">
-        <div class="card-header" onclick="toggleCollapsible('budgetCard')"><div><h2 class="card-title"><span id="budgetMonthLabel">10월</span> 목표 예산</h2><div class="card-sub">변동 생활비 목표로 사용합니다.</div></div><span>⌄</span></div>
+        <div class="card-header" onclick="toggleCollapsible('budgetCard')"><div><h2 class="card-title"><span id="budgetMonthLabel">10월</span> 목표 예산</h2><div class="card-sub">고정지출을 포함한 한 달 전체 생활비 목표입니다.</div></div><span>⌄</span></div>
         <div class="collapsible"><div class="field"><label>월 목표 예산</label><input id="budgetInput" type="number" min="0" step="10000"></div><button class="btn primary" style="width:100%;margin-top:9px" onclick="saveBudget()">예산 저장</button></div>
       </section>
 
@@ -174,7 +421,7 @@ button:disabled{cursor:not-allowed;opacity:.55}
 <div class="setup-modal" id="backupModal" aria-hidden="true">
   <div class="setup-backdrop" onclick="closeBackupModal()"></div>
   <div class="setup-panel" role="dialog" aria-modal="true">
-    <div class="setup-head"><div><div class="setup-eyebrow">DATA BACKUP</div><h2>백업 & 복원</h2><p>컴퓨터를 바꿔도 같은 JSON 파일을 가져오면 결제수단 설정까지 복원됩니다.</p></div><button class="close-btn" onclick="closeBackupModal()">✕</button></div>
+    <div class="setup-head"><div><div class="setup-eyebrow">DATA BACKUP</div><h2>백업 & 복원</h2><p>컴퓨터를 바꿔도 같은 JSON 파일을 가져오면 결제수단·고정지출 설정까지 함께 복원됩니다.</p></div><button class="close-btn" onclick="closeBackupModal()">✕</button></div>
     <div class="form-actions"><button class="btn success" onclick="exportBackup()">📥 JSON 파일 백업</button><button class="btn" onclick="copyBackup()">📋 코드 복사</button></div>
     <div class="field" style="margin-top:12px"><label>백업 코드 붙여넣기</label><textarea id="backupText" style="width:100%;min-height:150px;padding:10px;border:1px solid #e2e6ee;border-radius:10px" placeholder="JSON 백업 코드를 붙여넣으세요"></textarea></div>
     <div class="form-actions"><button class="btn primary" onclick="restoreFromText()">🔄 텍스트로 복원</button><button class="btn" onclick="triggerFileImport()">📂 JSON 파일 불러오기</button></div>
@@ -189,7 +436,8 @@ button:disabled{cursor:not-allowed;opacity:.55}
 'use strict';
 
 const APP_VERSION = 10;
-const STORAGE_KEY = 'swan_ledger_v3';
+const STORAGE_KEY = 'swan_ledger_general_v3';
+window.__GENERAL_VERSION__=true;
 const today = new Date();
 const todayStr = formatDate(today);
 let viewYear = today.getFullYear();
@@ -252,6 +500,16 @@ function normalizeState(raw){
   if(!s.monthlyBudgets||typeof s.monthlyBudgets!=='object')s.monthlyBudgets={};
   if(!s.monthlyFixedItems||typeof s.monthlyFixedItems!=='object')s.monthlyFixedItems={};
   if(Array.isArray(s.fixedItems)&&Object.keys(s.monthlyFixedItems).length===0){s.monthlyFixedItems[monthKey(today.getFullYear(),today.getMonth())]=s.fixedItems}
+  Object.keys(s.monthlyFixedItems).forEach(k=>{
+    if(!Array.isArray(s.monthlyFixedItems[k])) s.monthlyFixedItems[k]=[];
+    s.monthlyFixedItems[k]=s.monthlyFixedItems[k].map(x=>{
+      const amount=Math.max(0,Number(x?.amount)||0);
+      const split=!!x?.isSplit;
+      const count=split?Math.max(2,Math.floor(Number(x?.splitCount)||2)):1;
+      const actual=split?Math.round(amount/count):amount;
+      return {...x,id:String(x?.id??uid()),name:x?.name||'고정지출',amount,isSplit:split,splitCount:count,actualAmount:Number(x?.actualAmount??actual)||actual};
+    });
+  });
   s.expenses=Array.isArray(s.expenses)?s.expenses:[]; s.schedules=Array.isArray(s.schedules)?s.schedules:[]; s.todos=Array.isArray(s.todos)?s.todos:[]; s.recentColors=Array.isArray(s.recentColors)?s.recentColors:[]; s.paymentMethods=Array.isArray(s.paymentMethods)?s.paymentMethods:[];
   s.expenses=s.expenses.map(e=>({...e,id:e.id??uid(),cardAmount:Number(e.cardAmount??e.amount??e.actualAmount??0)||0,actualAmount:Number(e.actualAmount??e.amount??e.cardAmount??0)||0,category:e.category||'생활',title:e.title||'내역 없음'}));
   s.schedules=s.schedules.map(x=>({...x,id:x.id??uid(),startDate:x.startDate||x.date||todayStr,endDate:x.endDate||x.startDate||x.date||todayStr,color:x.color||'#5b63e8',note:x.note||''}));
@@ -272,115 +530,16 @@ function escapeHtml(v){return String(v??'').replace(/[&<>'"]/g,ch=>({'&':'&amp;'
 function toast(msg){const wrap=document.getElementById('toastWrap');const el=document.createElement('div');el.className='toast';el.textContent=msg;wrap.appendChild(el);setTimeout(()=>el.remove(),2200)}
 function getMonthExpenses(){const k=monthKey();return state.expenses.filter(e=>(e.date||'').startsWith(k))}
 function getMonthFixed(){return Array.isArray(state.monthlyFixedItems[monthKey()])?state.monthlyFixedItems[monthKey()]:[]}
-function paymentTheme(m){if(m?.type==='credit'){if(m.color)return themeFromColor(m.color,(PAYMENT_THEMES.cards[m.issuer]?.[2])||'CC');return PAYMENT_THEMES.cards[m.issuer]||['linear-gradient(135deg,#8d94a4,#50596a)','#fff','CC']}const pool=PAYMENT_THEMES.banks;return pool[m?.issuer]||['linear-gradient(135deg,#8d94a4,#50596a)','#fff','₩']}
-function paymentLabel(m){if(!m)return '결제수단 없음';if(m.type==='credit')return `${m.issuer} · ${m.detail&&m.detail!=='전체'?m.detail+' · ':''}신용카드`;return `${m.issuer} · 체크카드 / 통장`}
-function paymentById(id){return state.paymentMethods.find(m=>String(m.id)===String(id))}
-function actualAmount(e){return Number(e.actualAmount??e.amount??e.cardAmount??0)||0}
-function cardCharge(e){return Number(e.cardAmount??e.amount??e.actualAmount??0)||0}
-function categoryEmoji(cat){if(cat?.includes('식비'))return '🍚';if(cat?.includes('교통'))return '🚌';if(cat?.includes('주거'))return '🏠';if(cat?.includes('통신'))return '📱';if(cat?.includes('의료')||cat?.includes('건강'))return '💊';if(cat?.includes('교육'))return '📚';if(cat?.includes('의류'))return '👕';if(cat?.includes('문화'))return '🎬';if(cat?.includes('술'))return '🍻';if(cat?.includes('카페'))return '☕';if(cat?.includes('보험'))return '🛡️';if(cat?.includes('뷰티'))return '✂️';if(cat?.includes('경조'))return '💌';if(cat?.includes('여행'))return '✈️';return '🛍️'}
-
-function setMode(mode){currentMode=mode;editingScheduleId=null;render()}
-function toggleMode(){setMode(currentMode==='ledger'?'schedule':'ledger')}
-function changeMonth(delta){viewMonth+=delta;if(viewMonth<0){viewMonth=11;viewYear--}else if(viewMonth>11){viewMonth=0;viewYear++}selectedDate=`${monthKey()}-01`;render()}
-function goToday(){viewYear=today.getFullYear();viewMonth=today.getMonth();selectedDate=todayStr;render();window.scrollTo({top:0,behavior:'smooth'})}
-function selectDate(d){selectedDate=d;closeSchedulePop();render();}
-function toggleCollapsible(id){document.getElementById(id)?.classList.toggle('collapsed')}
-function toggleDetailCard(){const c=document.getElementById('detailCard');const body=document.getElementById('detailContent');const b=document.getElementById('detailToggleBtn');if(!c||!body)return;const hide=body.classList.toggle('hidden');b.textContent=hide?'펼치기':'접기'}
-function setSelectedDateToForm(){const ed=document.getElementById('expDate');if(ed)ed.value=selectedDate;const ss=document.getElementById('schStart');if(ss)ss.value=selectedDate;const se=document.getElementById('schEnd');if(se)se.value=selectedDate}
-
-function render(){
-  document.getElementById('heroKicker').textContent=`${viewYear}년 ${viewMonth+1}월`;
-  document.getElementById('budgetMonthLabel').textContent=`${viewMonth+1}월`;
-  document.getElementById('fixedMonthLabel').textContent=`${viewMonth+1}월 고정지출`;
-  document.getElementById('ledgerModeBtn').classList.toggle('active',currentMode==='ledger');document.getElementById('scheduleModeBtn').classList.toggle('active',currentMode==='schedule');
-  document.getElementById('paymentCard').style.display=currentMode==='ledger'?'block':'none';document.getElementById('fixedCard').style.display=currentMode==='ledger'?'block':'none';document.getElementById('budgetCard').style.display=currentMode==='ledger'?'block':'none';document.getElementById('todoCard').style.display=currentMode==='schedule'?'block':'none';
-  renderDashboard();renderForm();renderCalendar();renderDetails();renderPayments();renderFixed();if(currentMode==='schedule')renderTodos();
-}
-
-function renderDashboard(){
-  const month=getMonthExpenses();const budget=Number(state.monthlyBudgets[monthKey()]??900000);const spent=month.reduce((s,e)=>s+actualAmount(e),0);const fixed=getMonthFixed().reduce((s,x)=>s+(Number(x.amount)||0),0);const remaining=budget-spent;
-  const lastDay=new Date(viewYear,viewMonth+1,0).getDate();let elapsed;if(viewYear<today.getFullYear()||(viewYear===today.getFullYear()&&viewMonth<today.getMonth()))elapsed=lastDay;else if(viewYear>today.getFullYear()||(viewYear===today.getFullYear()&&viewMonth>today.getMonth()))elapsed=0;else elapsed=today.getDate();
-  const daysRemaining=Math.max(1,lastDay-elapsed+1);const daily=remaining>0?Math.floor(remaining/daysRemaining):0;const avg=elapsed>0?Math.floor(spent/elapsed):0;const pct=budget>0?Math.min(100,Math.round(spent/budget*100)):0;
-  const grid=document.getElementById('summaryGrid');const gauge=document.getElementById('gaugeBar');
-  if(currentMode==='ledger'){
-    document.getElementById('pageTitle').textContent='가계부&캘린더';document.getElementById('pageDesc').textContent='고정지출은 별도로 관리하고, 생활비 예산에는 변동지출만 반영합니다.';
-    const cardTotal=state.paymentMethods.reduce((s,m)=>s+month.filter(e=>String(e.methodId)===String(m.id)).reduce((a,e)=>a+cardCharge(e),0),0);
-    grid.innerHTML=`<div class="summary"><div class="summary-label">목표 생활비</div><div class="summary-value primary">${budget.toLocaleString()}원</div><div class="summary-help">고정지출 제외</div></div><div class="summary"><div class="summary-label">이번 달 지출</div><div class="summary-value">${spent.toLocaleString()}원</div><div class="summary-help">내 실제 부담액 기준</div></div><div class="summary"><div class="summary-label">카드·계좌 이용액</div><div class="summary-value primary">${cardTotal.toLocaleString()}원</div><div class="summary-help">N빵은 총 결제액</div></div><div class="summary"><div class="summary-label">남은 생활비</div><div class="summary-value ${remaining<0?'danger':'teal'}">${remaining.toLocaleString()}원</div><div class="summary-help">예산 - 변동지출</div></div><div class="summary"><div class="summary-label">오늘 권장 지출</div><div class="summary-value">${daily.toLocaleString()}원</div><div class="summary-help">남은 날짜 기준</div></div><div class="summary"><div class="summary-label">현재 일평균</div><div class="summary-value">${avg.toLocaleString()}원</div><div class="summary-help">경과일 기준</div></div>`;
-    document.getElementById('gaugeLabel').textContent='생활비 예산 사용률';document.getElementById('gaugeStatus').textContent=`${pct}% 사용 중`;gauge.style.width=`${pct}%`;gauge.style.background=pct>=100?'linear-gradient(90deg,#db6470,#e45d6d)':pct>=80?'linear-gradient(90deg,#e1a13c,#e9bb58)':'linear-gradient(90deg,#24ac90,#4bb7a6)';
-    document.getElementById('calendarTitle').textContent=`${viewMonth+1}월 캘린더`;document.getElementById('calendarModeBadge').className='badge ledger';document.getElementById('calendarModeBadge').textContent='가계부 ↔';
-  }else{
-    document.getElementById('pageTitle').textContent='가계부&캘린더';document.getElementById('pageDesc').textContent='일정과 할 일을 날짜 단위로 관리합니다.';
-    const monthTodos=state.todos.filter(t=>(t.date||'').startsWith(monthKey()));const done=monthTodos.filter(t=>t.done).length;const pctTodo=monthTodos.length?Math.round(done/monthTodos.length*100):0;const todayTodos=state.todos.filter(t=>t.date===todayStr);const todayDone=todayTodos.filter(t=>t.done).length;const upcoming=state.schedules.filter(s=>s.startDate>=todayStr).sort((a,b)=>a.startDate.localeCompare(b.startDate))[0];const diff=upcoming?diffDays(todayStr,upcoming.startDate):null;
-    const weekStart=new Date(today);const dow=weekStart.getDay();weekStart.setDate(weekStart.getDate()+(dow===0?-6:1-dow));const weekEnd=new Date(weekStart);weekEnd.setDate(weekStart.getDate()+6);const weekS=formatDate(weekStart),weekE=formatDate(weekEnd);const weekTodos=state.todos.filter(t=>t.date>=weekS&&t.date<=weekE);const weekPct=weekTodos.length?Math.round(weekTodos.filter(t=>t.done).length/weekTodos.length*100):0;let streak=0;let d=new Date(today);while(true){const ds=formatDate(d);const dayTodos=state.todos.filter(t=>t.date===ds);if(dayTodos.length&&dayTodos.every(t=>t.done)){streak++;d.setDate(d.getDate()-1)}else break;if(streak>366)break}
-    const monthSchedules=state.schedules.filter(s=>s.startDate.startsWith(monthKey())).length;
-    grid.innerHTML=`<div class="summary"><div class="summary-label">오늘의 할 일</div><div class="summary-value primary">${todayDone} / ${todayTodos.length}</div><div class="summary-help">완료 개수</div></div><div class="summary"><div class="summary-label">이달 달성률</div><div class="summary-value teal">${pctTodo}%</div><div class="summary-help">완료 / 전체</div></div><div class="summary"><div class="summary-label">다가오는 일정</div><div class="summary-value" style="font-size:1rem">${escapeHtml(upcoming?.title||'일정 없음')}</div><div class="summary-help">${upcoming?(diff<=0?'D-Day':`D-${diff}`):'-'}</div></div><div class="summary"><div class="summary-label">이달 일정</div><div class="summary-value">${monthSchedules}건</div><div class="summary-help">시작일 기준</div></div><div class="summary"><div class="summary-label">연속 달성</div><div class="summary-value">🔥 ${streak}일</div><div class="summary-help">매일 전체 완료 기준</div></div><div class="summary"><div class="summary-label">주간 완료율</div><div class="summary-value">${weekPct}%</div><div class="summary-help">월~일 기준</div></div>`;
-    document.getElementById('gaugeLabel').textContent='이달의 할 일 달성률';document.getElementById('gaugeStatus').textContent=`${pctTodo}% 완료`;gauge.style.width=`${pctTodo}%`;gauge.style.background='linear-gradient(90deg,#5b63e8,#7658d7)';document.getElementById('calendarTitle').textContent=`${viewMonth+1}월 일정`;document.getElementById('calendarModeBadge').className='badge schedule';document.getElementById('calendarModeBadge').textContent='일정 ↔';
-  }
-}
-
-function renderForm(){
-  const body=document.getElementById('formBody');if(currentMode==='ledger'){
-    document.getElementById('formTitle').textContent=editingExpenseId?'✏️ 지출 수정':'💸 지출 입력';document.getElementById('formSub').textContent=editingExpenseId?'기존 내역을 수정하고 저장합니다.':'선택한 날짜에 바로 기록됩니다.';
-    const e=editingExpenseId?state.expenses.find(x=>String(x.id)===String(editingExpenseId)):null;
-    const noMethods=!state.paymentMethods.length;
-    body.innerHTML=`${noMethods?'<div class="notice warn">결제수단이 아직 없습니다. 사이트는 바로 사용할 수 있지만, 지출 등록 전에는 최소 1개를 추가해주세요.</div>':''}
-      <div class="field"><label>날짜</label><input type="date" id="expDate" value="${e?.date||selectedDate}"></div>
-      <div class="field"><label>내역</label><input id="expTitle" placeholder="예: 점심, 카카오T, 생활용품" value="${escapeHtml(e?.title||'')}"></div>
-      <div class="field"><label>결제 금액</label><input type="number" id="expAmount" min="0" step="100" placeholder="0" value="${e?cardCharge(e):''}"></div>
-      <div class="field"><label>카테고리</label><select id="expCategory">${CATEGORIES.map(c=>`<option ${c===(e?.category||'식비(외식/배달)')?'selected':''}>${c}</option>`).join('')}</select></div>
-      <div class="field"><label>결제 수단</label><select id="expMethod" ${noMethods?'disabled':''}>${state.paymentMethods.map(m=>`<option value="${escapeHtml(m.id)}" ${String(m.id)===String(e?.methodId)?'selected':''}>${escapeHtml(paymentLabel(m))}</option>`).join('')}</select></div>
-      <div class="split-box"><label class="split-line"><input type="checkbox" id="splitToggle" ${e?.isSplit?'checked':''} onchange="toggleSplitFields()"> 친구들과 공동결제 / N빵</label><div class="split-fields ${e?.isSplit?'open':''}" id="splitFields"><div class="field"><label>총 인원</label><input id="splitCount" type="number" min="2" step="1" value="${e?.splitCount||2}" oninput="updateSplitPreview()"></div><div class="field"><label>내 실제 부담액</label><input id="splitPreview" value="${e?actualAmount(e).toLocaleString()+'원':'0원'}" readonly></div><div class="split-note">카드·계좌 이용액에는 전체 결제금액, 예산·지출 분석에는 내 몫이 반영됩니다.</div></div></div>
-      <div class="form-actions"><button class="btn primary" ${noMethods?'disabled':''} onclick="saveExpense()">${editingExpenseId?'수정 내용 저장':'지출 등록'}</button>${editingExpenseId?'<button class="btn" onclick="resetForm()">취소</button>':''}</div>`;
-    updateSplitPreview();
-  }else{
-    document.getElementById('formTitle').textContent=editingScheduleId?'✏️ 일정 수정':'🗓️ 일정 등록';document.getElementById('formSub').textContent='여러 날짜 일정은 시작일~종료일로 이어집니다.';const s=editingScheduleId?state.schedules.find(x=>String(x.id)===String(editingScheduleId)):null;const recent=state.recentColors.map(c=>`<button class="btn" style="width:28px;height:28px;padding:0;border-radius:50%;background:${c};border:1px solid #ddd" onclick="document.getElementById('schColor').value='${c}'"></button>`).join('');
-    body.innerHTML=`<div class="field-grid"><div class="field"><label>시작일</label><input type="date" id="schStart" value="${s?.startDate||selectedDate}"></div><div class="field"><label>종료일</label><input type="date" id="schEnd" value="${s?.endDate||selectedDate}"></div></div><div class="field"><label>일정 제목</label><input id="schTitle" value="${escapeHtml(s?.title||'')}" placeholder="예: 제주도 여행, 회의, 마감"></div><div class="field"><label>색상</label><div style="display:flex;align-items:center;gap:9px"><input id="schColor" type="color" value="${s?.color||state.recentColors[0]||'#5b63e8'}" style="width:40px;height:36px;padding:0;border:0;background:transparent"><div style="display:flex;gap:5px">${recent}</div></div></div><div class="field"><label>상세 메모</label><textarea id="schNote" placeholder="장소, 준비물, 메모 등">${escapeHtml(s?.note||'')}</textarea></div><div class="form-actions"><button class="btn primary" onclick="saveSchedule()">${editingScheduleId?'수정 저장':'일정 등록'}</button>${editingScheduleId?'<button class="btn" onclick="cancelScheduleEdit()">취소</button>':''}</div>`;
-  }
-}
-function resetForm(){editingExpenseId=null;editingScheduleId=null;renderForm()}
-function toggleSplitFields(){document.getElementById('splitFields')?.classList.toggle('open',document.getElementById('splitToggle')?.checked);updateSplitPreview()}
-function updateSplitPreview(){const amount=Number(document.getElementById('expAmount')?.value)||0;const count=Math.max(2,Math.floor(Number(document.getElementById('splitCount')?.value)||2));const on=!!document.getElementById('splitToggle')?.checked;const el=document.getElementById('splitPreview');if(el)el.value=(on?Math.round(amount/count):amount).toLocaleString()+'원'}
-function saveExpense(){const date=document.getElementById('expDate')?.value,title=document.getElementById('expTitle')?.value.trim(),amount=Number(document.getElementById('expAmount')?.value)||0,category=document.getElementById('expCategory')?.value,methodId=document.getElementById('expMethod')?.value;if(!date||!amount||amount<=0)return toast('금액을 올바르게 입력해주세요.');if(!methodBySafe(methodId))return toast('결제수단을 먼저 등록해주세요.');const split=!!document.getElementById('splitToggle')?.checked;const count=split?Math.max(2,Math.floor(Number(document.getElementById('splitCount')?.value)||2)):1;const payload={date,title:title||'내역 없음',cardAmount:amount,actualAmount:split?Math.round(amount/count):amount,category,methodId,isSplit:split,splitCount:count};if(editingExpenseId){const e=state.expenses.find(x=>String(x.id)===String(editingExpenseId));if(e)Object.assign(e,payload)}else state.expenses.push({id:uid(),...payload});selectedDate=date;editingExpenseId=null;persist();render();toast('지출이 저장되었습니다.');}
-function methodBySafe(id){return state.paymentMethods.find(m=>String(m.id)===String(id))}
-function editExpense(id){editingExpenseId=id;currentMode='ledger';const e=state.expenses.find(x=>String(x.id)===String(id));if(e){selectedDate=e.date;viewYear=Number(e.date.slice(0,4));viewMonth=Number(e.date.slice(5,7))-1}render();window.scrollTo({top:0,behavior:'smooth'})}
-function deleteExpense(id){if(!confirm('이 지출 내역을 삭제할까요?'))return;state.expenses=state.expenses.filter(e=>String(e.id)!==String(id));if(String(editingExpenseId)===String(id))editingExpenseId=null;persist();render();toast('지출 내역을 삭제했습니다.')}
-
-function saveSchedule(){const start=document.getElementById('schStart')?.value,end=document.getElementById('schEnd')?.value||start,title=document.getElementById('schTitle')?.value.trim(),color=document.getElementById('schColor')?.value||'#5b63e8',note=document.getElementById('schNote')?.value.trim()||'';if(!start||!title)return toast('일정 제목을 입력해주세요.');if(end<start)return toast('종료일이 시작일보다 빠를 수 없습니다.');state.recentColors=[color,...state.recentColors.filter(c=>c!==color)].slice(0,4);if(editingScheduleId){const s=state.schedules.find(x=>String(x.id)===String(editingScheduleId));if(s)Object.assign(s,{title,startDate:start,endDate:end,color,note})}else state.schedules.push({id:uid(),title,startDate:start,endDate:end,color,note});editingScheduleId=null;persist();render();toast('일정을 저장했습니다.')}
-function editSchedule(id){const s=state.schedules.find(x=>String(x.id)===String(id));if(!s)return;editingScheduleId=id;currentMode='schedule';selectedDate=s.startDate;viewYear=Number(s.startDate.slice(0,4));viewMonth=Number(s.startDate.slice(5,7))-1;closeSchedulePop();render();window.scrollTo({top:0,behavior:'smooth'})}
-function cancelScheduleEdit(){editingScheduleId=null;render()}
-function deleteSchedule(id){if(!confirm('이 일정을 삭제할까요?'))return;state.schedules=state.schedules.filter(x=>String(x.id)!==String(id));closeSchedulePop();persist();render();toast('일정을 삭제했습니다.')}
-function scheduleDragStart(ev,id){draggingScheduleId=id;if(ev.dataTransfer){ev.dataTransfer.effectAllowed='move';ev.dataTransfer.setData('text/plain',id)}ev.currentTarget.classList.add('dragging')}
-function scheduleDragEnd(ev){ev.currentTarget.classList.remove('dragging');draggingScheduleId=null;document.querySelectorAll('.day.drag-over').forEach(x=>x.classList.remove('drag-over'))}
-function scheduleDragOver(ev){if(draggingScheduleId==null)return;ev.preventDefault();ev.currentTarget.classList.add('drag-over')}
-function scheduleDragLeave(ev){ev.currentTarget.classList.remove('drag-over')}
-function scheduleDrop(ev,dateStr){ev.preventDefault();if(draggingScheduleId==null)return;const s=state.schedules.find(x=>String(x.id)===String(draggingScheduleId));document.querySelectorAll('.day.drag-over').forEach(x=>x.classList.remove('drag-over'));if(!s){draggingScheduleId=null;return}const dur=Math.max(0,diffDays(s.startDate,s.endDate));s.startDate=dateStr;s.endDate=datePlus(dateStr,dur);draggingScheduleId=null;suppressScheduleClickUntil=Date.now()+400;persist();render();toast('일정을 날짜로 옮겼습니다.')}
-function showSchedulePop(id,ev){ev?.preventDefault();ev?.stopPropagation();if(Date.now()<suppressScheduleClickUntil)return;const s=state.schedules.find(x=>String(x.id)===String(id));if(!s)return;closeSchedulePop();const p=document.getElementById('schedulePop');p.classList.remove('hidden');p.innerHTML=`<div class="schedule-pop-title"><span class="schedule-dot" style="background:${s.color}"></span><div style="flex:1"><h4>${escapeHtml(s.title)}</h4><div style="font-size:.63rem;color:#8c95a5;margin-top:4px">📅 ${s.startDate}${s.endDate!==s.startDate?' ~ '+s.endDate:''}</div></div><button class="btn tiny" style="border:0;background:#f4f5f8" onclick="closeSchedulePop()">✕</button></div>${s.note?`<div class="schedule-pop-note">${escapeHtml(s.note)}</div>`:''}<div class="schedule-pop-actions"><button class="btn" onclick="editSchedule('${s.id}')">✏️ 수정</button><button class="btn danger" onclick="deleteSchedule('${s.id}')">🗑 삭제</button></div>`;if(window.matchMedia('(max-width:600px)').matches){p.style.left='14px';p.style.right='14px';p.style.bottom='14px';p.style.top='auto'}else{const r=ev.currentTarget.getBoundingClientRect();let left=r.left,top=r.bottom+9;const w=Math.min(340,innerWidth-28);if(left+w>innerWidth-12)left=innerWidth-w-12;if(top+180>innerHeight-12)top=Math.max(12,r.top-180);p.style.left=left+'px';p.style.top=top+'px'}}
-function closeSchedulePop(){const p=document.getElementById('schedulePop');if(p)p.classList.add('hidden')}
-
-function renderCalendar(){const cal=document.getElementById('calendar');let html=['일','월','화','수','목','금','토'].map((d,i)=>`<div class="weekday ${i===0?'sun':i===6?'sat':''}">${d}</div>`).join('');const first=new Date(viewYear,viewMonth,1).getDay();for(let i=0;i<first;i++)html+='<div class="day empty"></div>';const last=new Date(viewYear,viewMonth+1,0).getDate();const expenses=getMonthExpenses();for(let i=1;i<=last;i++){const d=`${monthKey()}-${String(i).padStart(2,'0')}`;const dow=(first+i-1)%7;let cls=`day ${dow===0?'sun':dow===6?'sat':''} ${d===todayStr?'today':''} ${d===selectedDate?'selected':''}`;let content='';if(currentMode==='ledger'){const spent=expenses.filter(e=>e.date===d).reduce((s,e)=>s+actualAmount(e),0);if(spent>0){if(spent>=50000)cls+=' high';content=`<div class="day-spend">${spent.toLocaleString()}원</div>`}else if(d<=todayStr){cls+=' no-spend';content='<div class="zero-dot"></div><div class="day-spend">무지출</div>'}}else{const sch=state.schedules.filter(s=>d>=s.startDate&&d<=s.endDate);content=sch.map(s=>{const isStart=d===s.startDate,isEnd=d===s.endDate;let type='';if(s.startDate!==s.endDate){if(isStart&&dow!==0)type='cont-start';else if(isEnd&&dow!==6)type='cont-end';else if(!isStart&&!isEnd)type=dow===0?'cont-start':dow===6?'cont-end':'cont-mid'}const show=isStart||dow===0;return `<div class="sch-bar ${type}" draggable="true" style="background:${s.color}" onclick="showSchedulePop('${s.id}',event)" ondragstart="scheduleDragStart(event,'${s.id}')" ondragend="scheduleDragEnd(event)">${show?escapeHtml(s.title):'&nbsp;'}</div>`}).join('');const t=state.todos.filter(x=>x.date===d);if(t.length){const done=t.filter(x=>x.done).length;content+=`<div class="todo-mini ${done===t.length?'done':''}">✔ ${done}/${t.length}</div>`}}
-    html+=`<div class="${cls}" data-date="${d}" onclick="selectDate('${d}')" ondragover="scheduleDragOver(event)" ondragleave="scheduleDragLeave(event)" ondrop="scheduleDrop(event,'${d}')"><div class="day-number">${i}</div>${content}</div>`}
-  cal.innerHTML=html}
-
-function renderPayments(){const list=document.getElementById('paymentList');const empty=document.getElementById('paymentEmpty');if(!state.paymentMethods.length){list.innerHTML='';empty.innerHTML=`<div class="empty-state"><div class="empty-icon">＋</div><strong>결제수단이 아직 없습니다</strong><p>사이트 본체는 바로 사용할 수 있습니다. 은행·체크카드 또는 신용카드를 추가하면 결제수단별 사용액과 실적을 함께 볼 수 있어요.</p><button class="btn primary" onclick="openPaymentSetup()">결제수단 설정하기</button></div>`;return}empty.innerHTML='';const ex=getMonthExpenses();list.innerHTML=state.paymentMethods.map(m=>{const t=paymentTheme(m),spent=ex.filter(e=>String(e.methodId)===String(m.id)).reduce((s,e)=>s+cardCharge(e),0),credit=m.type==='credit',target=Number(m.target)||0,pct=credit&&target>0?Math.min(100,Math.round(spent/target*100)):0;return `<div class="payment-card" style="--pay-gradient:${t[0]};--pay-text:${t[1]}"><div class="pay-top"><div class="pay-brand"><span class="pay-icon">${escapeHtml(t[2])}</span><div class="pay-name"><strong>${escapeHtml(m.issuer)}</strong><span>${credit?escapeHtml(m.detail&&m.detail!=='전체'?m.detail+' · 신용카드':'신용카드'):'체크카드 · 통장'}</span></div></div><div class="pay-amount">${spent.toLocaleString()}원</div></div>${credit?`<div class="pay-meta"><span>월 실적 ${target.toLocaleString()}원</span><strong>${pct}%</strong></div><div class="pay-track"><span style="width:${pct}%"></span></div><div class="pay-sub">${pct>=100?'실적 목표 달성 🎉':`${Math.max(0,target-spent).toLocaleString()}원 더 사용하면 달성`}</div>`:'<div class="pay-sub">이번 달 사용액 · 실적 목표 없음</div>'}</div>`}).join('')}
-function openPaymentSetup(){editingPaymentId=null;document.getElementById('setupModal').classList.add('open');document.body.style.overflow='hidden';renderSetupForm();renderSetupList()}
-function closePaymentSetup(){editingPaymentId=null;document.getElementById('setupModal').classList.remove('open');document.body.style.overflow='';render()}
-function selectCreditIssuer(issuer){setupCreditIssuer=issuer;setupCreditDetail=CREDIT_CARD_DETAILS[issuer]?.[0]||'전체';setupCardColor=CREDIT_DEFAULT_COLORS[issuer]||'#5b63e8';renderSetupForm()}
-function selectSetupColor(color){setupCardColor=color;const input=document.getElementById('cardColorInput');if(input)input.value=color;renderSetupPreview()}
-function setSetupCardColor(color){setupCardColor=color;renderSetupPreview();renderSetupColorSwatches()}
-function renderSetupColorSwatches(){const wrap=document.getElementById('cardColorSwatches');if(!wrap)return;wrap.innerHTML=CREDIT_CARD_COLORS.map(c=>`<button type="button" class="card-color-swatch ${String(setupCardColor).toLowerCase()===c.toLowerCase()?'active':''}" style="background:${c}" title="${c}" onclick="selectSetupColor('${c}')"></button>`).join('')}
-function renderCreditIssuerGrid(){const grid=document.getElementById('creditIssuerGrid');if(!grid)return;grid.innerHTML=Object.keys(PAYMENT_THEMES.cards).map(issuer=>{const t=PAYMENT_THEMES.cards[issuer];return `<button type="button" class="credit-issuer-btn ${setupCreditIssuer===issuer?'active':''}" onclick="selectCreditIssuer('${issuer.replace(/'/g,"\'")}')"><span class="credit-issuer-dot" style="background:${t[0]};color:${t[1]}">${t[2]}</span><span class="credit-issuer-name">${escapeHtml(issuer)}</span><span class="credit-issuer-check">✓</span></button>`}).join('')}
-function renderSetupForm(){const type=document.querySelector('input[name="paymentType"]:checked')?.value||'debit';document.getElementById('setupDebit').classList.toggle('active',type==='debit');document.getElementById('setupCredit').classList.toggle('active',type==='credit');const debitRow=document.getElementById('debitSetupRow');const creditPanel=document.getElementById('creditSetupPanel');if(debitRow)debitRow.style.display=type==='debit'?'grid':'none';if(creditPanel)creditPanel.style.display=type==='credit'?'block':'none';const issuerLabel=document.getElementById('issuerLabel');if(issuerLabel)issuerLabel.textContent='은행';const sel=document.getElementById('issuerSelect');if(type==='debit'&&sel){const opts=Object.keys(PAYMENT_THEMES.banks);sel.innerHTML=opts.map(o=>`<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}if(type==='credit'){renderCreditIssuerGrid();const detailSel=document.getElementById('creditDetailSelect');const details=CREDIT_CARD_DETAILS[setupCreditIssuer]||['전체'];if(detailSel){detailSel.innerHTML=details.map(d=>`<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');if(details.includes(setupCreditDetail))detailSel.value=setupCreditDetail;else {setupCreditDetail=details[0];detailSel.value=setupCreditDetail}}const colorInput=document.getElementById('cardColorInput');if(colorInput)colorInput.value=setupCardColor;renderSetupColorSwatches()}renderSetupPreview()}
-function renderSetupPreview(){const type=document.querySelector('input[name="paymentType"]:checked')?.value||'debit';let issuer,detail,t;if(type==='credit'){issuer=setupCreditIssuer;detail=document.getElementById('creditDetailSelect')?.value||setupCreditDetail;setupCreditDetail=detail;t=themeFromColor(setupCardColor,PAYMENT_THEMES.cards[issuer]?.[2]||'CC')}else{issuer=document.getElementById('issuerSelect')?.value;if(!issuer)return;t=PAYMENT_THEMES.banks[issuer]||['linear-gradient(135deg,#8d94a4,#50596a)','#fff','₩']}const p=document.getElementById('setupPreview');p.style.setProperty('--pay-gradient',t[0]);p.style.setProperty('--pay-text',t[1]);p.style.background=t[0];p.style.color=t[1];p.innerHTML=`<span class="setup-preview-icon">${escapeHtml(t[2])}</span><div><small>미리보기</small><strong>${escapeHtml(issuer)}</strong><span>${type==='credit'?escapeHtml(detail!=='전체'?detail+' · 신용카드':'신용카드 · 전체'): '체크카드 / 통장 · 사용액 관리'}</span></div>`}
-function addPaymentMethod(){const type=document.querySelector('input[name="paymentType"]:checked')?.value||'debit';let issuer,detail='전체',color='';if(type==='credit'){issuer=setupCreditIssuer;detail=document.getElementById('creditDetailSelect')?.value||setupCreditDetail;color=setupCardColor}else{issuer=document.getElementById('issuerSelect').value}const duplicate=state.paymentMethods.some(m=>m.type===type&&m.issuer===issuer&&(type!=='credit'||(m.detail||'전체')===detail)&&String(m.id)!==String(editingPaymentId));if(duplicate)return toast('이미 등록한 결제수단입니다.');const target=type==='credit'?Math.max(0,Number(document.getElementById('targetInput').value)||0):0;if(editingPaymentId){const m=state.paymentMethods.find(x=>String(x.id)===String(editingPaymentId));if(m){m.type=type;m.issuer=issuer;m.detail=detail;m.color=color;m.target=target}}else state.paymentMethods.push({id:uid(),type,issuer,detail,color,target});editingPaymentId=null;persist();renderSetupList();render();toast('결제수단을 저장했습니다.')}
-function editPayment(id){const m=paymentById(id);if(!m)return;editingPaymentId=id;document.querySelector(`input[name="paymentType"][value="${m.type}"]`).checked=true;if(m.type==='credit'){setupCreditIssuer=m.issuer;setupCreditDetail=m.detail||'전체';setupCardColor=m.color||CREDIT_DEFAULT_COLORS[m.issuer]||'#5b63e8'}renderSetupForm();if(m.type==='credit'){document.getElementById('targetInput').value=Number(m.target||0)}setTimeout(()=>document.getElementById('paymentSaveButton').textContent='수정 내용 저장',0);}
-function renderSetupList(){const list=document.getElementById('setupList');const count=document.getElementById('setupCount');count.textContent=state.paymentMethods.length;list.innerHTML=state.paymentMethods.length?state.paymentMethods.map(m=>{const t=paymentTheme(m);const detail=m.type==='credit'?(m.detail&&m.detail!=='전체'?` · ${escapeHtml(m.detail)}`:'') : '';return `<div class="setup-item"><span class="setup-swatch" style="background:${t[0]};color:${t[1]}">${t[2]}</span><div class="setup-main"><strong>${escapeHtml(m.issuer)}${detail}</strong><span>${m.type==='credit'?'신용카드 · 실적 목표 '+Number(m.target||0).toLocaleString()+'원':'체크카드 · 통장'}</span></div><div class="setup-item-actions"><button class="btn tiny" onclick="editPayment('${m.id}')">수정</button><button class="btn danger tiny" onclick="removePayment('${m.id}')">삭제</button></div></div>`}).join(''):'<div class="empty-state" style="margin-top:8px">등록된 결제수단이 없습니다.</div>';document.getElementById('setupHint').textContent=state.paymentMethods.length?`${state.paymentMethods.length}개가 설정되어 있습니다.`:'최소 1개를 추가하면 지출 입력을 사용할 수 있습니다.';const saveBtn=document.getElementById('paymentSaveButton');if(saveBtn&&!editingPaymentId)saveBtn.textContent='＋ 이 결제수단 추가'}
-function removePayment(id){const used=state.expenses.some(e=>String(e.methodId)===String(id));const msg=used?'이 결제수단을 삭제하면 기존 지출에서 결제수단 표시가 사라집니다. 계속할까요?':'이 결제수단을 삭제할까요?';if(!confirm(msg))return;state.paymentMethods=state.paymentMethods.filter(m=>String(m.id)!==String(id));if(String(editingPaymentId)===String(id))editingPaymentId=null;persist();renderSetupList();render();toast('결제수단을 삭제했습니다.')}
-
-function renderFixed(){const list=document.getElementById('fixedList');const items=getMonthFixed();if(!items.length){list.innerHTML='<div class="section-note">등록된 고정지출이 없습니다.</div>';return}list.innerHTML=items.map(x=>`<div class="list-item"><div class="list-main"><div class="list-title">📌 ${escapeHtml(x.name)}</div></div><div class="list-amount">${Number(x.amount||0).toLocaleString()}원</div><button class="btn danger tiny" onclick="deleteFixed('${x.id}')">삭제</button></div>`).join('')}
-function addFixedItem(){const name=document.getElementById('fixedName').value.trim();const amount=Number(document.getElementById('fixedAmount').value)||0;if(!name||amount<=0)return toast('항목명과 금액을 입력해주세요.');const arr=getMonthFixed();arr.push({id:uid(),name,amount});state.monthlyFixedItems[monthKey()]=arr;document.getElementById('fixedName').value='';document.getElementById('fixedAmount').value='';persist();render();toast('고정지출을 추가했습니다.')}
+function fixedActualAmount(item){const total=Math.max(0,Number(item?.amount)||0);if(!item?.isSplit)return total;const count=Math.max(2,Math.floor(Number(item?.splitCount)||2));return Math.round(total/count)}
+function fixedTotalAmount(items=getMonthFixed()){return items.reduce((s,x)=>s+fixedActualAmount(x),0)}
+function toggleFixedSplitFields(){const on=!!document.getElementById('fixedSplitToggle')?.checked;document.getElementById('fixedSplitFields')?.classList.toggle('open',on);updateFixedSplitPreview()}
+function updateFixedSplitPreview(){const total=Math.max(0,Number(document.getElementById('fixedAmount')?.value)||0);const count=Math.max(2,Math.floor(Number(document.getElementById('fixedSplitCount')?.value)||2));const on=!!document.getElementById('fixedSplitToggle')?.checked;const el=document.getElementById('fixedSplitPreview');if(el)el.value=(on?Math.round(total/count):total).toLocaleString()+'원'}
+function renderFixed(){const list=document.getElementById('fixedList');const items=getMonthFixed();if(!items.length){list.innerHTML='<div class="section-note fixed-list-empty">등록된 고정지출이 없습니다.</div>';return}list.innerHTML=items.map(x=>{const total=Math.max(0,Number(x.amount)||0),actual=fixedActualAmount(x);return `<div class="list-item"><div class="fixed-item-main"><div class="fixed-item-line"><div class="list-title">📌 ${escapeHtml(x.name)}</div>${x.isSplit?'<span class="fixed-split-badge">N빵 '+(x.splitCount||2)+'인</span>':''}</div>${x.isSplit?`<div class="list-meta">전체 ${total.toLocaleString()}원 · 내 부담 ${actual.toLocaleString()}원</div>`:''}</div><div class="fixed-item-amounts">${x.isSplit?`<div class="fixed-item-total">전체 ${total.toLocaleString()}원</div>`:''}<div class="fixed-item-my">${actual.toLocaleString()}원</div></div><button class="btn danger tiny" onclick="deleteFixed('${x.id}')">삭제</button></div>`}).join('')}
+function addFixedItem(){const name=document.getElementById('fixedName').value.trim();const amount=Math.max(0,Number(document.getElementById('fixedAmount').value)||0);if(!name||amount<=0)return toast('항목명과 금액을 입력해주세요.');const split=!!document.getElementById('fixedSplitToggle')?.checked;const count=split?Math.max(2,Math.floor(Number(document.getElementById('fixedSplitCount')?.value)||2)):1;const arr=getMonthFixed();arr.push({id:uid(),name,amount,isSplit:split,splitCount:count,actualAmount:split?Math.round(amount/count):amount});state.monthlyFixedItems[monthKey()]=arr;document.getElementById('fixedName').value='';document.getElementById('fixedAmount').value='';const tog=document.getElementById('fixedSplitToggle');if(tog)tog.checked=false;const cnt=document.getElementById('fixedSplitCount');if(cnt)cnt.value=2;toggleFixedSplitFields();persist();render();toast('고정지출을 추가했습니다.')}
 function deleteFixed(id){const arr=getMonthFixed().filter(x=>String(x.id)!==String(id));state.monthlyFixedItems[monthKey()]=arr;persist();render();}
-function importPreviousFixed(ev){ev.stopPropagation();const [y,m]=monthKey().split('-').map(Number);const d=new Date(y,m-2,1);const prevKey=monthKey(d.getFullYear(),d.getMonth());const prev=Array.isArray(state.monthlyFixedItems[prevKey])?state.monthlyFixedItems[prevKey]:[];if(!prev.length)return toast('전월 고정지출이 없습니다.');const cur=getMonthFixed();if(cur.length&&!confirm('현재 월의 고정지출을 전월 항목으로 교체할까요?'))return;state.monthlyFixedItems[monthKey()]=prev.map(x=>({id:uid(),name:x.name,amount:Number(x.amount)||0}));persist();render();toast('전월 고정지출을 불러왔습니다.')}
+function importPreviousFixed(ev){ev.stopPropagation();const [y,m]=monthKey().split('-').map(Number);const d=new Date(y,m-2,1);const prevKey=monthKey(d.getFullYear(),d.getMonth());const prev=Array.isArray(state.monthlyFixedItems[prevKey])?state.monthlyFixedItems[prevKey]:[];if(!prev.length)return toast('전월 고정지출이 없습니다.');const cur=getMonthFixed();if(cur.length&&!confirm('현재 월의 고정지출을 전월 항목으로 교체할까요?'))return;state.monthlyFixedItems[monthKey()]=prev.map(x=>{const amount=Math.max(0,Number(x.amount)||0),split=!!x.isSplit,count=split?Math.max(2,Math.floor(Number(x.splitCount)||2)):1;return {id:uid(),name:x.name,amount,isSplit:split,splitCount:count,actualAmount:split?Math.round(amount/count):amount}});persist();render();toast('전월 고정지출을 불러왔습니다.')}
 function saveBudget(){const n=Math.max(0,Number(document.getElementById('budgetInput').value)||0);state.monthlyBudgets[monthKey()]=n;persist();render();toast('목표 예산을 저장했습니다.')}
+
 
 function renderTodos(){const parts=selectedDate.split('-');document.getElementById('todoDateLabel').textContent=`${Number(parts[1])}월 ${Number(parts[2])}일`;const list=document.getElementById('todoList');const todos=state.todos.filter(t=>t.date===selectedDate).sort((a,b)=>(Number(b.priority)||1)-(Number(a.priority)||1)||String(a.id).localeCompare(String(b.id)));if(!todos.length){list.innerHTML='<div class="section-note">등록된 할 일이 없습니다. 오늘 할 일을 하나 추가해보세요.</div>';return}list.innerHTML=todos.map(t=>`<div class="list-item" style="align-items:flex-start"><div style="display:flex;gap:8px;min-width:0;flex:1"><button class="btn ${t.done?'success':'soft'} tiny" onclick="toggleTodo('${t.id}')">${t.done?'✓':'○'}</button><div class="list-main"><div class="list-title" style="${t.done?'text-decoration:line-through;color:#a0a7b2':''}">${escapeHtml(t.text)}</div><div class="list-meta">중요도 ${t.priority===3?'높음':t.priority===2?'보통':'낮음'}</div></div></div><div class="item-actions"><button class="btn tiny" onclick="editTodo('${t.id}')">수정</button><button class="btn danger tiny" onclick="deleteTodo('${t.id}')">삭제</button></div></div>`).join('')}
 function showTodoForm(){document.getElementById('todoForm').classList.remove('hidden');setTimeout(()=>document.getElementById('todoInput')?.focus(),20)}
@@ -390,9 +549,54 @@ function toggleTodo(id){const t=state.todos.find(x=>String(x.id)===String(id));i
 function editTodo(id){const t=state.todos.find(x=>String(x.id)===String(id));if(!t)return;const v=prompt('할 일을 수정하세요.',t.text);if(v===null)return;if(!v.trim())return toast('내용을 입력해주세요.');t.text=v.trim();persist();render()}
 function deleteTodo(id){if(!confirm('이 할 일을 삭제할까요?'))return;state.todos=state.todos.filter(x=>String(x.id)!==String(id));persist();render()}
 
+
+function actualAmount(e){return Number(e?.actualAmount??e?.amount??e?.cardAmount??0)||0}
+function cardCharge(e){return Number(e?.cardAmount??e?.amount??e?.actualAmount??0)||0}
+function paymentById(id){return (state.paymentMethods||[]).find(m=>String(m.id)===String(id))}
+function paymentLabel(m){if(!m)return '결제수단 없음';return m.type==='credit'?`${m.issuer} · ${m.detail&&m.detail!=='전체'?m.detail+' · ':''}신용카드`:`${m.issuer} · 체크카드 / 통장`}
+function paymentTheme(m){if(m?.type==='credit'){return m.color?themeFromColor(m.color,PAYMENT_THEMES.cards[m.issuer]?.[2]||'CC'):(PAYMENT_THEMES.cards[m.issuer]||['linear-gradient(135deg,#8d94a4,#50596a)','#fff','CC'])}return PAYMENT_THEMES.banks[m?.issuer]||['linear-gradient(135deg,#8d94a4,#50596a)','#fff','₩']}
+function setMode(mode){currentMode=mode;editingScheduleId=null;render()}
+function toggleMode(){setMode(currentMode==='ledger'?'schedule':'ledger')}
+function changeMonth(delta){viewMonth+=delta;if(viewMonth<0){viewMonth=11;viewYear--}else if(viewMonth>11){viewMonth=0;viewYear++}selectedDate=`${monthKey()}-01`;render()}
+function goToday(){viewYear=today.getFullYear();viewMonth=today.getMonth();selectedDate=todayStr;render();window.scrollTo({top:0,behavior:'smooth'})}
+function selectDate(d){selectedDate=d;closeSchedulePop();render()}
+function toggleCollapsible(id){document.getElementById(id)?.classList.toggle('collapsed')}
+function toggleDetailCard(){const body=document.getElementById('detailContent');const b=document.getElementById('detailToggleBtn');if(!body||!b)return;const hide=body.classList.toggle('hidden');b.textContent=hide?'펼치기':'접기'}
+function toggleSplitFields(){const on=!!document.getElementById('splitToggle')?.checked;document.getElementById('splitFields')?.classList.toggle('open',on);updateSplitPreview()}
+function updateSplitPreview(){const amount=Number(document.getElementById('expAmount')?.value)||0;const count=Math.max(2,Math.floor(Number(document.getElementById('splitCount')?.value)||2));const on=!!document.getElementById('splitToggle')?.checked;const el=document.getElementById('splitPreview');if(el)el.value=(on?Math.round(amount/count):amount).toLocaleString()+'원'}
+function resetForm(){editingExpenseId=null;editingScheduleId=null;selectedDate=selectedDate||todayStr;render()}
+function saveExpense(){const date=document.getElementById('expDate')?.value;const title=document.getElementById('expTitle')?.value.trim()||'내역 없음';const amount=Number(document.getElementById('expAmount')?.value)||0;const category=document.getElementById('expCategory')?.value||'생활';const methodId=document.getElementById('expMethod')?.value;if(!date||amount<=0)return toast('날짜와 결제 금액을 입력해주세요.');if(!paymentById(methodId))return toast('결제수단을 먼저 등록해주세요.');const split=!!document.getElementById('splitToggle')?.checked;const count=split?Math.max(2,Math.floor(Number(document.getElementById('splitCount')?.value)||2)):1;const payload={date,title,cardAmount:amount,actualAmount:split?Math.round(amount/count):amount,category,methodId,isSplit:split,splitCount:count};if(editingExpenseId){const e=state.expenses.find(x=>String(x.id)===String(editingExpenseId));if(e)Object.assign(e,payload)}else state.expenses.push({id:uid(),...payload});selectedDate=date;editingExpenseId=null;persist();render();toast('지출을 저장했습니다.')}
+function editExpense(id){const e=state.expenses.find(x=>String(x.id)===String(id));if(!e)return;editingExpenseId=id;editingScheduleId=null;selectedDate=e.date||selectedDate;render();document.getElementById('expTitle')?.focus()}
+function deleteExpense(id){if(!confirm('이 지출 내역을 삭제할까요?'))return;state.expenses=state.expenses.filter(x=>String(x.id)!==String(id));persist();render();toast('지출 내역을 삭제했습니다.')}
+function saveSchedule(){const start=document.getElementById('schStart')?.value;let end=document.getElementById('schEnd')?.value||start;const title=document.getElementById('schTitle')?.value.trim();const color=document.getElementById('schColor')?.value||'#5b63e8';const note=document.getElementById('schNote')?.value.trim()||'';if(!start||!title)return toast('시작일과 일정 제목을 입력해주세요.');if(end<start)return toast('종료일이 시작일보다 빠를 수 없습니다.');if(editingScheduleId){const x=state.schedules.find(s=>String(s.id)===String(editingScheduleId));if(x)Object.assign(x,{startDate:start,endDate:end,title,color,note})}else state.schedules.push({id:uid(),startDate:start,endDate:end,title,color,note});editingScheduleId=null;selectedDate=start;persist();render();toast('일정을 저장했습니다.')}
+function editSchedule(id){const x=state.schedules.find(s=>String(s.id)===String(id));if(!x)return;editingScheduleId=id;currentMode='schedule';selectedDate=x.startDate||x.date||selectedDate;closeSchedulePop();render()}
+function deleteSchedule(id){if(!confirm('이 일정을 삭제할까요?'))return;state.schedules=state.schedules.filter(x=>String(x.id)!==String(id));closeSchedulePop();persist();render();toast('일정을 삭제했습니다.')}
+function closeSchedulePop(){const p=document.getElementById('schedulePop');if(p){p.classList.add('hidden');p.innerHTML=''}}
+function showScheduleDetail(id,event){event?.stopPropagation();const x=state.schedules.find(s=>String(s.id)===String(id));if(!x)return;const p=document.getElementById('schedulePop');if(!p)return;const rect=event?.currentTarget?.getBoundingClientRect?.();p.classList.remove('hidden');p.innerHTML=`<div class="schedule-pop-title"><span class="schedule-dot" style="background:${escapeHtml(x.color||'#5b63e8')}"></span><div style="min-width:0;flex:1"><h4>${escapeHtml(x.title)}</h4><div class="list-meta">${escapeHtml(x.startDate)}${x.endDate&&x.endDate!==x.startDate?' ~ '+escapeHtml(x.endDate):''}</div></div><button class="btn tiny" onclick="closeSchedulePop()">✕</button></div>${x.note?`<div class="schedule-pop-note">${escapeHtml(x.note)}</div>`:''}<div class="schedule-pop-actions"><button class="btn soft" onclick="editSchedule('${escapeHtml(x.id)}')">수정</button><button class="btn danger" onclick="deleteSchedule('${escapeHtml(x.id)}')">삭제</button></div>`;if(window.matchMedia('(max-width:600px)').matches){p.style.left='14px';p.style.right='14px';p.style.bottom='14px';p.style.top='auto'}else if(rect){const w=Math.min(340,window.innerWidth-28);let left=Math.min(rect.left,window.innerWidth-w-14);let top=rect.bottom+8;if(top+180>window.innerHeight)top=Math.max(14,rect.top-190);p.style.left=`${Math.max(14,left)}px`;p.style.top=`${top}px`;p.style.right='auto';p.style.bottom='auto'}}
+function scheduleDragStart(ev,id){ev.stopPropagation();ev.dataTransfer?.setData('text/plain',String(id));ev.dataTransfer?.setData('text/uri-list','');draggingScheduleId=id;ev.currentTarget.classList.add('dragging')}
+function scheduleDrop(ev,date){ev.preventDefault();ev.stopPropagation();const id=draggingScheduleId||ev.dataTransfer?.getData('text/plain');const x=state.schedules.find(s=>String(s.id)===String(id));document.querySelectorAll('.day.drag-over').forEach(el=>el.classList.remove('drag-over'));if(!x)return;const duration=Math.max(0,diffDays(x.startDate||date,x.endDate||x.startDate||date));x.startDate=date;x.endDate=datePlus(date,duration);draggingScheduleId=null;persist();render();toast('일정을 이동했습니다.')}
+function renderForm(){const body=document.getElementById('formBody');const title=document.getElementById('formTitle');const sub=document.getElementById('formSub');if(!body)return;if(currentMode==='ledger'){const e=editingExpenseId?state.expenses.find(x=>String(x.id)===String(editingExpenseId)):null;title.textContent=e?'✏️ 지출 수정':'💸 지출 입력';sub.textContent=e?'기존 지출 내용을 수정합니다.':'선택한 날짜에 바로 기록됩니다.';body.innerHTML=`<div class="field"><label>날짜</label><input id="expDate" type="date" value="${escapeHtml(e?.date||selectedDate)}"></div><div class="field"><label>내역</label><input id="expTitle" placeholder="예: 점심, 카카오T" value="${escapeHtml(e?.title||'')}"></div><div class="field"><label>결제 금액</label><input id="expAmount" type="number" min="0" step="100" placeholder="원" value="${e?cardCharge(e):''}" oninput="updateSplitPreview()"></div><div class="field"><label>카테고리</label><select id="expCategory">${CATEGORIES.map(c=>`<option ${e?.category===c?'selected':''}>${escapeHtml(c)}</option>`).join('')}</select></div><div class="field"><label>결제수단</label><select id="expMethod">${(state.paymentMethods||[]).map(m=>`<option value="${escapeHtml(m.id)}" ${String(e?.methodId)===String(m.id)?'selected':''}>${escapeHtml(paymentLabel(m))}</option>`).join('')}</select></div><div class="split-box"><label class="split-line"><input type="checkbox" id="splitToggle" ${e?.isSplit?'checked':''} onchange="toggleSplitFields()"> 친구들과 공동결제 / N빵</label><div class="split-fields ${e?.isSplit?'open':''}" id="splitFields"><div class="field"><label>총 인원</label><input id="splitCount" type="number" min="2" step="1" value="${e?.splitCount||2}" oninput="updateSplitPreview()"></div><div class="field"><label>내 실제 부담액</label><input id="splitPreview" value="${e?actualAmount(e).toLocaleString()+'원':'0원'}" readonly></div><div class="split-note">카드·계좌 이용액에는 전체 결제금액, 예산·지출 분석에는 내 몫이 반영됩니다.</div></div></div><div class="form-actions"><button class="btn primary" onclick="saveExpense()">${e?'수정 저장':'지출 등록'}</button>${e?'<button class="btn" onclick="resetForm()">취소</button>':''}</div>`;updateSplitPreview();}else{const x=editingScheduleId?state.schedules.find(s=>String(s.id)===String(editingScheduleId)):null;title.textContent=x?'✏️ 일정 수정':'🗓️ 일정 등록';sub.textContent='하루 또는 여러 날의 일정을 기록할 수 있습니다.';body.innerHTML=`<div class="field-grid"><div class="field"><label>시작일</label><input id="schStart" type="date" value="${escapeHtml(x?.startDate||selectedDate)}"></div><div class="field"><label>종료일</label><input id="schEnd" type="date" value="${escapeHtml(x?.endDate||selectedDate)}"></div></div><div class="field"><label>일정 제목</label><input id="schTitle" placeholder="예: 제주도 여행, 회의" value="${escapeHtml(x?.title||'')}"></div><div class="field"><label>색상</label><input id="schColor" type="color" value="${escapeHtml(x?.color||'#5b63e8')}" style="width:50px;height:38px;padding:2px"></div><div class="field"><label>메모</label><textarea id="schNote" placeholder="상세 메모">${escapeHtml(x?.note||'')}</textarea></div><div class="form-actions"><button class="btn primary" onclick="saveSchedule()">${x?'수정 저장':'일정 등록'}</button>${x?'<button class="btn" onclick="resetForm()">취소</button>':''}</div>`}}
+function renderPayments(){const list=document.getElementById('paymentList'),empty=document.getElementById('paymentEmpty');if(!list)return;const methods=state.paymentMethods||[];const month=getMonthExpenses();if(!methods.length){list.innerHTML='';if(empty)empty.innerHTML='<div class="notice info" style="margin-top:10px">등록된 결제수단이 없습니다. 필요한 시점에 결제수단을 추가하세요.</div>';return}if(empty)empty.innerHTML='';list.innerHTML=methods.map(m=>{const t=paymentTheme(m);const spent=month.filter(e=>String(e.methodId)===String(m.id)).reduce((a,e)=>a+cardCharge(e),0);const credit=m.type==='credit',target=Number(m.target)||0,pct=credit&&target?Math.min(100,Math.round(spent/target*100)):0;return `<div class="payment-card" style="--pay-gradient:${t[0]};--pay-text:${t[1]}"><div class="pay-top"><div class="pay-brand"><span class="pay-icon">${escapeHtml(t[2])}</span><div class="pay-name"><strong>${escapeHtml(m.issuer)}</strong><span>${credit?(m.detail&&m.detail!=='전체'?escapeHtml(m.detail)+' · ':'')+'신용카드':'체크카드 · 통장'}</span></div></div><div class="pay-amount">${spent.toLocaleString()}원</div></div>${credit?`<div class="pay-meta"><span>월 실적 ${target.toLocaleString()}원</span><strong>${pct}%</strong></div><div class="pay-track"><span style="width:${pct}%"></span></div><div class="pay-sub">${pct>=100?'실적 목표 달성 🎉':`${Math.max(0,target-spent).toLocaleString()}원 더 사용하면 달성`}</div>`:'<div class="pay-sub">이번 달 사용액 · 실적 목표 없음</div>'}</div>`}).join('')}
+function openPaymentSetup(){editingPaymentId=null;document.getElementById('setupModal').classList.add('open');document.body.style.overflow='hidden';renderSetupForm();renderSetupList()}
+function closePaymentSetup(){editingPaymentId=null;document.getElementById('setupModal').classList.remove('open');document.body.style.overflow='';render()}
+function selectCreditIssuer(issuer){setupCreditIssuer=issuer;setupCreditDetail=CREDIT_CARD_DETAILS[issuer]?.[0]||'전체';setupCardColor=CREDIT_DEFAULT_COLORS[issuer]||'#5b63e8';renderSetupForm()}
+function selectSetupColor(color){setupCardColor=color;const el=document.getElementById('cardColorInput');if(el)el.value=color;renderSetupPreview();renderSetupColorSwatches()}
+function setSetupCardColor(color){setupCardColor=color;renderSetupPreview();renderSetupColorSwatches()}
+function renderSetupColorSwatches(){const wrap=document.getElementById('cardColorSwatches');if(!wrap)return;wrap.innerHTML=CREDIT_CARD_COLORS.map(c=>`<button type="button" class="card-color-swatch ${setupCardColor.toLowerCase()===c.toLowerCase()?'active':''}" style="background:${c}" title="${c}" onclick="selectSetupColor('${c}')"></button>`).join('')}
+function renderCreditIssuerGrid(){const grid=document.getElementById('creditIssuerGrid');if(!grid)return;grid.innerHTML=Object.keys(PAYMENT_THEMES.cards).map(issuer=>{const t=PAYMENT_THEMES.cards[issuer];return `<button type="button" class="credit-issuer-btn ${setupCreditIssuer===issuer?'active':''}" onclick="selectCreditIssuer('${escapeHtml(issuer)}')"><span class="credit-issuer-dot" style="background:${t[0]};color:${t[1]}">${escapeHtml(t[2])}</span><span class="credit-issuer-name">${escapeHtml(issuer)}</span><span class="credit-issuer-check">✓</span></button>`}).join('')}
+function renderSetupForm(){const type=document.querySelector('input[name="paymentType"]:checked')?.value||'debit';document.getElementById('setupDebit').classList.toggle('active',type==='debit');document.getElementById('setupCredit').classList.toggle('active',type==='credit');const debit=document.getElementById('debitSetupRow'),credit=document.getElementById('creditSetupPanel');if(debit)debit.style.display=type==='debit'?'grid':'none';if(credit)credit.style.display=type==='credit'?'block':'none';const sel=document.getElementById('issuerSelect');if(type==='debit'&&sel){sel.innerHTML=Object.keys(PAYMENT_THEMES.banks).map(o=>`<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('');renderSetupPreview()}if(type==='credit'){renderCreditIssuerGrid();const detailSel=document.getElementById('creditDetailSelect');const details=CREDIT_CARD_DETAILS[setupCreditIssuer]||['전체'];detailSel.innerHTML=details.map(d=>`<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');if(details.includes(setupCreditDetail))detailSel.value=setupCreditDetail;else setupCreditDetail=details[0];const target=document.getElementById('targetInput');if(target&&!target.value)target.value=300000;const color=document.getElementById('cardColorInput');if(color)color.value=setupCardColor;renderSetupColorSwatches();renderSetupPreview()}}
+function renderSetupPreview(){const type=document.querySelector('input[name="paymentType"]:checked')?.value||'debit';let issuer,detail,t;if(type==='credit'){issuer=setupCreditIssuer;detail=document.getElementById('creditDetailSelect')?.value||setupCreditDetail;setupCreditDetail=detail;t=themeFromColor(setupCardColor,PAYMENT_THEMES.cards[issuer]?.[2]||'CC')}else{issuer=document.getElementById('issuerSelect')?.value;if(!issuer)return;t=PAYMENT_THEMES.banks[issuer]||['linear-gradient(135deg,#8d94a4,#50596a)','#fff','₩']}const p=document.getElementById('setupPreview');p.style.setProperty('--pay-gradient',t[0]);p.style.setProperty('--pay-text',t[1]);p.style.background=t[0];p.style.color=t[1];p.innerHTML=`<span class="setup-preview-icon">${escapeHtml(t[2])}</span><div><small>미리보기</small><strong>${escapeHtml(issuer)}</strong><span>${type==='credit'?(detail&&detail!=='전체'?escapeHtml(detail)+' · ':'')+'신용카드':'체크카드 / 통장 · 사용액 관리'}</span></div>`}
+function addPaymentMethod(){const type=document.querySelector('input[name="paymentType"]:checked')?.value||'debit';let issuer,detail='전체',color='';if(type==='credit'){issuer=setupCreditIssuer;detail=document.getElementById('creditDetailSelect')?.value||setupCreditDetail;color=setupCardColor}else issuer=document.getElementById('issuerSelect')?.value;if(!issuer)return toast('결제수단을 선택해주세요.');const duplicate=state.paymentMethods.some(m=>m.type===type&&m.issuer===issuer&&(type!=='credit'||(m.detail||'전체')===detail)&&String(m.id)!==String(editingPaymentId));if(duplicate)return toast('이미 등록한 결제수단입니다.');const target=type==='credit'?Math.max(0,Number(document.getElementById('targetInput')?.value)||0):0;if(editingPaymentId){const m=state.paymentMethods.find(x=>String(x.id)===String(editingPaymentId));if(m)Object.assign(m,{type,issuer,detail,color,target})}else state.paymentMethods.push({id:uid(),type,issuer,detail,color,target});editingPaymentId=null;persist();renderSetupList();render();toast('결제수단을 저장했습니다.')}
+function editPayment(id){const m=paymentById(id);if(!m)return;editingPaymentId=id;document.querySelector(`input[name="paymentType"][value="${m.type}"]`).checked=true;if(m.type==='credit'){setupCreditIssuer=m.issuer;setupCreditDetail=m.detail||'전체';setupCardColor=m.color||CREDIT_DEFAULT_COLORS[m.issuer]||'#5b63e8'}renderSetupForm();if(m.type==='credit')document.getElementById('targetInput').value=Number(m.target||0);document.getElementById('paymentSaveButton').textContent='수정 내용 저장'}
+function renderSetupList(){const list=document.getElementById('setupList'),count=document.getElementById('setupCount'),saveBtn=document.getElementById('paymentSaveButton');if(!list)return;count.textContent=(state.paymentMethods||[]).length;list.innerHTML=state.paymentMethods?.length?state.paymentMethods.map(m=>{const t=paymentTheme(m);const detail=m.type==='credit'&&m.detail&&m.detail!=='전체'?` · ${escapeHtml(m.detail)}`:'';return `<div class="setup-item"><span class="setup-swatch" style="background:${t[0]};color:${t[1]}">${escapeHtml(t[2])}</span><div class="setup-main"><strong>${escapeHtml(m.issuer)}${detail}</strong><span>${m.type==='credit'?'신용카드 · 실적 목표 '+Number(m.target||0).toLocaleString()+'원':'체크카드 · 통장'}</span></div><div class="setup-item-actions"><button class="btn tiny" onclick="editPayment('${escapeHtml(m.id)}')">수정</button><button class="btn danger tiny" onclick="removePayment('${escapeHtml(m.id)}')">삭제</button></div></div>`}).join(''):'<div class="empty-state" style="margin-top:8px">등록된 결제수단이 없습니다.</div>';document.getElementById('setupHint').textContent=state.paymentMethods?.length?`${state.paymentMethods.length}개가 설정되어 있습니다.`:'최소 1개를 추가하면 지출 입력을 사용할 수 있습니다.';if(saveBtn&&!editingPaymentId)saveBtn.textContent='＋ 이 결제수단 추가'}
+function removePayment(id){const used=state.expenses.some(e=>String(e.methodId)===String(id));if(!confirm(used?'이 결제수단을 삭제하면 기존 지출에서 결제수단 표시가 사라집니다. 계속할까요?':'이 결제수단을 삭제할까요?'))return;state.paymentMethods=state.paymentMethods.filter(m=>String(m.id)!==String(id));if(String(editingPaymentId)===String(id))editingPaymentId=null;persist();renderSetupList();render();toast('결제수단을 삭제했습니다.')}
+function renderDashboard(){const month=getMonthExpenses();const budget=Number(state.monthlyBudgets[monthKey()]??900000);const variableSpent=month.reduce((sum,e)=>sum+actualAmount(e),0);const fixedTotal=fixedTotalAmount();const totalForBudget=variableSpent+fixedTotal;const trackedSpend=window.__GENERAL_VERSION__?totalForBudget:variableSpent;const remaining=budget-trackedSpend;const lastDay=new Date(viewYear,viewMonth+1,0).getDate();let elapsed;if(viewYear<today.getFullYear()||(viewYear===today.getFullYear()&&viewMonth<today.getMonth()))elapsed=lastDay;else if(viewYear>today.getFullYear()||(viewYear===today.getFullYear()&&viewMonth>today.getMonth()))elapsed=0;else elapsed=today.getDate();const daysRemaining=Math.max(1,lastDay-elapsed+1);const daily=remaining>0?Math.floor(remaining/daysRemaining):0;const avg=elapsed>0?Math.floor(trackedSpend/elapsed):0;const pct=budget>0?Math.min(100,Math.round(trackedSpend/budget*100)):0;const grid=document.getElementById('summaryGrid');document.getElementById('pageTitle').textContent='가계부&캘린더';document.getElementById('gaugeLabel').textContent=window.__GENERAL_VERSION__?'월 생활비 예산 사용률':'생활비 예산 사용률';document.getElementById('gaugeStatus').textContent=`${pct}%`;document.getElementById('gaugeBar').style.width=`${pct}%`;document.getElementById('gaugeBar').style.background=pct>=90?'linear-gradient(90deg,#e45d6d,#ef8793)':pct>=70?'linear-gradient(90deg,#e39a2e,#f0bd68)':'linear-gradient(90deg,var(--teal),#4bb7a6)';const cardTotal=state.paymentMethods.reduce((sum,m)=>sum+month.filter(e=>String(e.methodId)===String(m.id)).reduce((a,e)=>a+cardCharge(e),0),0);if(currentMode==='ledger'){document.getElementById('pageDesc').textContent=window.__GENERAL_VERSION__?'고정지출까지 포함해 한 달 생활비를 관리합니다.':'고정지출과 대출 이자·상환은 별도로 관리하고 순수 변동 생활비를 기준으로 보여줍니다.';grid.innerHTML=`<div class="summary"><div class="summary-label">목표 ${window.__GENERAL_VERSION__?'월 생활비':'생활비'}</div><div class="summary-value primary">${budget.toLocaleString()}원</div><div class="summary-help">${window.__GENERAL_VERSION__?'고정지출 포함':'고정지출 제외'}</div></div><div class="summary"><div class="summary-label">이번 달 총 지출</div><div class="summary-value">${trackedSpend.toLocaleString()}원</div><div class="summary-help">${window.__GENERAL_VERSION__?'변동 + 고정':'변동지출 기준'}</div></div><div class="summary"><div class="summary-label">카드·계좌 이용액</div><div class="summary-value primary">${cardTotal.toLocaleString()}원</div><div class="summary-help">N빵은 전체 결제액</div></div><div class="summary"><div class="summary-label">남은 생활비</div><div class="summary-value ${remaining<0?'danger':'teal'}">${remaining.toLocaleString()}원</div><div class="summary-help">예산 - ${window.__GENERAL_VERSION__?'총지출':'변동지출'}</div></div><div class="summary"><div class="summary-label">오늘 권장 지출</div><div class="summary-value">${daily.toLocaleString()}원</div><div class="summary-help">남은 날짜 기준</div></div><div class="summary"><div class="summary-label">현재 일평균</div><div class="summary-value">${avg.toLocaleString()}원</div><div class="summary-help">경과일 기준</div></div>`}else{const monthTodos=state.todos.filter(t=>(t.date||'').startsWith(monthKey()));const done=monthTodos.filter(t=>t.done).length;const pctTodo=monthTodos.length?Math.round(done/monthTodos.length*100):0;const upcoming=state.schedules.filter(x=>(x.startDate||'')>=todayStr).sort((a,b)=>(a.startDate||'').localeCompare(b.startDate||''))[0];const todayTodos=state.todos.filter(t=>t.date===todayStr);const todayDone=todayTodos.filter(t=>t.done).length;grid.innerHTML=`<div class="summary"><div class="summary-label">오늘의 할 일</div><div class="summary-value primary">${todayDone} / ${todayTodos.length}</div><div class="summary-help">완료 개수</div></div><div class="summary"><div class="summary-label">이번 달 달성률</div><div class="summary-value teal">${pctTodo}%</div><div class="summary-help">할 일 완료율</div></div><div class="summary"><div class="summary-label">다가오는 일정</div><div class="summary-value" style="font-size:1rem">${escapeHtml(upcoming?.title||'일정 없음')}</div><div class="summary-help">${upcoming?escapeHtml(upcoming.startDate):'-'}</div></div><div class="summary"><div class="summary-label">이달의 총 일정</div><div class="summary-value">${state.schedules.filter(x=>(x.startDate||'').startsWith(monthKey())).length}건</div></div><div class="summary"><div class="summary-label">오늘 연속 달성</div><div class="summary-value">${todayDone?'🔥 오늘 달성':'○ 진행 중'}</div></div><div class="summary"><div class="summary-label">주간 완료율</div><div class="summary-value">${pctTodo}%</div></div>`;document.getElementById('pageDesc').textContent='이번 달 일정과 할 일 목표 달성 현황을 보여줍니다.'}document.getElementById('heroKicker').textContent=`${viewYear}년 ${viewMonth+1}월`}
+function renderCalendar(){const cal=document.getElementById('calendar');if(!cal)return;const monthKeyValue=monthKey();const first=new Date(viewYear,viewMonth,1).getDay();const last=new Date(viewYear,viewMonth+1,0).getDate();let html=['일','월','화','수','목','금','토'].map((d,i)=>`<div class="weekday ${i===0?'sun':i===6?'sat':''}">${d}</div>`).join('');for(let i=0;i<first;i++)html+='<div class="day empty"></div>';for(let i=1;i<=last;i++){const d=`${monthKeyValue}-${String(i).padStart(2,'0')}`;const dow=(first+i-1)%7;let cls='day '+(dow===0?'sun ':dow===6?'sat ':'')+(d===todayStr?'today ':'')+(d===selectedDate?'selected ':'');let inside='';if(currentMode==='ledger'){const spent=getMonthExpenses().filter(e=>e.date===d).reduce((a,e)=>a+actualAmount(e),0);if(spent>0){inside+=`<div class="day-spend">${spent.toLocaleString()}원</div>`;if(spent>=40000)cls+='high '}else if(d<=todayStr){cls+='no-spend ';inside+='<div class="day-spend">🎉</div>'}}else{const schedules=state.schedules.filter(x=>d>=(x.startDate||d)&&d<=(x.endDate||x.startDate||d));inside+=schedules.map(x=>{const start=x.startDate||d,end=x.endDate||start,isStart=d===start,isEnd=d===end;let bar='';if(start!==end){if(isStart&&dow!==6)bar='cont-start';else if(isEnd&&dow!==0)bar='cont-end';else if(!isStart&&!isEnd)bar=dow===0?'cont-start':dow===6?'cont-end':'cont-mid'}const show=isStart||dow===0;return `<div class="sch-bar ${bar}" draggable="true" style="background:${escapeHtml(x.color||'#5b63e8')};" onclick="showScheduleDetail('${escapeHtml(x.id)}',event)" ondragstart="scheduleDragStart(event,'${escapeHtml(x.id)}')" ondragend="this.classList.remove('dragging')">${show?escapeHtml(x.title):'&nbsp;'}</div>`}).join('');const ts=state.todos.filter(t=>t.date===d);if(ts.length){const done=ts.filter(t=>t.done).length;inside+=`<div class="todo-mini ${done===ts.length?'done':''}">✔ ${done}/${ts.length}</div>`}}html+=`<div class="${cls}" onclick="selectDate('${d}')" ondragover="if(currentMode==='schedule'){event.preventDefault();this.classList.add('drag-over')}" ondragleave="this.classList.remove('drag-over')" ondrop="scheduleDrop(event,'${d}')"><div class="day-number">${i}</div>${inside}</div>`}cal.innerHTML=html;document.getElementById('calendarTitle').textContent=`${viewMonth+1}월 ${currentMode==='ledger'?'캘린더':'일정 캘린더'}`;const badge=document.getElementById('calendarModeBadge');badge.textContent=currentMode==='ledger'?'가계부 ↔':'일정 ↔';badge.className=`badge ${currentMode==='ledger'?'ledger':'schedule'}`}
+function render(){const ledger=currentMode==='ledger';document.getElementById('ledgerModeBtn').classList.toggle('active',ledger);document.getElementById('scheduleModeBtn').classList.toggle('active',!ledger);document.getElementById('paymentCard').style.display=ledger?'block':'none';document.getElementById('fixedCard').style.display=ledger?'block':'none';document.getElementById('loanCard')?.style && (document.getElementById('loanCard').style.display=window.__GENERAL_VERSION__?'none':(ledger?'block':'none'));document.getElementById('budgetCard').style.display=ledger?'block':'none';document.getElementById('todoCard').style.display=ledger?'none':'block';document.getElementById('budgetMonthLabel').textContent=`${viewMonth+1}월`;document.getElementById('fixedMonthLabel').textContent=`${viewMonth+1}월 고정지출`;const budget=Number(state.monthlyBudgets[monthKey()]??900000);document.getElementById('budgetInput').value=budget;renderDashboard();renderForm();renderCalendar();renderPayments();renderFixed();if(!window.__GENERAL_VERSION__){renderLoans()}renderDetails();if(!ledger)renderTodos()}
+
 function renderDetails(){const c=document.getElementById('detailContent');if(currentMode==='schedule'){document.getElementById('detailTitle').textContent='🏆 이번 달 완료한 할 일';document.getElementById('detailSub').textContent='완료한 목표를 날짜 순으로 모아봅니다.';const done=state.todos.filter(t=>(t.date||'').startsWith(monthKey())&&t.done).sort((a,b)=>a.date.localeCompare(b.date));c.innerHTML=done.length?`<div class="list">${done.map(t=>`<div class="list-item"><span class="badge ledger">✔ ${t.date.slice(5)}</span><div class="list-main"><div class="list-title" style="text-decoration:line-through;color:#8e96a4">${escapeHtml(t.text)}</div></div></div>`).join('')}</div>`:'<div class="section-note">아직 완료한 할 일이 없습니다.</div>';return}
   document.getElementById('detailTitle').textContent='이 달의 지출 분석';document.getElementById('detailSub').textContent='카테고리별 소비 비중, 고정지출, 상세 내역을 확인합니다.';const month=getMonthExpenses();const total=month.reduce((s,e)=>s+actualAmount(e),0);const prev=new Date(viewYear,viewMonth-1,1);const prevKey=monthKey(prev.getFullYear(),prev.getMonth());const prevEx=state.expenses.filter(e=>(e.date||'').startsWith(prevKey));const cats={};const prevCats={};month.forEach(e=>cats[e.category]=(cats[e.category]||0)+actualAmount(e));prevEx.forEach(e=>prevCats[e.category]=(prevCats[e.category]||0)+actualAmount(e));const keys=Object.keys(cats).sort((a,b)=>cats[b]-cats[a]);const analysis=keys.length?`<div class="analysis-card">${keys.map((cat,i)=>{const amt=cats[cat],pct=total?Math.round(amt/total*100):0,diff=amt-(prevCats[cat]||0);return `<div class="analysis-row"><div class="analysis-top"><span class="analysis-name">${categoryEmoji(cat)} ${escapeHtml(cat)}</span><span class="analysis-value">${amt.toLocaleString()}원 <span class="analysis-diff ${diff>0?'up':diff<0?'down':''}">${diff>0?'▲ '+diff.toLocaleString():diff<0?'▼ '+Math.abs(diff).toLocaleString():'-'}</span></span></div><div class="analysis-bar"><div class="analysis-fill" style="width:${pct}%;background:${CAT_COLORS[i%CAT_COLORS.length]}"></div></div></div>`}).join('')}</div>`:'<div class="section-note">기록된 지출이 없습니다.</div>';
-  const fixed=getMonthFixed();const fixedTotal=fixed.reduce((s,x)=>s+(Number(x.amount)||0),0);const fixedHtml=fixed.length?`<div class="fixed-summary" id="fixedSummary"><div class="fixed-head" onclick="document.getElementById('fixedSummary').classList.toggle('open')"><strong>📌 이번 달 고정지출</strong><strong>${fixedTotal.toLocaleString()}원　⌄</strong></div><div class="fixed-items">${fixed.map(x=>`<div class="fixed-chip"><span>${escapeHtml(x.name)}</span><strong>${Number(x.amount).toLocaleString()}원</strong></div>`).join('')}</div></div>`:'';
+  const fixed=getMonthFixed();const fixedTotal=fixedTotalAmount(fixed);const fixedHtml=fixed.length?`<div class="fixed-summary" id="fixedSummary"><div class="fixed-head" onclick="document.getElementById('fixedSummary').classList.toggle('open')"><strong>📌 이번 달 고정지출</strong><strong>${fixedTotal.toLocaleString()}원　⌄</strong></div><div class="fixed-items">${fixed.map(x=>{const total=Number(x.amount)||0,actual=fixedActualAmount(x);return `<div class="fixed-chip"><span>${escapeHtml(x.name)}${x.isSplit?` · N빵 ${x.splitCount||2}인`:''}</span><strong>${actual.toLocaleString()}원${x.isSplit?` <small style="color:#9aa1af;font-weight:700">/ ${total.toLocaleString()}원</small>`:''}</strong></div>`}).join('')}</div></div>`:'';
   const sorted=[...month].sort((a,b)=>actualAmount(b)-actualAmount(a));const visible=sorted.slice(0,6),hidden=sorted.slice(6);const item=e=>`<div class="list-item"><div class="list-main"><div class="list-title">${categoryEmoji(e.category)} ${escapeHtml(e.title||'내역 없음')}</div><div class="list-meta">${e.date} · ${escapeHtml(e.category)} · ${escapeHtml(paymentLabel(paymentById(e.methodId)))}</div>${e.isSplit?`<div class="list-meta">N빵 ${e.splitCount}인 · 카드 ${cardCharge(e).toLocaleString()}원 · 내 부담 ${actualAmount(e).toLocaleString()}원</div>`:''}</div><div class="list-amount">${actualAmount(e).toLocaleString()}원</div><div class="item-actions"><button class="btn tiny" onclick="editExpense('${e.id}')">수정</button><button class="btn danger tiny" onclick="deleteExpense('${e.id}')">삭제</button></div></div>`;
   c.innerHTML=`${analysis}${fixedHtml}<div class="analysis-card" style="margin-top:14px;padding:10px 13px"><div style="font-size:.75rem;font-weight:850;margin-bottom:2px">🧾 지출 상세 내역 <span style="color:#98a0ae;font-weight:700">${sorted.length}건</span></div><div class="list">${visible.map(item).join('')||'<div class="section-note">지출 내역이 없습니다.</div>'}</div>${hidden.length?`<div class="more-wrap"><button class="more-btn" onclick="toggleHiddenExpenses(this)">지출 내역 ${hidden.length}개 더보기 ▼</button></div><div class="hidden-more" style="display:none"><div class="list">${hidden.map(item).join('')}</div></div>`:''}</div>`
 }
@@ -406,7 +610,7 @@ function triggerFileImport(){document.getElementById('backupFile').click()}
 function restoreFromText(){const t=document.getElementById('backupText').value.trim();if(!t)return toast('백업 코드를 붙여넣어주세요.');restoreData(t)}
 function restoreFromFile(ev){const f=ev.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>restoreData(String(r.result||''));r.readAsText(f);ev.target.value=''}
 function restoreData(text){try{const parsed=JSON.parse(text);state=normalizeState(parsed);persist();closeBackupModal();render();toast('백업 데이터를 복원했습니다.')}catch(_){toast('올바른 JSON 백업이 아닙니다.')}}
-function resetAllData(){if(!confirm('모든 가계부·일정·할 일·결제수단 데이터를 삭제할까요?\n이 작업은 되돌릴 수 없습니다.'))return;localStorage.removeItem(STORAGE_KEY);state=freshState();persist();editingExpenseId=null;editingScheduleId=null;render();toast('모든 데이터가 초기화되었습니다.')}
+function resetAllData(){if(!confirm('모든 가계부·일정·할 일·고정지출·결제수단 데이터를 삭제할까요?\n이 작업은 되돌릴 수 없습니다.'))return;localStorage.removeItem(STORAGE_KEY);state=freshState();persist();editingExpenseId=null;editingScheduleId=null;render();toast('모든 데이터가 초기화되었습니다.')}
 
 // 바깥 클릭으로 일정 팝오버 닫기 + ESC
 window.addEventListener('click',e=>{const p=document.getElementById('schedulePop');if(!p||p.classList.contains('hidden'))return;if(p.contains(e.target)||e.target.closest('.sch-bar'))return;closeSchedulePop()});
