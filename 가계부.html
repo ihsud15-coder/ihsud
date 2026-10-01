@@ -1,9 +1,9 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>해녕가계부</title>
+  <title>스마트 가계부 & 일정 관리 시스템 — 해녕 V2</title>
   <style>
     :root { 
       --primary: #3182f6; 
@@ -1846,6 +1846,23 @@ input,select,textarea,
 }
 
 </style>
+<style>
+/* 공동결제 / N빵 */
+.split-payment-box{margin-top:7px;padding:8px 9px;border:1px solid #e7eaf0;border-radius:10px;background:linear-gradient(145deg,#fbfcff,#fff);}
+.split-payment-toggle{display:flex;align-items:center;gap:7px;font-size:.74rem;font-weight:750;color:#566174;cursor:pointer;user-select:none;}
+.split-payment-toggle input{margin:0;width:15px;height:15px;accent-color:#03c75a;}
+.split-payment-fields{display:none;margin-top:7px;}
+.split-payment-fields.open{display:block;}
+.split-payment-row{display:grid;grid-template-columns:90px minmax(0,1fr);gap:7px;align-items:center;}
+.split-payment-row input{margin:0 !important;}
+.split-payment-preview{margin-top:6px;color:#7b8495;font-size:.68rem;line-height:1.4;}
+.split-payment-preview strong{color:#2b3448;}
+.split-badge{display:inline-flex;align-items:center;margin-left:5px;padding:2px 5px;border-radius:6px;background:#f0fff7;border:1px solid #c8f0db;color:#0a9a48;font-size:.61rem;font-weight:800;white-space:nowrap;}
+.fixed-management-share,.fixed-analysis-share{display:block;margin-top:3px;color:#7b8495;font-size:.62rem;font-weight:650;}
+.expense-amount-meta{display:block;margin-top:3px;color:#7b8495;font-size:.65rem;line-height:1.35;}
+.expense-amount-meta strong{color:#2f394d;}
+@media(max-width:600px){.split-payment-row{grid-template-columns:74px minmax(0,1fr);}}
+</style>
 </head>
 <body>
 
@@ -1945,7 +1962,8 @@ input,select,textarea,
 
       <!-- 3. 결제 수단별 이용대금 -->
       <div class="card" id="cardPayment">
-        <h2 style="margin:0 0 14px 0; font-size:1.05rem;">💳 결제 수단별 이용대금 & 실적</h2>
+        <h2 style="margin:0 0 4px 0; font-size:1.05rem;">💳 결제 수단별 이용대금 & 실적</h2>
+        <div style="margin:0 0 14px; color:#8991a2; font-size:.68rem; line-height:1.45;">공동결제/N빵은 <strong style="color:#495368;">카드 실적에는 전체 결제액</strong>을, 생활비에는 <strong style="color:#495368;">내 부담액</strong>만 반영합니다.</div>
 
         <div class="main-card-box hyundai-card">
           <div style="display:flex; justify-content:space-between; align-items:center; font-weight:800;">
@@ -2011,8 +2029,21 @@ input,select,textarea,
           </div>
           <div class="fixed-add-form">
             <div class="fixed-add-main">
-              <input type="text" id="fixedName" placeholder="항목명">
-              <input type="number" id="fixedAmount" placeholder="금액">
+              <input type="text" id="fixedName" placeholder="항목명 (예: 넷플릭스)" aria-label="고정지출 항목명">
+              <input type="number" id="fixedAmount" placeholder="결제 금액" aria-label="고정지출 결제 금액" oninput="updateFixedSplitPreview()">
+            </div>
+            <div class="split-payment-box" style="margin-top:6px;">
+              <label class="split-payment-toggle">
+                <input type="checkbox" id="fixedSplitToggle" onchange="toggleFixedSplitFields()">
+                공동 부담 / N빵
+              </label>
+              <div id="fixedSplitFields" class="split-payment-fields">
+                <div class="split-payment-row">
+                  <span style="font-size:.69rem;color:#7b8495;font-weight:700;">총 인원</span>
+                  <input type="number" id="fixedSplitCount" min="2" step="1" value="2" oninput="updateFixedSplitPreview()" placeholder="예: 4">
+                </div>
+              </div>
+              <div id="fixedSplitPreview" class="split-payment-preview">OTT·구독 등 공동 부담이면 N빵을 켜면 됩니다. 결제 금액은 카드 실적, 내 부담액은 생활비에 반영됩니다.</div>
             </div>
             <div class="fixed-add-sub">
               <select id="fixedMethod" aria-label="고정지출 결제 수단">
@@ -2058,7 +2089,7 @@ input,select,textarea,
               </select>
             </div>
             <button onclick="addFixedItem()">+ 고정지출 추가</button>
-            <div class="fixed-add-hint">카드를 연결하면 이번 달 카드 실적에 자동으로 포함됩니다.</div>
+            <div class="fixed-add-hint">카드에 청구된 전체 금액은 카드 실적에, N빵을 켜면 내 실제 부담액만 생활비 예산에 반영됩니다. 식비·기차·OTT·구독 등에도 동일하게 적용됩니다.</div>
           </div>
           <div id="fixedList" style="margin-top:10px;"></div>
         </div>
@@ -2109,21 +2140,53 @@ input,select,textarea,
     function loadState() {
       let saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        try { 
+        try {
           const parsed = JSON.parse(saved);
           if (!parsed.monthlyFixedItems) parsed.monthlyFixedItems = {};
+
+          // 기존 데이터도 "카드에 찍힌 금액"과 "내 실제 부담액"을 구분할 수 있도록 보정합니다.
+          if (Array.isArray(parsed.expenses)) {
+            parsed.expenses = parsed.expenses.map(e => {
+              const cardAmount = Number(e.cardAmount ?? e.amount ?? e.actualAmount ?? 0) || 0;
+              const splitCount = Math.max(1, Number(e.splitCount) || 1);
+              const actualAmount = Number(e.actualAmount ?? (splitCount > 1 ? Math.round(cardAmount / splitCount) : cardAmount)) || 0;
+              return { ...e, cardAmount, actualAmount, splitCount, split: splitCount > 1 || e.split === true };
+            });
+          }
+
+          Object.keys(parsed.monthlyFixedItems).forEach(key => {
+            parsed.monthlyFixedItems[key] = Array.isArray(parsed.monthlyFixedItems[key])
+              ? parsed.monthlyFixedItems[key].map(item => {
+                  const cardAmount = Number(item.cardAmount ?? item.amount ?? item.actualAmount ?? 0) || 0;
+                  const splitCount = Math.max(1, Number(item.splitCount) || 1);
+                  const actualAmount = Number(item.actualAmount ?? (splitCount > 1 ? Math.round(cardAmount / splitCount) : cardAmount)) || 0;
+                  return { ...item, amount: cardAmount, cardAmount, actualAmount, splitCount, split: splitCount > 1 || item.split === true };
+                })
+              : [];
+          });
+
           // 기존 버전의 전역 고정지출 데이터는 현재 월 데이터로 1회 이전합니다.
-          if (Array.isArray(parsed.fixedItems) && parsed.fixedItems.length > 0 && Object.keys(parsed.monthlyFixedItems).length === 0) {
+          if (Array.isArray(parsed.fixedItems)) {
+            parsed.fixedItems = parsed.fixedItems.map(item => {
+              const cardAmount = Number(item.cardAmount ?? item.amount ?? item.actualAmount ?? 0) || 0;
+              const splitCount = Math.max(1, Number(item.splitCount) || 1);
+              const actualAmount = Number(item.actualAmount ?? (splitCount > 1 ? Math.round(cardAmount / splitCount) : cardAmount)) || 0;
+              return { ...item, amount: cardAmount, cardAmount, actualAmount, splitCount, split: splitCount > 1 || item.split === true };
+            });
+          } else {
+            parsed.fixedItems = [];
+          }
+          if (parsed.fixedItems.length > 0 && Object.keys(parsed.monthlyFixedItems).length === 0) {
             parsed.monthlyFixedItems[`${systemToday.getFullYear()}-${String(systemToday.getMonth()+1).padStart(2,'0')}`] = parsed.fixedItems;
           }
           if (!parsed.fixedItems) parsed.fixedItems = [];
           if (!parsed.schedules) parsed.schedules = [];
-          if (!parsed.todos) parsed.todos = []; 
+          if (!parsed.todos) parsed.todos = [];
           if (!parsed.recentColors) parsed.recentColors = [];
           return parsed;
         } catch(e) {}
       }
-      return { monthlyBudgets: {}, expenses: [], fixedItems: [], schedules: [], todos: [], recentColors: [] };
+      return { monthlyBudgets: {}, expenses: [], fixedItems: [], monthlyFixedItems: {}, schedules: [], todos: [], recentColors: [] };
     }
 
     let state = loadState();
@@ -2282,17 +2345,45 @@ input,select,textarea,
       }).join('');
     }
 
+    function getSplitCount(id) {
+      const el = document.getElementById(id);
+      const n = Math.floor(Number(el?.value) || 1);
+      return Math.max(1, n);
+    }
+
+    function updateExpenseSplitPreview() {
+      const amount = Number(document.getElementById('expAmount')?.value) || 0;
+      const enabled = !!document.getElementById('expSplitToggle')?.checked;
+      const count = getSplitCount('expSplitCount');
+      const preview = document.getElementById('expSplitPreview');
+      if (!preview) return;
+      preview.innerHTML = enabled && amount > 0
+        ? `카드 실적에는 <strong>${amount.toLocaleString()}원</strong>이 잡히고, 생활비에는 내 부담액 <strong>${Math.round(amount / count).toLocaleString()}원</strong>만 반영됩니다.`
+        : '공동결제가 아니면 결제 금액과 내 실제 지출액이 같습니다.';
+    }
+
+    function toggleExpenseSplitFields() {
+      const enabled = !!document.getElementById('expSplitToggle')?.checked;
+      const fields = document.getElementById('expSplitFields');
+      if (fields) fields.classList.toggle('open', enabled);
+      updateExpenseSplitPreview();
+    }
+
     function saveExpense() {
       const date = document.getElementById('expDate').value;
       const title = document.getElementById('expTitle').value.trim();
       const amount = Number(document.getElementById('expAmount').value);
       const category = document.getElementById('expCategory').value;
       const method = document.getElementById('expMethod').value;
+      const split = !!document.getElementById('expSplitToggle')?.checked;
+      const splitCount = split ? getSplitCount('expSplitCount') : 1;
+      const actualAmount = split ? Math.round(amount / splitCount) : amount;
       if (!date || !amount) return alert('결제 금액을 올바르게 입력해주세요.');
-      state.expenses.push({ id: Date.now(), date, title, cardAmount: amount, actualAmount: amount, category, method });
+      state.expenses.push({ id: Date.now(), date, title, cardAmount: amount, actualAmount, category, method, split, splitCount });
       save();
       document.getElementById('expTitle').value = ''; document.getElementById('expAmount').value = '';
     }
+
     function deleteExpense(id) { if (confirm('해당 내역을 삭제하시겠습니까?')) { state.expenses = state.expenses.filter(e => e.id !== id); save(); } }
     
     function setSchColor(color) {
@@ -2322,14 +2413,25 @@ input,select,textarea,
     
     function getFixedItemsForMonth(monthKey = getMonthKey()) {
       if (!state.monthlyFixedItems) state.monthlyFixedItems = {};
-      return Array.isArray(state.monthlyFixedItems[monthKey]) ? state.monthlyFixedItems[monthKey] : [];
+      const items = Array.isArray(state.monthlyFixedItems[monthKey]) ? state.monthlyFixedItems[monthKey] : [];
+      const normalized = items.map(normalizeFixedItem);
+      state.monthlyFixedItems[monthKey] = normalized;
+      return normalized;
+    }
+
+    function normalizeFixedItem(item) {
+      const cardAmount = Number(item.cardAmount ?? item.amount ?? item.actualAmount ?? 0) || 0;
+      const splitCount = Math.max(1, Number(item.splitCount) || 1);
+      const actualAmount = Number(item.actualAmount ?? (splitCount > 1 ? Math.round(cardAmount / splitCount) : cardAmount)) || 0;
+      return { ...item, amount: cardAmount, cardAmount, actualAmount, splitCount, split: splitCount > 1 || item.split === true };
     }
 
     function setFixedItemsForMonth(monthKey, items) {
       if (!state.monthlyFixedItems) state.monthlyFixedItems = {};
-      state.monthlyFixedItems[monthKey] = items;
+      const normalized = Array.isArray(items) ? items.map(normalizeFixedItem) : [];
+      state.monthlyFixedItems[monthKey] = normalized;
       // 하위 호환: 기존 코드가 참조하는 fixedItems에도 현재 화면의 월 데이터를 반영
-      state.fixedItems = items;
+      state.fixedItems = normalized;
     }
 
     function getPreviousMonthKey(monthKey = getMonthKey()) {
@@ -2349,27 +2451,48 @@ input,select,textarea,
       }
       const currentItems = getFixedItemsForMonth(currentKey);
       if (currentItems.length && !confirm('현재 월의 고정지출이 있습니다. 전월 항목으로 교체할까요?')) return;
-      const copied = prevItems.map(item => ({ id: Date.now() + Math.random(), name: item.name, amount: Number(item.amount) || 0, method: item.method || '', day: item.day || '' }));
+      const copied = prevItems.map(item => ({ ...normalizeFixedItem(item), id: Date.now() + Math.random() }));
       setFixedItemsForMonth(currentKey, copied);
       save();
     }
+
+    function updateFixedSplitPreview() {
+      const amount = Number(document.getElementById('fixedAmount')?.value) || 0;
+      const enabled = !!document.getElementById('fixedSplitToggle')?.checked;
+      const count = getSplitCount('fixedSplitCount');
+      const preview = document.getElementById('fixedSplitPreview');
+      const fields = document.getElementById('fixedSplitFields');
+      if (fields) fields.classList.toggle('open', enabled);
+      if (!preview) return;
+      preview.innerHTML = enabled && amount > 0
+        ? `카드 실적에는 <strong>${amount.toLocaleString()}원</strong>, 생활비에는 내 부담액 <strong>${Math.round(amount / count).toLocaleString()}원</strong>만 반영됩니다.`
+        : 'OTT·구독 등 공동 부담이면 N빵을 켜면 됩니다. 결제 금액은 카드 실적, 내 부담액은 생활비에 반영됩니다.';
+    }
+
+    function toggleFixedSplitFields() { updateFixedSplitPreview(); }
 
     function addFixedItem() {
       const name = document.getElementById('fixedName').value.trim();
       const amount = Number(document.getElementById('fixedAmount').value);
       const method = document.getElementById('fixedMethod').value || '';
       const day = document.getElementById('fixedDay').value || '';
+      const split = !!document.getElementById('fixedSplitToggle')?.checked;
+      const splitCount = split ? getSplitCount('fixedSplitCount') : 1;
+      const actualAmount = split ? Math.round(amount / splitCount) : amount;
       if (!name || !amount) return;
       const monthKey = getMonthKey();
       const items = getFixedItemsForMonth(monthKey);
-      items.push({ id: Date.now(), name, amount, method, day });
+      items.push({ id: Date.now(), name, amount, cardAmount: amount, actualAmount, method, day, split, splitCount });
       setFixedItemsForMonth(monthKey, items);
       document.getElementById('fixedName').value = '';
       document.getElementById('fixedAmount').value = '';
       document.getElementById('fixedMethod').value = '';
       document.getElementById('fixedDay').value = '';
+      if (document.getElementById('fixedSplitToggle')) document.getElementById('fixedSplitToggle').checked = false;
+      updateFixedSplitPreview();
       save();
     }
+
     function deleteFixedItem(id) {
       const monthKey = getMonthKey();
       const items = getFixedItemsForMonth(monthKey).filter(i => i.id !== id);
@@ -2412,7 +2535,21 @@ input,select,textarea,
         body.innerHTML = `
           <label>날짜</label><input type="date" id="expDate" value="${selectedDate}">
           <label>내역</label><input type="text" id="expTitle" placeholder="예: 카카오T, 점심">
-          <label>결제 금액</label><input type="number" id="expAmount" placeholder="원">
+          <label>결제 금액 <span style="font-size:.65rem;color:#8991a2;font-weight:650;">(카드에 실제 청구된 금액)</span></label>
+          <input type="number" id="expAmount" placeholder="원" oninput="updateExpenseSplitPreview()">
+          <div class="split-payment-box">
+            <label class="split-payment-toggle">
+              <input type="checkbox" id="expSplitToggle" onchange="toggleExpenseSplitFields()">
+              친구들과 공동결제 / N빵
+            </label>
+            <div id="expSplitFields" class="split-payment-fields">
+              <div class="split-payment-row">
+                <span style="font-size:.69rem;color:#7b8495;font-weight:700;">총 인원</span>
+                <input type="number" id="expSplitCount" min="2" step="1" value="2" oninput="updateExpenseSplitPreview()" placeholder="예: 3">
+              </div>
+            </div>
+            <div id="expSplitPreview" class="split-payment-preview">공동결제가 아니면 결제 금액과 내 실제 지출액이 같습니다.</div>
+          </div>
           <label>카테고리</label>
           <select id="expCategory">
             <option>식비(식재료)</option><option>식비(외식/배달)</option><option>교통(대중교통)</option><option>교통(택시)</option><option>주거(월세/관리비)</option><option>통신(휴대폰/인터넷)</option><option>의료/건강</option><option>교육/자기계발</option><option>의류/패션</option><option>문화여가</option><option>술유흥</option><option>생활</option><option>카페간식</option><option>보험비</option><option>뷰티미용</option><option>경조선물</option><option>여행숙박</option>
@@ -2484,7 +2621,7 @@ input,select,textarea,
       const monthFixedItems = getFixedItemsForMonth(monthKey);
       // 기존 버전 호환용 현재월 참조
       state.fixedItems = monthFixedItems;
-      const fixedTotal = monthFixedItems.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+      const fixedTotal = monthFixedItems.reduce((s, i) => s + (Number(i.actualAmount ?? i.amount) || 0), 0);
       const monthExpenses = state.expenses.filter(e => e.date && e.date.startsWith(monthKey));
       const totalSpent = monthExpenses.reduce((s, e) => s + (Number(e.actualAmount ?? e.cardAmount) || 0), 0);
       // 해녕 V2: 목표 예산은 고정지출까지 포함한 "한 달 전체 생활비 예산"입니다.
@@ -2504,11 +2641,11 @@ input,select,textarea,
         document.getElementById('pageSubTitle').innerText = `고정지출을 포함한 월 생활비 예산 기준으로 일일 권장 지출액을 계산합니다`;
         
         let cardTotals = {};
-        monthExpenses.forEach(e => { cardTotals[e.method] = (cardTotals[e.method] || 0) + (Number(e.actualAmount) || 0); });
+        monthExpenses.forEach(e => { cardTotals[e.method] = (cardTotals[e.method] || 0) + (Number(e.cardAmount ?? e.actualAmount) || 0); });
         // 카드가 연결된 월 고정지출도 해당 카드의 이번 달 이용금액/실적에 자동 포함합니다.
         monthFixedItems.forEach(item => {
           if (item.method && item.method !== '현금') {
-            cardTotals[item.method] = (cardTotals[item.method] || 0) + (Number(item.amount) || 0);
+            cardTotals[item.method] = (cardTotals[item.method] || 0) + (Number(item.cardAmount ?? item.amount) || 0);
           }
         });
         let totalCardSpent = Object.keys(cardTotals)
@@ -2699,17 +2836,20 @@ input,select,textarea,
               ${item.method ? `<span class="fixed-management-chip card-linked">💳 ${item.method}</span>` : ''}
               ${item.day ? `<span class="fixed-management-chip day-chip">📅 ${item.day}일</span>` : ''}
             </div>
-            <span class="fixed-amount">${Number(item.amount).toLocaleString()}원</span>
+            <div style="text-align:right; min-width:0;">
+              <span class="fixed-amount">${Number(item.actualAmount ?? item.amount).toLocaleString()}원</span>
+              ${Number(item.cardAmount ?? item.amount) !== Number(item.actualAmount ?? item.amount) ? `<span class="fixed-management-share">카드 ${Number(item.cardAmount ?? item.amount).toLocaleString()}원 · ${Number(item.splitCount || 1)}인 N빵</span>` : ''}
+            </div>
             <button class="action-btn btn-del fixed-delete" onclick="deleteFixedItem(${item.id})">삭제</button>
           </div>`).join('') || `<small style="color:var(--sub);">이 달에 등록된 고정지출이 없습니다.</small>`;
 
         let cardTotals = {};
-        monthExpenses.forEach(e => { cardTotals[e.method] = (cardTotals[e.method] || 0) + (Number(e.actualAmount) || 0); });
+        monthExpenses.forEach(e => { cardTotals[e.method] = (cardTotals[e.method] || 0) + (Number(e.cardAmount ?? e.actualAmount) || 0); });
 
         // 카드에 연결된 고정지출도 해당 카드의 이용금액과 실적에 포함합니다.
         monthFixedItems.forEach(item => {
           if (item.method) {
-            cardTotals[item.method] = (cardTotals[item.method] || 0) + (Number(item.amount) || 0);
+            cardTotals[item.method] = (cardTotals[item.method] || 0) + (Number(item.cardAmount ?? item.amount) || 0);
           }
         });
 
@@ -2753,8 +2893,8 @@ input,select,textarea,
 
         const catTotals = {};
         const prevCatTotals = {};
-        monthExpenses.forEach(e => { catTotals[e.category] = (catTotals[e.category] || 0) + e.actualAmount; });
-        prevMonthExpenses.forEach(e => { prevCatTotals[e.category] = (prevCatTotals[e.category] || 0) + e.actualAmount; });
+        monthExpenses.forEach(e => { catTotals[e.category] = (catTotals[e.category] || 0) + (Number(e.actualAmount ?? e.cardAmount) || 0); });
+        prevMonthExpenses.forEach(e => { prevCatTotals[e.category] = (prevCatTotals[e.category] || 0) + (Number(e.actualAmount ?? e.cardAmount) || 0); });
         
         const sortedCats = Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]);
         const catColors = ['#00c471', '#3182f6', '#ff9500', '#8b5cf6', '#ef4444', '#14b8a6', '#f43f5e'];
@@ -2791,12 +2931,17 @@ input,select,textarea,
 
         // 지출 상세 내역은 복잡도를 줄이기 위해 처음 5개만 노출하고,
         // 5개 초과분은 "더보기"를 눌러야 펼쳐지도록 구성합니다.
-        const sortedExp = [...monthExpenses].sort((a,b) => b.actualAmount - a.actualAmount);
-        const renderExpenseItem = (e, idx) => `
+        const sortedExp = [...monthExpenses].sort((a,b) => (Number(b.actualAmount ?? b.cardAmount) || 0) - (Number(a.actualAmount ?? a.cardAmount) || 0));
+        const renderExpenseItem = (e, idx) => {
+          const actual = Number(e.actualAmount ?? e.cardAmount ?? 0) || 0;
+          const card = Number(e.cardAmount ?? actual) || 0;
+          const splitText = card !== actual ? `<span class="expense-amount-meta">카드 ${card.toLocaleString()}원 · 내 부담 ${actual.toLocaleString()}원 · ${Number(e.splitCount || 1)}인 N빵</span>` : '';
+          return `
           <div class="list-item expense-detail-item">
             <div><strong style="color:var(--primary); margin-right:6px;">${idx + 1}</strong><strong>${e.title || '내역 없음'}</strong><div style="font-size:0.75rem; color:var(--sub);">${e.date} | ${e.category} | ${e.method}</div></div>
-            <div><strong style="margin-right:8px;">${e.actualAmount.toLocaleString()}원</strong><button class="action-btn btn-del" onclick="deleteExpense(${e.id})">삭제</button></div>
+            <div><strong style="margin-right:8px;">${actual.toLocaleString()}원</strong><button class="action-btn btn-del" onclick="deleteExpense(${e.id})">삭제</button>${splitText}</div>
           </div>`;
+        };
 
         const visibleExpenses = sortedExp.slice(0, 5);
         const hiddenExpenses = sortedExp.slice(5);
@@ -2831,8 +2976,9 @@ input,select,textarea,
                 <div class="fixed-expense-analysis-item">
                   <div class="fixed-analysis-top">
                     <span>${item.name}</span>
-                    <strong>${Number(item.amount).toLocaleString()}원</strong>
+                    <strong>${Number(item.actualAmount ?? item.amount).toLocaleString()}원</strong>
                   </div>
+                  ${Number(item.cardAmount ?? item.amount) !== Number(item.actualAmount ?? item.amount) ? `<span class="fixed-analysis-share">카드 ${Number(item.cardAmount ?? item.amount).toLocaleString()}원 · ${Number(item.splitCount || 1)}인 N빵</span>` : ''}
                   ${(item.method || item.day) ? `
                     <div class="fixed-analysis-meta">
                       ${item.method ? `<span class="fixed-analysis-item-method">💳 ${item.method}</span>` : ''}
