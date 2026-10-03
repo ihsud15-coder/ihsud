@@ -345,6 +345,95 @@ button:disabled{cursor:not-allowed;opacity:.55}
 @media(max-width:600px){.fixed-items,.loan-analysis-list{grid-template-columns:1fr}.fixed-head{min-height:50px}.fixed-analysis-item{align-items:flex-start}.fixed-analysis-amount{padding-top:1px}}
 </style>
 
+
+<style id="fixed-analysis-balance-fix">
+.fixed-items{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:7px!important;
+}
+.fixed-analysis-item{
+  min-width:0!important;
+  min-height:64px!important;
+  padding:9px 10px!important;
+  display:grid!important;
+  grid-template-rows:auto minmax(18px,auto)!important;
+  align-content:center!important;
+  gap:6px!important;
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+.fixed-analysis-top{
+  min-width:0;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:7px;
+}
+.fixed-analysis-top>strong{
+  min-width:0;
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:.72rem!important;
+  line-height:1.2!important;
+  color:#596174!important;
+}
+.fixed-analysis-meta{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  flex-wrap:nowrap;
+  overflow:hidden;
+  min-height:18px;
+}
+.fixed-analysis-meta>*{flex:0 1 auto;min-width:0;max-width:100%;}
+.fixed-analysis-badge{
+  flex:0 0 auto!important;
+  font-size:.56rem!important;
+  line-height:1!important;
+  padding:3px 5px!important;
+  white-space:nowrap!important;
+}
+.analysis-fixed-payment{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  max-width:100%!important;
+  margin:0!important;
+  font-size:.56rem!important;
+  line-height:1!important;
+  padding:3px 5px!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+}
+.analysis-fixed-payment-name{
+  min-width:0!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.analysis-fixed-payment-type,.analysis-fixed-payment-performance{
+  flex:0 0 auto!important;
+  font-size:.48rem!important;
+  padding:2px 4px!important;
+}
+.fixed-analysis-amount{
+  flex:0 0 auto!important;
+  font-size:.72rem!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+  color:#bf5b68!important;
+}
+.fixed-analysis-amount small{font-size:.52rem!important;color:#a0a6b1!important}
+@media(max-width:600px){
+  .fixed-items{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .fixed-analysis-item{min-height:62px!important}
+}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -434,7 +523,7 @@ button:disabled{cursor:not-allowed;opacity:.55}
             </div>
             <div class="fixed-split-row">
               <label class="split-line"><input type="checkbox" id="fixedSplitToggle" onchange="toggleFixedSplitFields()"> 공동결제 / N빵</label>
-              <div class="fixed-split-help">OTT등</div>
+              <div class="fixed-split-help">OTT처럼 친구·가족과 나눠 내는 고정비에 사용</div>
             </div>
             <div class="fixed-split-fields" id="fixedSplitFields">
               <div class="field"><label>총 인원</label><input id="fixedSplitCount" type="number" min="2" step="1" value="2" oninput="updateFixedSplitPreview()"></div>
@@ -710,7 +799,7 @@ function renderDetails(){
   const analysis=keys.length?`<div class="analysis-card">${keys.map((cat,i)=>{const amt=cats[cat],pct=total?Math.round(amt/total*100):0,diff=amt-(prevCats[cat]||0);return `<div class="analysis-row"><div class="analysis-top"><span class="analysis-name">${categoryEmoji(cat)} ${escapeHtml(cat)}</span><span class="analysis-value">${amt.toLocaleString()}원 <span class="analysis-diff ${diff>0?'up':diff<0?'down':''}">${diff>0?'▲ '+diff.toLocaleString():diff<0?'▼ '+Math.abs(diff).toLocaleString():'-'}</span></span></div><div class="analysis-bar"><div class="analysis-fill" style="width:${pct}%;background:${CAT_COLORS[i%CAT_COLORS.length]} !important"></div></div></div>`}).join('')}</div>`:'<div class="section-note analysis-empty">이번 달에 등록된 변동 지출이 없습니다.</div>';
   const fixed=getMonthFixed();
   const fixedTotal=fixedTotalAmount(fixed);
-  const fixedHtml=`<div class="fixed-summary open" id="fixedSummary"><div class="fixed-head" onclick="document.getElementById('fixedSummary').classList.toggle('open')"><div><strong>📌 이번 달 고정지출</strong><small>${fixed.length?'월별 고정비를 따로 관리합니다.':'등록된 고정지출이 없습니다.'}</small></div><strong>${fixedTotal.toLocaleString()}원 <span class="fixed-summary-chevron">⌄</span></strong></div><div class="fixed-items">${fixed.length?fixed.map(x=>{const t=Number(x.amount)||0,a=fixedActualAmount(x),m=fixedPaymentMethod(x),payment=m?`<span class="analysis-fixed-payment ${m.type==='credit'?'credit':'debit'}" title="${escapeHtml(paymentLabel(m))}"><span class="analysis-fixed-payment-icon">${m.type==='credit'?'💳':'🏦'}</span><span class="analysis-fixed-payment-name">${escapeHtml(compactPaymentName(m))}</span><span class="analysis-fixed-payment-type">${m.type==='credit'?'신용':'통장'}</span>${m.type==='credit'?'<span class="analysis-fixed-payment-performance">실적</span>':''}</span>`:'';return `<div class="fixed-analysis-item"><div class="fixed-analysis-main"><strong>${escapeHtml(x.name)}</strong>${x.isSplit?`<span class="fixed-analysis-badge">N빵 ${x.splitCount||2}인</span>`:''}${payment}</div><div class="fixed-analysis-amount">${a.toLocaleString()}원${x.isSplit?` <small>/ ${t.toLocaleString()}원</small>`:''}</div></div>`}).join(''):'<div class="fixed-analysis-empty">고정지출 관리에서 이번 달 항목을 추가할 수 있습니다.</div>'}</div></div>`;
+  const fixedHtml=`<div class="fixed-summary open" id="fixedSummary"><div class="fixed-head" onclick="document.getElementById('fixedSummary').classList.toggle('open')"><div><strong>📌 이번 달 고정지출</strong><small>${fixed.length?'월별 고정비를 따로 관리합니다.':'등록된 고정지출이 없습니다.'}</small></div><strong>${fixedTotal.toLocaleString()}원 <span class="fixed-summary-chevron">⌄</span></strong></div><div class="fixed-items">${fixed.length?fixed.map(x=>{const t=Number(x.amount)||0,a=fixedActualAmount(x),m=fixedPaymentMethod(x),payment=m?`<span class="analysis-fixed-payment ${m.type==='credit'?'credit':'debit'}" title="${escapeHtml(paymentLabel(m))}"><span class="analysis-fixed-payment-icon">${m.type==='credit'?'💳':'🏦'}</span><span class="analysis-fixed-payment-name">${escapeHtml(compactPaymentName(m))}</span><span class="analysis-fixed-payment-type">${m.type==='credit'?'신용':'통장'}</span>${m.type==='credit'?'<span class="analysis-fixed-payment-performance">실적</span>':''}</span>`:'';return `<div class="fixed-analysis-item"><div class="fixed-analysis-top"><strong>${escapeHtml(x.name)}</strong><div class="fixed-analysis-amount">${a.toLocaleString()}원${x.isSplit?` <small>/ ${t.toLocaleString()}원</small>`:''}</div></div><div class="fixed-analysis-meta">${x.isSplit?`<span class="fixed-analysis-badge">N빵 ${x.splitCount||2}인</span>`:''}${payment}</div></div>`}).join(''):'<div class="fixed-analysis-empty">고정지출 관리에서 이번 달 항목을 추가할 수 있습니다.</div>'}</div></div>`;
   const loans=(!window.__GENERAL_VERSION__&&Array.isArray(state.loans))?state.loans:[];
   const loanInterestTotal=loans.reduce((sum,l)=>sum+loanInterest(l),0);
   const loanHtml=(!window.__GENERAL_VERSION__&&loans.length)?`<div class="loan-analysis-summary"><div class="loan-analysis-head"><strong>🏦 이번 달 대출 이자</strong><strong>${loanInterestTotal.toLocaleString()}원</strong></div><div class="loan-analysis-list">${loans.map(l=>`<div class="loan-analysis-row"><span>${escapeHtml(l.name)}</span><strong>${loanInterest(l).toLocaleString()}원</strong></div>`).join('')}</div></div>`:'';
