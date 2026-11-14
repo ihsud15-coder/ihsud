@@ -317,6 +317,24 @@
   .part-check-card.open .part-card-header{background:#f5f7ff}
   .part-check-card.open .toggle-btn-badge{background:#e8edff;color:#4f61c5}
 
+  .check-card-guide{
+    margin:0 0 14px;
+    color:#7b8493;
+    font-size:11.5px;
+    line-height:1.6;
+  }
+  .check-section-title{
+    margin:14px 0 10px;
+    padding-left:9px;
+    border-left:3px solid var(--blue);
+    color:#354052;
+    font-size:12px;
+    font-weight:850;
+  }
+  .webtoon-check-grid{margin-bottom:8px;gap:10px 16px}
+  .webtoon-survey-field{margin-top:14px}
+  .webtoon-survey-field label{display:block;margin-bottom:6px;color:#263143;font-size:12px;font-weight:800}
+
   .ani-warning{
     display:inline-flex;
     align-items:center;
@@ -810,7 +828,7 @@
       <label class="check-item"><input type="checkbox"><span><b>5. 작품 수위</b> 대학 제출용 작품인 만큼 과도한 폭력·선정성이나 민감한 소재는 피하고, <b>15세 관람가 수준</b>을 기준으로 작업합니다.</span></label>
       <label class="check-item"><input type="checkbox"><span><b>6. 파일 백업</b> 작업 파일은 매 수업이 끝난 뒤 외장하드나 클라우드 등에 백업해 주세요. 과정 파일도 함께 남겨두는 것이 좋습니다. <b>백업하지 않아 발생한 파일 손실은 학원에서 복구를 보장하지 않습니다.</b></span></label>
       <label class="check-item"><input type="checkbox"><span><b>7. 외부 자료와 AI 사용</b> 외부 이미지·3D 소재·브러시·AI 생성물 등을 사용할 경우 사용 범위와 출처를 확인해야 합니다. 포트폴리오의 핵심 제작 과정은 본인이 직접 진행하고, 대학 제출 규정에 맞지 않는 자료는 사용하지 않습니다.</span></label>
-      <label class="check-item"><input type="checkbox"><span><b>8. 모집요강 확인</b> 대학별 모집요강과 제출 규격은 지원자가 최종적으로 확인해야 하며, 확인하지 않아 발생한 불이익은 본인이 책임집니다.</span></label>
+      <label class="check-item"><input type="checkbox"><span><b>8. 모집요강 확인</b> 대학별 모집요강과 포트폴리오 제출 규격은 지원자가 최종적으로 확인해야 합니다. 전형 내용이나 제출 조건이 변경될 수 있으므로 지원 전 최신 내용을 다시 확인해 주세요.</span></label>
     </div>
 
     <div class="section-title">1. 지금의 나와 입시 목표 확인 <span>현재 상황과 목표를 함께 확인합니다</span></div>
@@ -872,15 +890,37 @@
     <!-- 1. 웹툰/출판만화 사전 질문 -->
     <div id="check-card-webtoon" class="part-check-card open">
       <div class="part-card-header" onclick="toggleCard('check-card-webtoon')">
-        <h4>📚 웹툰·출판만화 — 읽어본 작품과 연출 경험</h4>
+        <h4>📚 웹툰·출판만화 — 감상·연출·제작 경험</h4>
         <span class="toggle-btn-badge">▲ 접기</span>
       </div>
       <div class="part-card-body">
-        <div class="grid-2" style="margin-bottom:8px;">
+        <p class="check-card-guide">현재 경험을 확인하기 위한 질문입니다. 직접 해본 적이 없는 항목은 체크하지 않아도 됩니다.</p>
+
+        <div class="check-section-title">① 작품 감상과 연출 이해</div>
+        <div class="grid-2 webtoon-check-grid">
           <label class="check-item" style="color:#1e293b;"><input type="checkbox"><span>평소 단행본 만화나 스크롤 웹툰을 자주 찾아보나요?</span></label>
-          <label class="check-item" style="color:#1e293b;"><input type="checkbox"><span>컷 나누기, 시선 흐름, 카메라 구도처럼 만화 연출을 따로 살펴본 적이 있나요?</span></label>
+          <label class="check-item" style="color:#1e293b;"><input type="checkbox"><span>작품을 볼 때 컷 배치, 시선 흐름, 카메라 구도 등을 살펴본 적이 있나요?</span></label>
+          <label class="check-item" style="color:#1e293b;"><input type="checkbox"><span>컷의 크기와 간격, 여백으로 장면의 속도나 분위기를 조절하는 방법을 생각해 본 적이 있나요?</span></label>
+          <label class="check-item" style="color:#1e293b;"><input type="checkbox"><span>말풍선과 대사 위치가 독자의 시선 흐름에 영향을 준다는 점을 알고 있나요?</span></label>
         </div>
-        <input type="text" placeholder="본인이 가장 재미있게 본 웹툰/출판만화 3개와, 그 작품의 연출이 왜 좋았는지 짧게 적어보세요.">
+
+        <div class="check-section-title">② 직접 만화를 제작해 본 경험</div>
+        <div class="grid-2 webtoon-check-grid">
+          <label class="check-item" style="color:#1e293b;"><input type="checkbox"><span>4컷 만화, 칸만화 또는 짧은 만화를 직접 그려본 적이 있나요?</span></label>
+          <label class="check-item" style="color:#1e293b;"><input type="checkbox"><span>콘티를 작성하거나 하나의 장면을 여러 컷으로 나누어 구성해 본 적이 있나요?</span></label>
+          <label class="check-item" style="color:#1e293b;"><input type="checkbox"><span>여러 컷에 걸쳐 캐릭터의 표정과 동작, 장면의 흐름을 이어서 표현해 본 적이 있나요?</span></label>
+          <label class="check-item" style="color:#1e293b;"><input type="checkbox"><span>짧은 분량이라도 처음부터 결말까지 만화를 완성해 본 적이 있나요?</span></label>
+          <label class="check-item" style="color:#1e293b;"><input type="checkbox"><span>클립 스튜디오(Clip Studio Paint)로 컷을 나누고 만화 원고를 제작해 본 적이 있나요?</span></label>
+        </div>
+
+        <div class="form-group webtoon-survey-field">
+          <label>좋아하는 작품과 인상 깊었던 연출</label>
+          <textarea rows="3" placeholder="가장 재미있게 본 웹툰·출판만화 3개와 인상 깊었던 장면이나 연출을 적어주세요."></textarea>
+        </div>
+        <div class="form-group webtoon-survey-field">
+          <label>클립 스튜디오 사용 경험 <span class="sub-desc">(사용 경험이 있다면 작성)</span></label>
+          <textarea rows="2" placeholder="사용해 본 기능을 적어주세요. 예: 컷 테두리, 말풍선, 문자 입력, 3D 소재, 원고 설정 등 / 사용 경험이 없다면 '없음'이라고 적어도 됩니다."></textarea>
+        </div>
       </div>
     </div>
 
@@ -908,7 +948,7 @@
           <h4>🎬 애니메이션 — 쉽게 선택하면 안 되는 분야</h4>
           <p class="ani-entry-subtitle">작화뿐 아니라 연출·영상 편집·파일 관리까지 끝까지 책임지고 완성해야 합니다.</p>
         </div>
-        <span class="toggle-btn-badge ani-badge">▼ 더보기</span>
+        <span class="toggle-btn-badge ani-badge">▼ 확인하기</span>
       </div>
       <div class="part-card-body">
         <div class="ani-gate-note">
